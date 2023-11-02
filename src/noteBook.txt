@@ -1,0 +1,468 @@
+# Mounting Google Drive to access files within the notebook:
+from google.colab import drive
+drive.mount('/content/drive')
+
+
+# Moving inside 'Thesis Project' directory:
+# In Google Colab (and Jupyter notebooks in general), you can run shell commands directly within notebook cells by prefixing the command with either ! or %.
+%cd '/content/drive/My Drive/Thesis Project/'
+
+
+
+# Installing 'wfdb' library to read the WFDB formatted data:
+!pip install wfdb
+
+
+
+
+# Importing necessary libraries:
+import os
+import numpy as np # Library to work with arrays
+from scipy.signal import butter, filtfilt # For filtering
+import matplotlib.pyplot as plt
+import wfdb # Library to read the WFDB formatted data
+import logging
+from scipy.signal import resample
+
+
+# Set up logging:
+# if you're processing many records in batch mode, it might be beneficial to log these errors to a file for easier post-processing. 
+# Consider using Python's built-in logging module for this purpose.
+logging.basicConfig(filename='preprocessing_errors.log', level=logging.ERROR,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Function to pre-process and clean an ECG signal, and then save it.
+def preprocess_record(record_name, dataset_path='.', save_dataset_path='.'):
+    
+    """
+    Preprocess and clean an ECG signal and save it to a file.
+
+    Args:
+    - record_name (str): Name of the record to be processed.
+    - dataset_path (str, optional): Path to the directory containing the dataset. Defaults to current directory.
+    - save_dataset_path (str, optional): Path to save the preprocessed data. Defaults to current directory.
+
+    Returns:
+    None
+    """
+
+    # Check if the preprocessed file already exists:
+    preprocessed_filename = os.path.join(save_dataset_path, 'Pre-processed Data (360 Hz)', f"{record_name}_preprocessed_360hz.dat")
+    if os.path.exists(preprocessed_filename):
+        print(f"Record {record_name} has already been preprocessed. Skipping...")
+        return
+    
+    try:
+        # Check if the record exists
+        if not os.path.exists(os.path.join(dataset_path, f"{record_name}.dat")):
+            raise FileNotFoundError(f"Record {record_name} not found in {dataset_path}")
+
+        # Load the record / read the data:
+        record = wfdb.rdrecord(os.path.join(dataset_path, record_name))
+        original_signal = record.p_signal # The `p_signal` attribute of the record object holds the physical signal (i.e. the ECG signal) of the record.
+        
+        # 1) Baseline Wander Removal:
+        # Baseline wander is a low-frequency noise introduced in the ECG signal. 
+        # Common sources include respiration or movement artifacts.
+        # You can use a high-pass Butterworth filter to remove baseline wander and DC components.
+        # Note: if the ECG data has significant baseline wander with frequency content around 1 Hz, 
+        # a lowcut of 0.5 Hz might be preferable as it will be less aggressive in attenuating those frequencies.
+        # On the other hand, if you want a sharper attenuation of the low-frequency components, a lowcut of 1 Hz might be better.
+
+        # Padding is a technique used to avoid edge effects when filtering a signal. 
+        # Edge effects occur when the filter is applied to the signal near the beginning or end of the signal, 
+        # where there are not enough samples to apply the filter properly.
+        # The length of the input vector must be greater than `padlen` to avoid a `ValueError` exception. 
+        # Padding involves adding extra samples to the beginning and end of the signal to ensure that the filter is applied correctly.
+
+        # This function applies the high-pass filter to the signal after padding it at the beginning and end:
+        # By extending the signal at both the beginning and the end, the filter can be applied more uniformly, and the edge effects are pushed into the padded regions. 
+        # After filtering, the padded regions are then removed, leaving a signal that has been more evenly filtered throughout its length.
+        def highpass_filter_with_padding(signal, lowcut=1, fs=360, order=1, pad_length=100):
+            # Create an empty array to store the filtered signals for each lead
+            filtered_signals = np.zeros_like(signal)
+            
+            # Loop through each lead (column)
+            for i in range(signal.shape[1]):
+                lead_signal = signal[:, i]
+                
+                # Pad the signal for the current lead
+                padded_signal = np.pad(lead_signal, (pad_length, pad_length), 'edge')
+                
+                # High-pass filter the padded signal for the current lead
+                nyquist = 0.5 * fs
+                low = lowcut / nyquist
+                b, a = butter(order, low, btype='high')
+                filtered_padded_signal = filtfilt(b, a, padded_signal)
+                
+                # Remove the padding and store the filtered signal for the current lead
+                filtered_signals[:, i] = filtered_padded_signal[pad_length:-pad_length]
+            
+            return filtered_signals
+
+        # Note:
+        # In summary, the issue seems to originate during the high-pass filtering stage for Lead 2. 
+        # The filter might be overly attenuating the signal, rendering it almost flat. 
+        # This could be due to the characteristics of Lead 2 in this specific dataset or the high-pass filter parameters.
+
+        # To address this, you can try the following:
+        # Investigate the frequency content of Lead 2 before filtering to ensure that the high-pass filter isn't overly aggressive.
+        # Experiment with different filter parameters or designs to retain more of Lead 2's original content.
+        # Consider the possibility that Lead 2 in this specific dataset might inherently have a low 
+
+
+
+        # 2) Noise Reduction:
+        # Apply a band-reject Butterworth filter to the signal to reduce the 60 Hz AC interference.
+        # The band-reject filter is also known as a notch filter.
+
+        # This function applies the band-reject filter to the signal after padding it at the beginning and end:
+        # By extending the signal at both the beginning and the end, the filter can be applied more uniformly, and the edge effects are pushed into the padded regions.
+        # After filtering, the padded regions are then removed, leaving a signal that has been more evenly filtered throughout its length.
+        def bandreject_filter_with_padding(signal, lowcut=59, highcut=61, fs=360, order=1, pad_length=100):
+            # Create an empty array to store the filtered signals for each lead
+            filtered_signals = np.zeros_like(signal)
+            
+            # Loop through each lead (column)
+            for i in range(signal.shape[1]):
+                lead_signal = signal[:, i]
+                
+                # Pad the signal for the current lead
+                padded_signal = np.pad(lead_signal, (pad_length, pad_length), 'edge')
+                
+                # Apply the band-reject filter to the padded signal for the current lead
+                nyquist = 0.5 * fs
+                low = lowcut / nyquist
+                high = highcut / nyquist
+                b, a = butter(order, [low, high], btype='bandstop')
+                filtered_padded_signal = filtfilt(b, a, padded_signal)
+                
+                # Remove the padding and store the filtered signal for the current lead
+                filtered_signals[:, i] = filtered_padded_signal[pad_length:-pad_length]
+            
+            return filtered_signals
+
+
+        # 3) High-frequency noise removal.
+        # Apply a low-pass Butterworth filter to high-frequency noise with cut-off frequency 25 Hz.
+
+        # Low-pass Butterworth filter (with cut-off frequency 25 Hz) after padding it at the beginning and end:
+        def lowpass_filter_with_padding(signal, highcut=25, fs=360, order=1, pad_length=100):
+            # Create an empty array to store the filtered signals for each lead
+            filtered_signals = np.zeros_like(signal)
+            
+            # Loop through each lead (column)
+            for i in range(signal.shape[1]):
+                lead_signal = signal[:, i]
+                
+                # Pad the signal for the current lead
+                padded_signal = np.pad(lead_signal, (pad_length, pad_length), 'edge')
+                
+                # Apply the low-pass filter to the padded signal for the current lead
+                nyquist = 0.5 * fs
+                high = highcut / nyquist
+                b, a = butter(order, high, btype='low')
+                filtered_padded_signal = filtfilt(b, a, padded_signal)
+                
+                # Remove the padding and store the filtered signal for the current lead
+                filtered_signals[:, i] = filtered_padded_signal[pad_length:-pad_length]
+            
+            return filtered_signals
+
+
+        # 4) Normalization:
+        # Normalization is a technique used to scale the ECG signal to a fixed range of values (typically between 0 and 1 or -1 and 1).
+        # This can be useful when comparing ECG signals from different patients or when training a machine learning model.
+
+        # The normalize function takes a signal as input and returns the normalized signal:
+        #   return (signal - np.min(signal)) / (np.max(signal) - np.min(signal))
+        def normalize(signal):
+            """
+            Normalize the signal to range [-1, 1] for each lead individually.
+            Given the single-lead focus, normalizing each lead individually makes more sense.
+            """
+            # Compute the minimum and maximum values for each lead
+            min_values = np.min(signal, axis=0)
+            max_values = np.max(signal, axis=0)
+            
+            # Compute the range (difference between max and min) for each lead
+            range_values = max_values - min_values
+            
+            # If the range is zero (i.e., constant signal), return the signal unchanged
+            # This prevents division by zero and retains the constant lead value
+            constant_lead_indices = np.where(range_values == 0)[0]
+            if len(constant_lead_indices) > 0:
+                logging.warning(f"Leads {constant_lead_indices} have constant values. They won't be normalized.")
+                range_values[range_values == 0] = 1.0  # Set to 1 to avoid division by zero, but the signal remains unchanged for these leads
+            
+            # Normalize the signal to [-1, 1]
+            normalized_signal = 2 * ((signal - min_values) / range_values) - 1
+            
+            return normalized_signal
+
+
+        # Cleaned ECG signal after high-pass filtering:
+        cleaned_signal = highpass_filter_with_padding(original_signal)
+        # Apply the band-reject filter to the cleaned signal:
+        denoised_signal = bandreject_filter_with_padding(cleaned_signal)
+        # Apply the low-pass filter to the denoised signal:
+        final_cleaned_signal = lowpass_filter_with_padding(denoised_signal)
+        # Apply normalization:
+        normalized_signal = normalize(final_cleaned_signal)  # The normalized signal for each lead is now between -1 and 1.
+
+        # Ensure the save directory exists
+        if not os.path.exists(save_dataset_path):
+            os.makedirs(save_dataset_path)
+
+        # Ensure the 'Pre-processed Data (360 Hz)' directory exists within the base directory
+        save_directory_path = os.path.join(save_dataset_path, 'Pre-processed Data (360 Hz)')
+
+        # This will check if the directory Pre-processed Data (360 Hz) exists. If it doesn't, it will create it. 
+        # After that, the code will proceed to save the .dat file inside that directory.
+        if not os.path.exists(save_directory_path):
+            os.makedirs(save_directory_path)
+        
+        # Save the preprocessed signal in the 'Pre-processed Data (360 Hz)' directory
+        output_filename = os.path.join(save_directory_path, f"{record_name}_preprocessed_360hz.dat")
+        np.savetxt(output_filename, normalized_signal, delimiter=',')  # Save or overwrite the existing record
+
+        print(f"Successfully preprocessed and saved {record_name} to {output_filename}.")
+    
+    except FileNotFoundError as fnf_error:
+            print(fnf_error)
+            logging.error(fnf_error)
+    except Exception as e:
+        print(f"Error processing record {record_name}. Error: {e}")
+
+def check_all_files_preprocessed():
+    # List of all .dat files in the MIT-BIH directory
+    original_files = [f for f in os.listdir('mit-bih-arrhythmia-database-1.0.0') if f.endswith('.dat')]
+    
+    # List of all preprocessed files in the 'Pre-processed Data (360 Hz)' directory
+    preprocessed_files = [f for f in os.listdir('./Pre-processed Data (360 Hz)') if f.endswith('_preprocessed_360hz.dat')]
+    
+    # Check if each original .dat file has a corresponding preprocessed file
+    missing_files = []
+    for orig_file in original_files:
+        expected_preprocessed_file = orig_file.split('.')[0] + '_preprocessed_360hz.dat'
+        if expected_preprocessed_file not in preprocessed_files:
+            missing_files.append(orig_file)
+    
+    # Display the results
+    if not missing_files:
+        print("\nAll .dat files have been successfully preprocessed and saved in the 'Pre-processed Data (360 Hz)' directory.\n")
+    else:
+        print("\nThe following files have not been preprocessed:")
+        for missing in missing_files:
+            print(missing)
+
+# Function to resample pre-processed data from 360 Hz to 256 Hz:
+def resample_preprocessed_data():
+    """
+    Resample preprocessed ECG data from 360 Hz to 256 Hz.
+    """
+    
+    source_directory = './Pre-processed Data (360 Hz)'
+    target_directory = './Pre-processed Data (256 Hz)'
+    
+    # Check the existence of the source directory
+    if not os.path.exists(source_directory):
+        print(f"Error: Source directory {source_directory} does not exist.")
+        return
+
+    # Create target directory if it doesn't exist
+    if not os.path.exists(target_directory):
+        os.makedirs(target_directory)
+    
+    # List all preprocessed files in the source directory
+    preprocessed_files = [f for f in os.listdir(source_directory) if f.endswith('_preprocessed_360hz.dat')]
+    
+    for file in preprocessed_files:
+        # Define the output filename
+        output_filename = file.replace('_preprocessed_360hz', '_preprocessed_256hz')
+        
+        # Check if the output file already exists in the target directory
+        if os.path.exists(os.path.join(target_directory, output_filename)):
+            print(f"{output_filename} already exists. Skipping resampling for {file}.")
+            continue
+        
+        # Load preprocessed data
+        data = np.loadtxt(os.path.join(source_directory, file), delimiter=',')
+        
+        # Calculate the number of samples for resampling the data.
+        num_samples_original = data.shape[0]
+        num_samples_resampled = int((256/360) * num_samples_original)
+        
+        # Resample the data to 256 Hz
+        resampled_data = resample(data, num_samples_resampled)
+        
+        # Save the resampled data to the target directory
+        np.savetxt(os.path.join(target_directory, output_filename), resampled_data, delimiter=',')
+        
+        print(f"Resampled and saved {file} to {output_filename}.")
+    
+
+# Function to plot an ECG segment with annotations:
+def plot_ecg_segment_with_annotations(record, start, end):
+    # Load preprocessed signal from the "Pre-processed Data (360 Hz)" directory
+    preprocessed_signal = np.loadtxt(f'./Pre-processed Data (360 Hz)/{record}_preprocessed_360hz.dat', delimiter=',')
+    
+    # Load annotations from the "mit-bih-arrhythmia-database-1.0.0" directory
+    annotations = wfdb.rdann(f'mit-bih-arrhythmia-database-1.0.0/{record}', 'atr')
+    
+    # Extract R-peak locations for the beats of interest
+    beat_labels = ['·', 'N', 'L', 'R', 'B', 'A', 'a', 'J', 'S', 'V', 'r', 'F', 'e', 'j', 'n', 'E', '/', 'f', 'Q']
+    r_peak_indices = [idx for idx, symbol in zip(annotations.sample, annotations.symbol) if symbol in beat_labels]
+    
+    # Calculate the average distance between consecutive R-peaks
+    average_r_distance = np.mean(np.diff(r_peak_indices))
+    window_size = int(average_r_distance * 0.2)
+    
+    q_peak_indices = []
+    s_peak_indices = []
+    
+    for r in r_peak_indices:
+        q_window_start = max(0, r - window_size)
+        s_window_end = min(len(preprocessed_signal), r + window_size)
+        
+        q_peak = np.argmin(preprocessed_signal[q_window_start:r, 0]) + q_window_start
+        q_peak_indices.append(q_peak)
+        
+        s_peak = np.argmin(preprocessed_signal[r:s_window_end, 0]) + r
+        s_peak_indices.append(s_peak)
+    
+    # Plotting
+    plt.figure(figsize=(15, 6))
+    plt.grid(True)
+    
+    # Correctly plot the ECG segment against the actual sample indices
+    x_values = np.arange(start, end)
+    plt.plot(x_values, preprocessed_signal[start:end, 0], label='Lead 1', linewidth=0.8)
+    
+    q_peak_plotted, r_peak_plotted, s_peak_plotted = False, False, False
+    for q, r, s in zip(q_peak_indices, r_peak_indices, s_peak_indices):
+        if start <= q <= end:
+            label = 'Q-peak' if not q_peak_plotted else ""
+            plt.plot(q, preprocessed_signal[q, 0], 'bs', markersize=5, label=label)
+            q_peak_plotted = True
+        if start <= r <= end:
+            label = 'R-peak' if not r_peak_plotted else ""
+            plt.plot(r, preprocessed_signal[r, 0], 'ro', markersize=5, label=label)
+            r_peak_plotted = True
+        if start <= s <= end:
+            label = 'S-peak' if not s_peak_plotted else ""
+            plt.plot(s, preprocessed_signal[s, 0], 'g^', markersize=5, label=label)
+            s_peak_plotted = True
+    
+    plt.title(f"Preprocessed ECG signal for record {record} - Lead 1 with QRS annotations")
+    plt.xlabel("Samples")
+    plt.ylabel("Amplitude")
+    plt.legend()
+    plt.show()
+
+# Plot a resampled ECG segment with adjusted annotations:
+def plot_resampled_ecg_segment_with_annotations(record, start, end):
+    # Since I am resampling the signal, the sample points of the annotations will also change.
+    # You can calculate the new sample points using a simple ratio based on the resampling rate:
+    # new_sample_point = original_sample_point × (new_sampling_rate / original_sampling_rate).
+
+    # Load resampled preprocessed signal from the "Pre-processed Data (256 Hz)" directory
+    resampled_signal = np.loadtxt(f'./Pre-processed Data (256 Hz)/{record}_preprocessed_256hz.dat', delimiter=',')
+    
+    # Load annotations from the original "mit-bih-arrhythmia-database-1.0.0" directory
+    annotations = wfdb.rdann(f'mit-bih-arrhythmia-database-1.0.0/{record}', 'atr')
+    
+    # Adjust annotations for the resampled data using linear transformation
+    resampling_ratio = 256 / 360
+    adjusted_sample_annotations = [int(x * resampling_ratio) for x in annotations.sample]
+    
+    # Extract R-peak locations for the beats of interest
+    beat_labels = ['·', 'N', 'L', 'R', 'B', 'A', 'a', 'J', 'S', 'V', 'r', 'F', 'e', 'j', 'n', 'E', '/', 'f', 'Q']
+    r_peak_indices = [idx for idx, symbol in zip(adjusted_sample_annotations, annotations.symbol) if symbol in beat_labels]
+    
+    # Re-identify R-peaks in the resampled signal
+    window_size = int(0.1 * 256)  # ~100 ms window around the estimated R-peak
+    r_peak_indices_resampled = []
+    for r in r_peak_indices:
+        search_start = max(0, r - window_size)
+        search_end = min(len(resampled_signal), r + window_size)
+        
+        # Find the maximum in this window and consider it as the R-peak
+        r_peak_resampled = np.argmax(resampled_signal[search_start:search_end, 0]) + search_start
+        r_peak_indices_resampled.append(r_peak_resampled)
+    
+    # Calculate the average distance between consecutive R-peaks for Q and S peaks identification
+    average_r_distance = np.mean(np.diff(r_peak_indices_resampled))
+    window_size = int(average_r_distance * 0.2)
+    
+    q_peak_indices = []
+    s_peak_indices = []
+    
+    for r in r_peak_indices_resampled:
+        q_window_start = max(0, r - window_size)
+        s_window_end = min(len(resampled_signal), r + window_size)
+        
+        q_peak = np.argmin(resampled_signal[q_window_start:r, 0]) + q_window_start
+        q_peak_indices.append(q_peak)
+        
+        s_peak = np.argmin(resampled_signal[r:s_window_end, 0]) + r
+        s_peak_indices.append(s_peak)
+    
+    # Plotting
+    plt.figure(figsize=(15, 6))
+    plt.grid(True)
+    
+    # Correctly plot the ECG segment against the actual sample indices
+    x_values = np.arange(start, end)
+    plt.plot(x_values, resampled_signal[start:end, 0], label='Lead 1', linewidth=0.8)
+    
+    q_peak_plotted, r_peak_plotted, s_peak_plotted = False, False, False
+    for q, r, s in zip(q_peak_indices, r_peak_indices_resampled, s_peak_indices):
+        if start <= q <= end:
+            label = 'Q-peak' if not q_peak_plotted else ""
+            plt.plot(q, resampled_signal[q, 0], 'bs', markersize=5, label=label)
+            q_peak_plotted = True
+        if start <= r <= end:
+            label = 'R-peak' if not r_peak_plotted else ""
+            plt.plot(r, resampled_signal[r, 0], 'ro', markersize=5, label=label)
+            r_peak_plotted = True
+        if start <= s <= end:
+            label = 'S-peak' if not s_peak_plotted else ""
+            plt.plot(s, resampled_signal[s, 0], 'g^', markersize=5, label=label)
+            s_peak_plotted = True
+    
+    plt.title(f"Preprocessed ECG signal for record {record} - Lead 1 with QRS annotations (Resampled at 256 Hz)")
+    plt.xlabel("Samples")
+    plt.ylabel("Amplitude")
+    plt.legend()
+    plt.show()
+            
+# Main Function:
+def main():
+    # Path to the dataset
+    dataset_path = '/content/drive/My Drive/Thesis Project/mit-bih-arrhythmia-database-1.0.0'  # MIT-BIH Arhhythmia Database directory.
+    save_dataset_path = '.'  # Current directory.
+    
+    # List all files in the dataset directory
+    all_files = os.listdir(dataset_path)
+    
+    # Extract unique record numbers by checking the first part of the file names before any extensions
+    records = set([f.split('.')[0] for f in all_files if f.endswith('.dat')])
+
+    # Preprocess each record in the dataset:
+    for record in records:
+        preprocess_record(record, dataset_path, save_dataset_path)
+
+    # Check if all files have been preprocessed:
+    check_all_files_preprocessed()
+    
+# Call to the `main` function:
+main()
+# Calling the function to resample pre-processed data from 360 Hz to 256 Hz:
+resample_preprocessed_data()
+
+# Plot an ECG segment with annotations:
+plot_ecg_segment_with_annotations('100', 0, 2000)
+
+# Plot a resampled ECG segment with adjusted annotations:
+plot_resampled_ecg_segment_with_annotations('100', 0, 2000)

@@ -1,0 +1,189 @@
+ECG Components Explained
+
+1. QRS Complex:
+Definition: Represents ventricular depolarization.
+Components:
+Q-wave: The first downward deflection after the P-wave.
+R-wave: The first upward deflection after the P-wave.
+S-wave: The first downward deflection after the R-wave.
+Duration: 80 to 120 ms.
+
+2. P-R Interval:
+Definition: Measures the time from the start of the P-wave to the beginning of the QRS complex.
+Components:
+P-wave: Represents atrial depolarization. Typically less than 120 ms, appearing 60-100 ms before the R-peak.
+PR Segment: Time between the end of the P-wave and the beginning of the QRS complex.
+Duration: 120 to 200 ms.
+Formula: PR Interval = P-wave duration + PR segment.
+
+3. ST Segment:
+Definition: Represents the period between ventricular depolarization and the beginning of ventricular repolarization. It spans from the end of the S wave to the beginning of the T wave.
+Duration: Typically around 80 to 120 ms but can vary based on factors like heart rate, medications, and underlying cardiac conditions.
+
+4. T Wave & Interval:
+Definition: Represents the repolarization (or recovery) of the ventricles.
+T Wave Duration: Typically 160 to 280 ms, but can vary based on age, gender, heart rate, etc.
+ST-T Segment: Connects the QRS complex and the T wave with a combined duration typically ranging from 240 ms to 400 ms.
+
+5. Q-T Interval:
+Definition: Measures from the start of the QRS complex to the end of the T-wave.
+Duration: 350 to 440 ms for heart rates around 60-100 bpm. Note that the QT interval is heart rate dependent; it shortens at faster heart rates and lengthens at slower ones.
+
+6. R-R Interval:
+Definition: Measures the duration between two consecutive R-waves. It is inversely proportional to the heart rate.
+Duration based on heart rate:
+Normal Resting Adult (60-100 bpm): 600 to 1000 ms.
+Bradycardia (50 bpm): 1200 ms.
+Tachycardia (150 bpm): 400 ms.
+
+
+Detecting P, Q, R, S, T Peaks:
+Q-peak: Identified as the minimum value within a window preceding the R-peak.
+R-peak: The highest point in the QRS complex.
+S-peak: Identified as the minimum value within a window following the R-peak.
+P-peak: Identified as the maximum value within a window preceding the Q-peak.
+T-peak: Identified as the maximum value within a window following the S-peak.
+
+
+
+
+
+
+Update the function again, considering what you told me before:
+
+- P Wave: Typically appears 60-100 ms before the R-peak (but for a normal ECG, it's usually around 60-80 ms).
+- Q Peak: Usually precedes the R-peak by a very short duration, approximately 20-60 ms.
+          (Its distance from the R peak, for a normal QRS duration, is typically less than the P-R interval, about 20-40 ms).
+- S Peak: Typically appears immediately after the R-peak, within a span of 20-60 ms.
+          (Its distance from the R peak can vary but, for a normal QRS complex, is usually within 20-40 ms).
+- T Wave: Appears about 160-320 ms after the R-peak (The start of the T wave is typically about 100-200 ms after the S peak).
+
+Dont forget I am working with resampled signal at 256 hz
+
+
+
+
+i have used this function to plot record 100 ecg signal after being resampled at 256 hz with adjusted annotations (i.e. adjusted r-peaks locations). i have created 3 plots for this specific record 100.
+
+1st plot is for 0 to 200 samples
+2nd plot is for 200 to 400 samples
+3rd plot is for 400 to 600 samples
+
+keep in mind that record 100 corresponds to a patient with normal rhythm (i.e. almost all beats are labeled with N).
+
+with all this information, I want you to tell me where in the x-axis (i.e. axis for samples) the P, Q, S, T peaks should be exactly located. this way I can actually see if my function is indeed correctly detecting and labeling the peaks in the right positions.
+
+1st plot (0 to 200 samples) has r-peak at approx. x = 56 samples
+2nd plot (200 to 400 samples) has r-peak at approx. x = 263 samples
+3rd plot (400 to 600 samples) has r-peak at approx. x = 470 samples
+
+1st Plot (0 to 200 samples):
+
+Estimated P: 31 to 41 samples. Actual: approx x = 28-32 samples
+Estimated Q: 41 to 51 samples. Actual: approx x = 42-48 samples
+Estimated S: 61 to 71 samples. Actual: approx x = 63 samples
+Estimated T: 96 to 136 samples. Actual: approx x = 135 samples
+
+2nd Plot (200 to 400 samples):
+
+Estimated P: 238 to 248 samples. Actual: approx x = 237 samples
+Estimated Q: 248 to 258 samples. Actual: approx x = 255 samples. 
+Estimated S: 268 to 278 samples. Actual: approx x = 270 samples. 
+Estimated T: 303 to 343 samples. Actual: approx x = 343 samples.
+
+3rd Plot (400 to 600 samples):
+
+Estimated P: 445 to 455 samples. Actual: approx x = 445 samples
+Estimated Q: 455 to 465 samples. Actual: approx x = 462 samples. 
+Estimated S: 475 to 485 samples. Actual: approx x = 480 samples.
+Estimated T: 510 to 550 samples. Actual: approx x = 552-555 samples.
+
+
+
+
+you said this:
+
+Lastly, remember that the MIT-BIH database contains a variety of records, including normal rhythms and various arrhythmias. The morphology of ECG waveforms can vary significantly between different arrhythmias, so a window size that works well for one record might not be optimal for another. Ideally, your method should be robust enough to handle these variations.
+
+well, I have done research and I have found this from MIT-BIH database:
+Beat annotations:
+
+Symbol:	              Meaning:
+
+· or N	              Normal beat
+L	                  Left bundle branch block beat
+R	                  Right bundle branch block beat
+A	                  Atrial premature beat
+a	                  Aberrated atrial premature beat
+J	                  Nodal (junctional) premature beat
+S	                  Supraventricular premature beat
+V	                  Premature ventricular contraction
+F	                  Fusion of ventricular and normal beat
+[	                  Start of ventricular flutter/fibrillation
+!	                  Ventricular flutter wave
+]	                  End of ventricular flutter/fibrillation
+e	                  Atrial escape beat
+j	                  Nodal (junctional) escape beat
+E	                  Ventricular escape beat
+/	                  Paced beat
+f	                  Fusion of paced and normal beat
+x	                  Non-conducted P-wave (blocked APB)
+Q	                  Unclassifiable beat
+|	                  Isolated QRS-like artifact
+
+
+
+Also, I have done research on general ecg components and properties and found this:
+
+ECG Components Explained
+
+1. QRS Complex:
+Definition: Represents ventricular depolarization.
+Components:
+Q-wave: The first downward deflection after the P-wave.
+R-wave: The first upward deflection after the P-wave.
+S-wave: The first downward deflection after the R-wave.
+Duration: 80 to 120 ms.
+
+2. P-R Interval:
+Definition: Measures the time from the start of the P-wave to the beginning of the QRS complex.
+Components:
+P-wave: Represents atrial depolarization. Typically less than 120 ms, appearing 60-100 ms before the R-peak.
+PR Segment: Time between the end of the P-wave and the beginning of the QRS complex.
+Duration: 120 to 200 ms.
+Formula: PR Interval = P-wave duration + PR segment.
+
+3. ST Segment:
+Definition: Represents the period between ventricular depolarization and the beginning of ventricular repolarization. It spans from the end of the S wave to the beginning of the T wave.
+Duration: Typically around 80 to 120 ms but can vary based on factors like heart rate, medications, and underlying cardiac conditions.
+
+4. T Wave & Interval:
+Definition: Represents the repolarization (or recovery) of the ventricles.
+T Wave Duration: Typically 160 to 280 ms, but can vary based on age, gender, heart rate, etc.
+ST-T Segment: Connects the QRS complex and the T wave with a combined duration typically ranging from 240 ms to 400 ms.
+
+5. Q-T Interval:
+Definition: Measures from the start of the QRS complex to the end of the T-wave.
+Duration: 350 to 440 ms for heart rates around 60-100 bpm. Note that the QT interval is heart rate dependent; it shortens at faster heart rates and lengthens at slower ones.
+
+6. R-R Interval:
+Definition: Measures the duration between two consecutive R-waves. It is inversely proportional to the heart rate.
+Duration based on heart rate:
+Normal Resting Adult (60-100 bpm): 600 to 1000 ms.
+Bradycardia (50 bpm): 1200 ms.
+Tachycardia (150 bpm): 400 ms.
+
+
+Detecting P, Q, R, S, T Peaks:
+Q-peak: Identified as the minimum value within a window preceding the R-peak.
+R-peak: The highest point in the QRS complex.
+S-peak: Identified as the minimum value within a window following the R-peak.
+P-peak: Identified as the maximum value within a window preceding the Q-peak.
+T-peak: Identified as the maximum value within a window following the S-peak.
+
+
+
+based on all this information and knowing that I already have the exact locations of the r-peaks 
+(which obviously are reampled since I am working with resampled ecg signal at 256 hz as you can see in the function I gave you), 
+what should be the window size? should it still remain 100 ms? what about the factor for P peak detection? what about T peak detection? 
+what other ways you think I could irpvoe the function to detect the peaks even more accurately based on this new info I gave you and your own knowledge you gave me before?
