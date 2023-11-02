@@ -33,9 +33,8 @@ def main():
     #plotting.plot_ecg_segment_with_pqrst('100', 0, 2000)
     
     # Plot a resampled ECG segment with adjusted PQRST annotations:
-    plt.ioff()  # Turn off interactive mode
+    plt.ioff()  # Turn off interactive mode to avoid multiple plots on the same figure
     plotting.plot_resampled_ecg_segment_with_pqrst4('100', 0, 200)
-    plt.ion()   # Turn on interactive mode
     plotting.plot_resampled_ecg_segment_with_pqrst4('100', 200, 400)
     plotting.plot_resampled_ecg_segment_with_pqrst4('100', 400, 600)
 
