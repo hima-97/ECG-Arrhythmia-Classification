@@ -5,9 +5,9 @@ import pandas as pd # Library to work with dataframes
 
 
 # Constants for dataset paths and beat labels:
-PREPROCESSED_PATH = './data/Pre-processed Data (360 Hz)'
+PREPROCESSED_PATH = './data/Preprocessed Data 360 Hz'
 ORIGINAL_PATH = './data/mit-bih-arrhythmia-database-1.0.0/'
-RESAMPLED_PATH = './data/Pre-processed Data (256 Hz)/'
+RESAMPLED_PATH = './data/Preprocessed Data 256 Hz/'
 BEAT_LABELS = ['·', 'N', 'L', 'R', 'B', 'A', 'a', 'J', 'S', 'V', 'r', 'F', 'e', 'j', 'n', 'E', '/', 'f', 'Q']
 
 
@@ -92,7 +92,7 @@ def plot_preprocessed_ecg_with_rpeaks(record_name, start, end, preprocessed_path
 # Function to plot an ECG segment with PQRST annotations:
 def plot_ecg_segment_with_pqrst(record, start, end, preprocessed_path=PREPROCESSED_PATH, original_path=ORIGINAL_PATH):
     
-    # Load preprocessed signal from the "Pre-processed Data (360 Hz)" directory:
+    # Load preprocessed signal from the "Preprocessed Data 360 Hz" directory:
     preprocessed_signal = np.loadtxt(f'{preprocessed_path}/{record}_preprocessed_360hz.dat', delimiter=',')
     
     # Load annotations from the "mit-bih-arrhythmia-database-1.0.0" directory:

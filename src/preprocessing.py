@@ -8,7 +8,7 @@ from scipy.signal import BadCoefficients, butter, filtfilt # Library to apply fi
 
 # Constants for dataset paths:
 DATASET_PATH = './data/mit-bih-arrhythmia-database-1.0.0'
-SAVE_DATASET_PATH = './data/Pre-processed Data (360 Hz)'
+SAVE_DATASET_PATH = './data/Preprocessed Data 360 Hz'
 
 # Set up logging:
 # if you're processing many records in batch mode, you can log these errors to a file for easier post-processing. 
@@ -191,6 +191,8 @@ def normalize(signal):
     
     # Normalize the signal to [-1, 1]
     normalized_signal = 2 * ((signal - min_values) / range_values) - 1
+    # Normalize the signal to [0, 1]
+    #normalized_signal = (signal - min_values) / range_values
     
     return normalized_signal
 
@@ -275,7 +277,7 @@ def check_all_files_preprocessed():
     # List of all .dat files in the MIT-BIH directory
     original_files = [f for f in os.listdir(DATASET_PATH) if f.endswith('.dat')]
     
-    # List of all preprocessed files in the 'Pre-processed Data (360 Hz)' directory
+    # List of all preprocessed files in the 'Preprocessed Data 360 Hz' directory
     preprocessed_files = [f for f in os.listdir(SAVE_DATASET_PATH) if f.endswith('_preprocessed_360hz.dat')]
     
     # Check if each original .dat file has a corresponding preprocessed file
@@ -287,7 +289,7 @@ def check_all_files_preprocessed():
     
     # Display the results
     if not missing_files:
-        print("\nAll .dat files have been successfully preprocessed and saved in the 'Pre-processed Data (360 Hz)' directory.\n")
+        print("\nAll .dat files have been successfully preprocessed and saved in the 'Preprocessed Data 360 Hz' directory.\n")
     else:
         print("\nThe following files have not been preprocessed:")
         for missing in missing_files:

@@ -2,9 +2,16 @@ import os
 import numpy as np # Library to work with arrays
 from scipy.signal import resample
 
+
+# Also, consider whether your analysis would benefit from an anti-aliasing filter applied before resampling, 
+# which can be critical when downsampling to avoid aliasing of higher-frequency components into your band of interest. 
+# The resample function applies an anti-aliasing filter by default, but depending on your specific requirements, 
+# you might want to apply a custom filter that better suits your data.
+
+
 # Constants:
-SOURCE_DIRECTORY = './data/Pre-processed Data (360 Hz)'
-TARGET_DIRECTORY = './data/Pre-processed Data (256 Hz)'
+SOURCE_DIRECTORY = './data/Preprocessed Data 360 Hz'
+TARGET_DIRECTORY = './data/Preprocessed Data 256 Hz'
     
 # Function to resample pre-processed data from 360 Hz to 256 Hz:
 def resample_preprocessed_data():
@@ -72,7 +79,7 @@ def check_all_files_resampled():
     
     # Display the results
     if not missing_files:
-        print("\nAll preprocessed files have been successfully resampled and saved in the 'Pre-processed Data (256 Hz)' directory.\n")
+        print("\nAll preprocessed files have been successfully resampled and saved in the 'Preprocessed Data ' directory.\n")
     else:
         print("\nThe following files have not been resampled:")
         for missing in missing_files:

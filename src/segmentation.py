@@ -16,7 +16,7 @@ import pandas as pd # Library to work with dataframes
 
 # Constants for dataset paths and beat labels:
 ORIGINAL_PATH = './data/mit-bih-arrhythmia-database-1.0.0/'
-RESAMPLED_PATH = './data/Pre-processed Data (256 Hz)/'
+RESAMPLED_PATH = './data/Preprocessed Data 256 Hz/'
 BEAT_LABELS = ['·', 'N', 'L', 'R', 'B', 'A', 'a', 'J', 'S', 'V', 'r', 'F', 'e', 'j', 'n', 'E', '/', 'f', 'Q']
 SEGMENTATION_PATH = './data/segmented_heartbeats.parquet'
 SEGMENTATION_PATH_CSV = './data/segmented_heartbeats.csv'

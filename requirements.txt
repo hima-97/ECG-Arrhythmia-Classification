@@ -3,3 +3,6 @@ matplotlib
 wfdb
 scipy
 pandas
+PyWavelets
+sklearn
+pandas
