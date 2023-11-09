@@ -11,6 +11,82 @@ RESAMPLED_PATH = './data/Pre-processed Data (256 Hz)/'
 BEAT_LABELS = ['·', 'N', 'L', 'R', 'B', 'A', 'a', 'J', 'S', 'V', 'r', 'F', 'e', 'j', 'n', 'E', '/', 'f', 'Q']
 
 
+# Function to plot original ECG signal:
+def plot_original_ecg(record_name, start, end, original_path=ORIGINAL_PATH):
+    """
+    Plot the ECG signal for a specified record from start to end samples.
+
+    Parameters:
+    - record_name (str): The name of the record.
+    - start (int): The starting sample number to plot.
+    - end (int): The ending sample number to plot.
+    - data_path (str): The directory path where the data files are located.
+    """
+    # Load the specified record
+    record = wfdb.rdrecord(f'{original_path}/{record_name}')
+    
+    # Extract the ECG signal data
+    ecg_signal = record.p_signal[start:end, 0]  # Assuming we are interested in the first lead
+
+    # Plotting
+    plt.figure(figsize=(15, 6))
+    plt.grid(True)
+    plt.plot(range(start, end), ecg_signal)
+    plt.title(f'Original ECG Signal for Record {record_name} - Lead 1')
+    plt.xlabel('Samples')
+    plt.ylabel('Amplitude')
+    plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+    plt.tight_layout()  # This ensures that everything fits well, especially when moving the legend outside.
+    plt.show()
+
+
+
+
+# Function to plot preprocessed ECG signal with R-peak annotations:
+def plot_preprocessed_ecg_with_rpeaks(record_name, start, end, preprocessed_path=PREPROCESSED_PATH, original_path=ORIGINAL_PATH):
+    """
+    Plot the preprocessed ECG signal for a specified record from start to end samples,
+    with R-peak annotations marked.
+
+    Parameters:
+    - record_name (str): The name of the record.
+    - start (int): The starting sample number to plot.
+    - end (int): The ending sample number to plot.
+    - preprocessed_path (str): The directory path where the preprocessed data files are located.
+    - original_path (str): The directory path where the original data files are located.
+    """
+    # Load the preprocessed ECG signal data
+    preprocessed_signal = np.loadtxt(f'{preprocessed_path}/{record_name}_preprocessed_360hz.dat', delimiter=',')
+
+    # Check if the signal is one-dimensional or two-dimensional
+    if preprocessed_signal.ndim > 1:
+        preprocessed_signal = preprocessed_signal[:, 0]  # Assuming we want the first lead
+
+    # Load annotations from the original directory
+    annotations = wfdb.rdann(f'{original_path}/{record_name}', 'atr')
+
+    # Extract R-peak locations and symbols
+    r_peak_indices = [idx for idx, symbol in zip(annotations.sample, annotations.symbol) if symbol in BEAT_LABELS]
+
+    # Plotting
+    plt.figure(figsize=(15, 6))
+    plt.grid(True)
+    plt.plot(range(start, end), preprocessed_signal[start:end], label='Lead 1', linestyle='-')
+
+    # Plot R-peaks using scatter to avoid connecting lines
+    for r_index in r_peak_indices:
+        if start <= r_index < end:
+            plt.scatter(r_index - start, preprocessed_signal[r_index - start], color='red', marker='o', s=20, zorder=3, label='R-peak' if 'R-peak' not in plt.gca().get_legend_handles_labels()[1] else "")
+
+    plt.title(f'Preprocessed ECG Signal for Record {record_name} - Lead 1 with R-peaks')
+    plt.xlabel('Samples')
+    plt.ylabel('Amplitude')
+    plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+    plt.tight_layout()  # This ensures that everything fits well, especially when moving the legend outside.
+    plt.show()
+
+
+
 
 
 # Function to plot an ECG segment with PQRST annotations:
@@ -172,6 +248,11 @@ def plot_resampled_ecg_segment_with_pqrst4(record, start, end, resampled_path=RE
     # Load resampled preprocessed signal from the directory
     resampled_signal = np.loadtxt(f'{resampled_path}/{record}_preprocessed_256hz.dat', delimiter=',')
     
+    # Check if the provided segment (start to end) is valid and within the bounds of the data
+    if start < 0 or end > len(resampled_signal) or start >= end:
+        print(f"Invalid segment provided: start={start}, end={end}. Ensure 0 <= start < end <= {len(resampled_signal)}")
+        return
+    
     # Load annotations from the original directory
     annotations = wfdb.rdann(f'{ORIGINAL_PATH}/{record}', 'atr')
     
@@ -226,19 +307,19 @@ def plot_resampled_ecg_segment_with_pqrst4(record, start, end, resampled_path=RE
     plt.plot(x_values, resampled_signal[start:end, 0], label='Lead 1', linewidth=0.8)
     
     for p, q, r, s, t in zip(p_peaks, q_peaks, r_peak_indices_resampled, s_peaks, t_peaks):
-        if start <= p <= end:
-            plt.plot(p, resampled_signal[p, 0], 'cv', markersize=4, label='P-peak' if 'P-peak' not in plt.gca().get_legend_handles_labels()[1] else "")
-        if start <= q <= end:
-            plt.plot(q, resampled_signal[q, 0], 'b^', markersize=4, label='Q-peak' if 'Q-peak' not in plt.gca().get_legend_handles_labels()[1] else "")
+        # if start <= p <= end:
+        #     plt.plot(p, resampled_signal[p, 0], 'cv', markersize=4, label='P-peak' if 'P-peak' not in plt.gca().get_legend_handles_labels()[1] else "")
+        # if start <= q <= end:
+        #     plt.plot(q, resampled_signal[q, 0], 'b^', markersize=4, label='Q-peak' if 'Q-peak' not in plt.gca().get_legend_handles_labels()[1] else "")
         if start <= r <= end:
             plt.plot(r, resampled_signal[r, 0], 'ro', markersize=4, label='R-peak' if 'R-peak' not in plt.gca().get_legend_handles_labels()[1] else "")
-        if start <= s <= end:
-            plt.plot(s, resampled_signal[s, 0], 'g^', markersize=4, label='S-peak' if 'S-peak' not in plt.gca().get_legend_handles_labels()[1] else "")
-        if start <= t <= end:
-            plt.plot(t, resampled_signal[t, 0], 'mv', markersize=4, label='T-peak' if 'T-peak' not in plt.gca().get_legend_handles_labels()[1] else "")
+        # if start <= s <= end:
+        #     plt.plot(s, resampled_signal[s, 0], 'g^', markersize=4, label='S-peak' if 'S-peak' not in plt.gca().get_legend_handles_labels()[1] else "")
+        # if start <= t <= end:
+        #     plt.plot(t, resampled_signal[t, 0], 'mv', markersize=4, label='T-peak' if 'T-peak' not in plt.gca().get_legend_handles_labels()[1] else "")
     
     plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
-    plt.title(f"Preprocessed ECG signal for record {record} - Lead 1 with PQRST annotations (Resampled at 256 Hz)")
+    plt.title(f"Preprocessed ECG signal for record {record} - Lead 1 with R-peaks annotations (Resampled at 256 Hz)")
     plt.xlabel("Samples")
     plt.ylabel("Amplitude")
     plt.tight_layout()  # This ensures that everything fits well, especially when moving the legend outside.

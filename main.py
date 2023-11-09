@@ -29,14 +29,21 @@ def main():
     # Check if all preprocessed files have been resampled:
     #resampling.check_all_files_resampled()
     
+    # Plot original ECG segment:
+    #plotting.plot_original_ecg('100', 0, 1000)
+    
+    # Plot preprocessed ECG segment with R-peaks:
+    #plotting.plot_preprocessed_ecg_with_rpeaks('100', 0, 1000)
+    
     # Plot an ECG segment with PQRST annotations:
-    #plotting.plot_ecg_segment_with_pqrst('100', 0, 2000)
+    #plotting.plot_ecg_segment_with_pqrst('100', 0, 500)
     
     # Plot a resampled ECG segment with adjusted PQRST annotations:
     plt.ioff()  # Turn off interactive mode to avoid multiple plots on the same figure
-    plotting.plot_resampled_ecg_segment_with_pqrst4('100', 0, 200)
-    plotting.plot_resampled_ecg_segment_with_pqrst4('100', 200, 400)
-    plotting.plot_resampled_ecg_segment_with_pqrst4('100', 400, 600)
+    # plotting.plot_resampled_ecg_segment_with_pqrst4('202', 324864, 328472) # Example of Atrial Fibrillation, PVC
+    plotting.plot_resampled_ecg_segment_with_pqrst4('100', 0, 1000)
+    # plotting.plot_resampled_ecg_segment_with_pqrst4('100', 200, 400)
+    # plotting.plot_resampled_ecg_segment_with_pqrst4('100', 400, 600)
 
 
 
