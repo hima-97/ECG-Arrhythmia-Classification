@@ -3,6 +3,7 @@ import numpy as np
 import wfdb
 import pandas as pd # Library to work with dataframes
 from scipy.signal import find_peaks
+import pickle
 
 # Heartbeat segmentation refers to the process of identifying and isolating individual heartbeats (or cardiac cycles) from a continuous ECG recording.
 # The goal of this process is to extract individual heartbeats from the ECG signal for further processing and analysis.
@@ -15,18 +16,41 @@ from scipy.signal import find_peaks
 # 3) Storing Segmented Heartbeats: Store the segmented heartbeats in a structured format (e.g., a list or dataframe) for further processing or analysis.
 
 
-# Constants for dataset paths and beat labels:
+# File Structure after this file is run:
+# Each pickle file contains a list of dictionaries, with each dictionary representing a single heartbeat and its corresponding fiducial points.
+# The keys in each dictionary correspond to the fiducial points, like 'q_peak', 'r_peak', 's_peak', 'p_peak', 'qrs_start', and 'qrs_end'.
+# The values are the indices within the signal where these fiducial points occur.
+
+
+
+# Constants for dataset paths:
 ORIGINAL_PATH = './data/mit-bih-arrhythmia-database-1.0.0/'
 RESAMPLED_PATH = './data/Preprocessed Data 256 Hz/'
+SEGMENTED_PATH = './data/Segmented Data/'
+LOGS_PATH = './logs/'
 SAMPLE_RATE = 256 # Sample rate in Hz
 MS_IN_SECOND = 1000 # Number of milliseconds in one second
 
 
 
+
+# Ensure the logs directory exists
+if not os.path.exists(LOGS_PATH):
+    os.makedirs(LOGS_PATH)
+
+
+# Function to log segmentation errors
+def log_segmentation_error(record, error_message):
+    
+    
+    with open(os.path.join(LOGS_PATH, 'segmentation_errors.log'), 'a') as log_file:
+        log_file.write(f"Record {record}: {error_message}\n")
+
 # Function to find inflection points using numerical differentiation
 def find_inflection_points(signal):
     derivative = np.diff(signal)  # Compute the first derivative
     inflection_points = np.where(np.diff(np.sign(derivative)))[0]  # Find where the sign of the derivative changes
+                                                                   # Change of sign indicates a potential inflection point
     return inflection_points
 
 
@@ -94,9 +118,9 @@ def analyze_forward(segment, qrs_max_index, qrs_max, segment_start):
 
 
 
-# Function to find the P peak as described in the paper
+# Function to find the P peak:
 def find_p_peak(signal, qrs_start_index, sample_rate):
-    # Constants for the windows specified in the paper
+    # Constants for the windows:
     window_start_offset = int((233 / MS_IN_SECOND) * sample_rate)  # 233 ms before QRS start
     window_end_offset = int((67 / MS_IN_SECOND) * sample_rate)    # 67 ms before QRS start
 
@@ -159,16 +183,11 @@ def segment_with_pqrst(signal, r_peak_index, sample_rate):
     if qrs_max > 0:
         fiducial_points['r_peak'] = qrs_max_index + segment_start  # Absolute index of R peak within the signal
 
-    # The above TODOs should implement the detailed steps provided in the paper's pseudocode.
-    # This includes checking the sign of inflection points and whether they cross certain amplitude thresholds.
-    # For example, you would look for the point where the signal goes below half of QRSmax (QRSmax/2a and QRSmax/2b).
-    # You would also determine the start and end of the QRS complex by locating inflection points where the signal crosses zero.
-
     # Analyze backward from QRSmax to identify Q peak and QRS start
-    fiducial_points['q_peak'], fiducial_points['qrs_start'] = analyze_backward(segment[:qrs_max_index], qrs_max_index, qrs_max, segment_start, sample_rate)
+    fiducial_points['q_peak'], fiducial_points['qrs_start'] = analyze_backward(segment[:qrs_max_index], qrs_max_index, qrs_max, segment_start)
 
     # Analyze forward from QRSmax to identify S peak and QRS end
-    fiducial_points['s_peak'], fiducial_points['qrs_end'] = analyze_forward(segment[qrs_max_index:], qrs_max_index, qrs_max, segment_start + qrs_max_index, sample_rate)
+    fiducial_points['s_peak'], fiducial_points['qrs_end'] = analyze_forward(segment[qrs_max_index:], qrs_max_index, qrs_max, segment_start)
 
 
     # Identify the P peak
@@ -177,3 +196,82 @@ def segment_with_pqrst(signal, r_peak_index, sample_rate):
 
     # Once all fiducial points are identified, they are stored in the fiducial_points dictionary
     return fiducial_points
+
+
+
+# Function to segment a single heartbeat of a resampled ECG recording through the segmentation process:
+def segment_data():
+    # Create 'Segmented Data' directory if it does not exist
+    if not os.path.exists(SEGMENTED_PATH):
+        os.makedirs(SEGMENTED_PATH)
+
+    # Get the list of files in the resampled data directory
+    resampled_files = os.listdir(RESAMPLED_PATH)
+    segmented_records = {f.split('_')[0] for f in resampled_files if 'segmented' in f}
+
+    # List all annotation files in the original dataset directory
+    annotation_files = [f for f in os.listdir(ORIGINAL_PATH) if f.endswith('.atr')]
+
+    # Extract unique record numbers from annotation files
+    records = set(f.split('.')[0] for f in annotation_files)
+
+    # Segment each record that hasn't been segmented yet
+    for record in records:
+        if record in segmented_records:
+            print(f"Record {record} has already been segmented. Skipping.")
+            continue
+
+        try:
+            # Load the resampled signal
+            signal = np.loadtxt(os.path.join(RESAMPLED_PATH, record + '_resampled.dat'), delimiter=',')
+
+            # Load annotations from the original directory
+            annotations = wfdb.rdann(os.path.join(ORIGINAL_PATH, record), 'atr')
+
+            # Adjust annotations for the resampled data using linear transformation
+            resampling_ratio = SAMPLE_RATE / 360
+            adjusted_annotation_indices = [int(x * resampling_ratio) for x in annotations.sample]
+
+            # Prepare a list to hold segmented heartbeat data
+            segmented_heartbeats = []
+
+            # Segment the signal around each R peak and find fiducial points
+            for r_peak_index in adjusted_annotation_indices:
+                try:
+                    heartbeat_segment = segment_with_pqrst(signal, r_peak_index, SAMPLE_RATE)
+                    segmented_heartbeats.append(heartbeat_segment)
+                except Exception as inner_e:
+                    log_segmentation_error(record, f"Error segmenting heartbeat at index {r_peak_index}: {inner_e}")
+
+            # Save the segmented data to the new 'Segmented Data' directory using pickle
+            with open(os.path.join(SEGMENTED_PATH, record + '_segmented.pkl'), 'wb') as f:
+                pickle.dump(segmented_heartbeats, f)
+
+            print(f"Record {record} segmented and saved in '{SEGMENTED_PATH}'.")
+
+        except Exception as e:
+            log_segmentation_error(record, f"General error: {e}")
+
+
+
+# Function to check if all resampled files have been segmented:
+def check_all_files_segmented():
+    # List all resampled files in the resampled data directory
+    resampled_files = [f for f in os.listdir(RESAMPLED_PATH) if f.endswith('_resampled.dat')]
+    
+    # Convert the resampled filenames to the expected segmented filenames
+    expected_segmented_files = {f.replace('_resampled.dat', '_segmented.pkl') for f in resampled_files}
+    
+    # List all segmented files in the segmented data directory
+    segmented_files = set(os.listdir(SEGMENTED_PATH))
+    
+    # Find any expected files that are not present in the segmented directory
+    missing_files = expected_segmented_files - segmented_files
+    
+    # Display the results
+    if not missing_files:
+        print("\nAll resampled files have been successfully segmented and saved in the 'Segmented Data' directory.\n")
+    else:
+        print("\nThe following files have not been segmented or are missing:")
+        for missing in missing_files:
+            print(missing)
