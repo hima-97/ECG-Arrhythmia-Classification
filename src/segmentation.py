@@ -4,6 +4,7 @@ import wfdb
 import pandas as pd # Library to work with dataframes
 from scipy.signal import find_peaks
 import pickle
+from ecgtypes import BeatType
 
 # Heartbeat segmentation refers to the process of identifying and isolating individual heartbeats (or cardiac cycles) from a continuous ECG recording.
 # The goal of this process is to extract individual heartbeats from the ECG signal for further processing and analysis.
@@ -41,8 +42,6 @@ if not os.path.exists(LOGS_PATH):
 
 # Function to log segmentation errors
 def log_segmentation_error(record, error_message):
-    
-    
     with open(os.path.join(LOGS_PATH, 'segmentation_errors.log'), 'a') as log_file:
         log_file.write(f"Record {record}: {error_message}\n")
 
@@ -50,79 +49,118 @@ def log_segmentation_error(record, error_message):
 def find_inflection_points(signal):
     derivative = np.diff(signal)  # Compute the first derivative
     inflection_points = np.where(np.diff(np.sign(derivative)))[0]  # Find where the sign of the derivative changes
-                                                                   # Change of sign indicates a potential inflection point
-    return inflection_points
+    return inflection_points + 1  # Shift by one due to the nature of np.diff reducing array length
 
 
-
-# Function to analyze the segment backward from QRSmax to find Q peak and QRS start
-def analyze_backward(segment, qrs_max_index, qrs_max, segment_start):
-    backward_segment = segment[:qrs_max_index]
-    inflection_points_backward = find_inflection_points(backward_segment)
-
-    q_peak = None
+# Function to analyze the segment backward from QRSmax to identify Qpeak, QRSstart, and Rpeak
+def analyze_backward(segment, qrs_max_index, qrs_max, segment_start, sample_rate):
+    # Initialize variables
+    q_peak = r_peak = s_peak = p_peak = 0
     qrs_start = None
 
-    # Look backward from QRSmax to evaluate the signal
-    for idx in inflection_points_backward[::-1]:  # Reverse the array to look backward
-        # Check if we're at half the value of QRSmax
-        if segment[idx] <= qrs_max / 2 and qrs_start is None:
-            qrs_start = idx + segment_start  # Absolute index in the signal
+    # If QRSmax is positive, then make Rpeak equal to QRSmax
+    if qrs_max > 0:
+        r_peak = qrs_max_index + segment_start
 
-        # Check if we're at a quarter the value of QRSmax
-        if segment[idx] <= qrs_max / 4 and q_peak is None:
-            q_peak = idx + segment_start  # Absolute index in the signal
+    # Get the backward segment and inflection points
+    backward_segment = segment[:qrs_max_index]
+    inflection_points_backward = find_inflection_points(backward_segment)
+    derivative_backward = np.diff(backward_segment)  # Compute the derivative of the backward segment
 
-        # Determine Q peak and QRS start
-        if segment[idx] < 0 and q_peak is None:
-            q_peak = idx + segment_start  # Absolute index in the signal
+    # Look for QRSmax/2a and QRSmax/4a
+    qrs_half_index = np.where(backward_segment < qrs_max / 2)[0]
+    qrs_quarter_index = np.where(backward_segment < qrs_max / 4)[0]
+    if len(qrs_half_index) > 0:
+        qrs_max_half_a = qrs_half_index[0] + segment_start
+    if len(qrs_quarter_index) > 0:
+        qrs_max_quarter_a = qrs_quarter_index[0] + segment_start
 
-        if segment[idx] >= 0 and qrs_start is None:
-            qrs_start = idx + segment_start  # Absolute index in the signal
-            if q_peak is None:
-                q_peak = 0  # If there's no Q peak, we assume its value is 0
+    # Analyze the signal backward from QRSmax
+    for idx in reversed(range(qrs_max_index)):
+        # Check for the first inflection point
+        if idx in inflection_points_backward:
+            inflection_value = derivative_backward[idx - 1]  # Use idx-1 because derivative array is one element shorter
+            if inflection_value < 0 and r_peak != 0 and q_peak == 0:
+                q_peak = idx + segment_start
+            elif inflection_value >= 0 and r_peak != 0:
+                if qrs_start is None:
+                    qrs_start = idx + segment_start
+                q_peak = 0
+                break  # Since this is the first inflection point, we can break the loop after processing
+            elif inflection_value > 0 and r_peak == 0:
+                r_peak = idx + segment_start
+                s_peak = qrs_max_index + segment_start
+                qrs_start = idx + segment_start
+                break  # Since this is the first inflection point, we can break the loop after processing
 
-    return q_peak, qrs_start
+    # If Qpeak is not zero and the signal crosses zero, mark the first non-negative point as QRSstart
+    if q_peak != 0:
+        zero_crossing_idx = np.where(backward_segment[:q_peak - segment_start] >= 0)[0]
+        if len(zero_crossing_idx) > 0:
+            qrs_start = zero_crossing_idx[0] + segment_start
+
+    # If the second inflection point is positive or zero and QRSstart has not been found yet, mark it as QRSstart
+    if qrs_start is None and len(inflection_points_backward) > 1:
+        second_inflection_value = derivative_backward[inflection_points_backward[-2] - 1]
+        if second_inflection_value >= 0:
+            qrs_start = inflection_points_backward[-2] + segment_start
+
+    return q_peak, qrs_start, r_peak
 
 
-
-# Function to analyze the segment forward from QRSmax to identify S peak and QRS end
-def analyze_forward(segment, qrs_max_index, qrs_max, segment_start):
-    # Initialize the S peak and QRS end points
+# Function to analyze the segment forward from QRSmax to identify Speak and QRSend
+def analyze_forward(segment, qrs_max_index, qrs_max, segment_start, sample_rate):
+    # Initialize Speak and QRSend
     s_peak = None
     qrs_end = None
 
-    # Convert the segment to the forward portion starting from QRSmax
+    # Forward segment and its inflection points
     forward_segment = segment[qrs_max_index:]
-
-    # Find inflection points in the forward segment
     inflection_points_forward = find_inflection_points(forward_segment)
+    derivative_forward = np.diff(forward_segment)  # Compute the derivative of the forward segment
 
-    # If there are inflection points, proceed with the analysis
-    if inflection_points_forward.size > 0:
-        # Analyze the first inflection point forward from QRSmax
-        first_inflection = inflection_points_forward[0]
+    # Look for QRSmax/2b and QRSmax/4b
+    qrs_half_index_forward = np.where(forward_segment < qrs_max / 2)[0]
+    qrs_quarter_index_forward = np.where(forward_segment < qrs_max / 4)[0]
+    if len(qrs_half_index_forward) > 0:
+        qrs_max_half_b = qrs_half_index_forward[0] + qrs_max_index + segment_start
+    if len(qrs_quarter_index_forward) > 0:
+        qrs_max_quarter_b = qrs_quarter_index_forward[0] + qrs_max_index + segment_start
 
-        # Check if the inflection point is negative and if the R peak is not zero (meaning it exists)
-        if forward_segment[first_inflection] < 0 and qrs_max > 0:
-            s_peak = first_inflection + qrs_max_index  # The S peak is at this inflection point
+    # Analyze the signal forward from QRSmax
+    for idx in range(len(forward_segment)):
+        # Check for the first inflection point
+        if idx in inflection_points_forward:
+            inflection_value = derivative_forward[idx - 1]  # Use idx-1 because derivative array is one element shorter
+            if inflection_value < 0 and s_peak is None:
+                s_peak = idx + qrs_max_index + segment_start
+            elif inflection_value >= 0:
+                if qrs_end is None:
+                    qrs_end = idx + qrs_max_index + segment_start
+                break  # Since this is the first positive inflection point, we can break the loop after processing
 
-        # Check for QRS end
-        for inflection in inflection_points_forward:
-            if forward_segment[inflection] >= 0:
-                qrs_end = inflection + qrs_max_index  # The QRS end is at the first non-negative inflection point
-                break
+    # If Speak is not zero and the signal crosses zero, mark the first non-negative point as QRSend
+    if s_peak is not None:
+        zero_crossing_idx_forward = np.where(forward_segment[s_peak - qrs_max_index:] >= 0)[0]
+        if len(zero_crossing_idx_forward) > 0:
+            qrs_end = zero_crossing_idx_forward[0] + s_peak
 
-    # Return the identified S peak and QRS end
+    # If the second inflection point is positive or zero and QRSend has not been found yet, mark it as QRSend
+    if qrs_end is None and len(inflection_points_forward) > 1:
+        second_inflection_value_forward = derivative_forward[inflection_points_forward[1] - 1]
+        if second_inflection_value_forward >= 0:
+            qrs_end = inflection_points_forward[1] + qrs_max_index + segment_start
+
     return s_peak, qrs_end
+
 
 
 
 # Function to find the P peak:
 def find_p_peak(signal, qrs_start_index, sample_rate):
-    # Constants for the windows:
-    window_start_offset = int((233 / MS_IN_SECOND) * sample_rate)  # 233 ms before QRS start
-    window_end_offset = int((67 / MS_IN_SECOND) * sample_rate)    # 67 ms before QRS start
+    # Constants for the windows
+    window_start_offset = int(0.233 * sample_rate)  # 233 ms before QRS start
+    window_end_offset = int(0.067 * sample_rate)    # 67 ms before QRS start
 
     # Calculate the start and end of the window to search for the P peak
     window_start = max(0, qrs_start_index - window_start_offset)
@@ -139,19 +177,25 @@ def find_p_peak(signal, qrs_start_index, sample_rate):
     p_peak_index = np.argmax(p_peak_segment) + window_start
 
     # Check if the maximum value is an inflection point and greater than three times the standard deviation
-    if p_peak_value > 3 * std_preceding_segment and p_peak_index in find_inflection_points(signal):
-        return p_peak_index  # Return the index of the P peak if the conditions are met
+    inflection_points = find_inflection_points(signal[window_start:qrs_start_index])
+    if p_peak_value > 3 * std_preceding_segment:
+        # Check if the p_peak_index corresponds to an inflection point
+        # Inflection points need to be offset since they are relative to window_start
+        inflection_indices = [ip + window_start for ip in inflection_points]
+        if p_peak_index in inflection_indices:
+            return p_peak_index  # Return the index of the P peak if the conditions are met
 
     return None  # Return None if no P peak is found based on the criteria
 
 
 
+
+
 # Function to segment a single heartbeat and identify PQRS points from an ECG signal:
-def segment_with_pqrst(signal, r_peak_index, sample_rate):
-    
+def segment_with_pqrst(signal, r_peak_index, sample_rate, annotation_symbol):
     # Constants for time windows around R peak
-    samples_before_r_peak = int((373 / MS_IN_SECOND) * sample_rate)  # Samples before R peak based on 373 ms window
-    samples_after_r_peak = int((267 / MS_IN_SECOND) * sample_rate)   # Samples after R peak based on 267 ms window
+    samples_before_r_peak = int(0.373 * sample_rate)  # Samples before R peak based on 373 ms window
+    samples_after_r_peak = int(0.267 * sample_rate)   # Samples after R peak based on 267 ms window
 
     # Extract the signal segment centered around the R peak
     segment_start = max(0, r_peak_index - samples_before_r_peak)
@@ -162,39 +206,36 @@ def segment_with_pqrst(signal, r_peak_index, sample_rate):
     segment -= np.mean(segment)
 
     # Find QRSmax within a 100 ms window around the R peak
-    window_100ms = int((100 / MS_IN_SECOND) * sample_rate)
+    window_100ms = int(0.100 * sample_rate)
     window_start = max(0, r_peak_index - window_100ms - segment_start)
     window_end = min(len(segment), r_peak_index + window_100ms - segment_start)
-    qrs_max_index = np.argmax(np.abs(segment[window_start:window_end]))  # Index of QRSmax within the window
-    qrs_max = segment[qrs_max_index + window_start]  # Value of QRSmax
-    qrs_max_index += window_start  # Absolute index of QRSmax within the segment
+    qrs_max_index = np.argmax(np.abs(segment[window_start:window_end])) + window_start
+    qrs_max = segment[qrs_max_index]
 
     # Initialize fiducial points
-    fiducial_points = {
-        'q_peak': None,
-        'r_peak': None,
-        's_peak': None,
-        'p_peak': None,
-        'qrs_start': None,
-        'qrs_end': None,
-    }
-
-    # If QRSmax is positive, mark it as R peak
-    if qrs_max > 0:
-        fiducial_points['r_peak'] = qrs_max_index + segment_start  # Absolute index of R peak within the signal
-
-    # Analyze backward from QRSmax to identify Q peak and QRS start
-    fiducial_points['q_peak'], fiducial_points['qrs_start'] = analyze_backward(segment[:qrs_max_index], qrs_max_index, qrs_max, segment_start)
-
-    # Analyze forward from QRSmax to identify S peak and QRS end
-    fiducial_points['s_peak'], fiducial_points['qrs_end'] = analyze_forward(segment[qrs_max_index:], qrs_max_index, qrs_max, segment_start)
-
+    q_peak, qrs_start, r_peak = analyze_backward(segment, qrs_max_index, qrs_max, segment_start, sample_rate)
+    s_peak, qrs_end = analyze_forward(segment, qrs_max_index, qrs_max, segment_start, sample_rate)
 
     # Identify the P peak
-    if fiducial_points['qrs_start'] is not None:
-        fiducial_points['p_peak'] = find_p_peak(signal, fiducial_points['qrs_start'], sample_rate)
+    p_peak = find_p_peak(signal, qrs_start, sample_rate)
+    
+    # Find the closest annotation to the R peak
+    #closest_annotation_index, closest_annotation_symbol = min(adjusted_annotations, key=lambda ann: abs(ann[0] - r_peak_index))
 
-    # Once all fiducial points are identified, they are stored in the fiducial_points dictionary
+    # Use ecgtypes.py to interpret the symbol into a label
+    beat_label = BeatType.new_from_symbol(annotation_symbol)
+
+    # Once all fiducial points are identified, they are stored in a dictionary
+    fiducial_points = {
+        'beat_label': beat_label,
+        'q_peak': q_peak,
+        'r_peak': r_peak,
+        's_peak': s_peak,
+        'p_peak': p_peak,
+        'qrs_start': qrs_start,
+        'qrs_end': qrs_end,
+    }
+
     return fiducial_points
 
 
@@ -215,7 +256,6 @@ def segment_data():
     # Extract unique record numbers from annotation files
     records = set(f.split('.')[0] for f in annotation_files)
 
-    # Segment each record that hasn't been segmented yet
     for record in records:
         if record in segmented_records:
             print(f"Record {record} has already been segmented. Skipping.")
@@ -230,15 +270,16 @@ def segment_data():
 
             # Adjust annotations for the resampled data using linear transformation
             resampling_ratio = SAMPLE_RATE / 360
-            adjusted_annotation_indices = [int(x * resampling_ratio) for x in annotations.sample]
+            adjusted_annotations = [(int(ann_sample * resampling_ratio), ann_symbol) for ann_sample, ann_symbol in zip(annotations.sample, annotations.symbol)]
 
             # Prepare a list to hold segmented heartbeat data
             segmented_heartbeats = []
 
             # Segment the signal around each R peak and find fiducial points
-            for r_peak_index in adjusted_annotation_indices:
+            for ann_tuple in adjusted_annotations:
+                r_peak_index, annotation_symbol = ann_tuple  # Unpack the tuple
                 try:
-                    heartbeat_segment = segment_with_pqrst(signal, r_peak_index, SAMPLE_RATE)
+                    heartbeat_segment = segment_with_pqrst(signal, r_peak_index, SAMPLE_RATE, annotation_symbol)
                     segmented_heartbeats.append(heartbeat_segment)
                 except Exception as inner_e:
                     log_segmentation_error(record, f"Error segmenting heartbeat at index {r_peak_index}: {inner_e}")
@@ -257,10 +298,10 @@ def segment_data():
 # Function to check if all resampled files have been segmented:
 def check_all_files_segmented():
     # List all resampled files in the resampled data directory
-    resampled_files = [f for f in os.listdir(RESAMPLED_PATH) if f.endswith('_resampled.dat')]
+    resampled_files = [f for f in os.listdir(RESAMPLED_PATH) if f.endswith('_preprocessed_256hz.dat')]
     
     # Convert the resampled filenames to the expected segmented filenames
-    expected_segmented_files = {f.replace('_resampled.dat', '_segmented.pkl') for f in resampled_files}
+    expected_segmented_files = {f.replace('_preprocessed_256hz.dat', '_segmented.pkl') for f in resampled_files}
     
     # List all segmented files in the segmented data directory
     segmented_files = set(os.listdir(SEGMENTED_PATH))

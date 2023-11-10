@@ -1,6 +1,6 @@
 import os
 import pandas as pd # Library to work with dataframes
-from src import preprocessing, plotting, resampling
+from src import preprocessing, plotting, resampling, segmentation
 import matplotlib.pyplot as plt
 
 
@@ -29,8 +29,6 @@ def main():
     #        continue
     #    preprocessing.preprocess_record(record, ORIGINAL_PATH)
     
-    
-    
     # Check if all files have been preprocessed:
     #preprocessing.check_all_files_preprocessed()
     
@@ -39,6 +37,16 @@ def main():
     
     # Check if all preprocessed files have been resampled:
     #resampling.check_all_files_resampled()
+    
+    
+    
+    
+    
+    # Segment the resampled ECG signal into individual beats:
+    #segmentation.segment_beats()
+    
+    # Chek if all resampled files have been segmented:
+    #segmentation.check_all_files_segmented()
     
     
     
