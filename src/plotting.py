@@ -2,13 +2,14 @@ import matplotlib.pyplot as plt
 import wfdb # Library to read the WFDB formatted data
 import numpy as np # Library to work with arrays
 import pandas as pd # Library to work with dataframes
+import pickle # Library to save and load python objects
 
 
-# Constants for dataset paths and beat labels:
+# Constants for dataset paths:
 PREPROCESSED_PATH = './data/Preprocessed Data 360 Hz'
 ORIGINAL_PATH = './data/mit-bih-arrhythmia-database-1.0.0/'
 RESAMPLED_PATH = './data/Preprocessed Data 256 Hz/'
-BEAT_LABELS = ['·', 'N', 'L', 'R', 'B', 'A', 'a', 'J', 'S', 'V', 'r', 'F', 'e', 'j', 'n', 'E', '/', 'f', 'Q']
+SEGMENTED_PATH = './data/Segmented Data/'
 
 
 # Function to plot original ECG signal:
@@ -84,6 +85,71 @@ def plot_preprocessed_ecg_with_rpeaks(record_name, start, end, preprocessed_path
     plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
     plt.tight_layout()  # This ensures that everything fits well, especially when moving the legend outside.
     plt.show()
+
+
+
+import matplotlib.pyplot as plt
+import pickle
+
+# Define the path to the segmented data
+SEGMENTED_PATH = './data/Segmented Data/'
+
+import matplotlib.pyplot as plt
+import pickle
+
+# Define the path to the segmented data
+SEGMENTED_PATH = './data/Segmented Data/'
+
+def plot_heartbeat(record_name, beat_number):
+    """
+    Plot a heartbeat for a specific record name with the content of the dictionary
+    (i.e., beat label, fiducial points) by reading from the pickle files directory.
+
+    Parameters:
+    - record_name (str): The name of the record.
+    - beat_number (int): The index number of the heartbeat to plot.
+    """
+    # Construct the filename for the pickle file
+    pickle_filename = f'{SEGMENTED_PATH}/{record_name}_segmented.pkl'
+
+    # Load the list of heartbeats from the pickle file
+    try:
+        with open(pickle_filename, 'rb') as file:
+            heartbeats = pickle.load(file)
+    except FileNotFoundError:
+        print(f"The file for record {record_name} was not found.")
+        return
+    except Exception as e:
+        print(f"An error occurred while loading the file: {e}")
+        return
+
+    # Check if the beat number is valid
+    if beat_number >= len(heartbeats) or beat_number < 0:
+        print(f"Beat number {beat_number} is out of range for record {record_name}.")
+        return
+
+    # Extract the specific heartbeat data
+    heartbeat_data = heartbeats[beat_number]
+    signal_segment = heartbeat_data['signal']
+    fiducial_points = {k: v for k, v in heartbeat_data.items() if k not in ['signal', 'beat_label']}
+
+    # Plot the ECG segment
+    plt.figure(figsize=(10, 4))
+    plt.plot(signal_segment, label='ECG Segment', color='blue')
+
+    # Plot fiducial points
+    for point_label, point_index in fiducial_points.items():
+        if point_index is not None and point_index >= 0:  # Check if the fiducial point was identified
+            plt.scatter(point_index, signal_segment[point_index], label=point_label, zorder=3)
+
+    plt.title(f'Heartbeat {beat_number} for Record {record_name} - {heartbeat_data["beat_label"]}')
+    plt.xlabel('Samples')
+    plt.ylabel('Amplitude')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
 
 
 

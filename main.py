@@ -43,7 +43,13 @@ def main():
     
     
     # Segment the resampled ECG signal into individual beats:
-    #segmentation.segment_beats()
+    #segmentation.segment_data()
+
+    count = segmentation.count_heartbeats('100')
+    print(f"Number of heartbeats for record 100: {count}")
+    
+    #plotting.plot_heartbeat('100', 0)  # Record '100', 5th heartbeat (index 4)
+
     
     # Chek if all resampled files have been segmented:
     #segmentation.check_all_files_segmented()
