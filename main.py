@@ -1,6 +1,6 @@
 import os
 import pandas as pd # Library to work with dataframes
-from src import preprocessing, plotting, resampling, segmentation
+from src import preprocessing, plotting, resampling, segmentation, segmentation_2
 import matplotlib.pyplot as plt
 
 
@@ -44,9 +44,10 @@ def main():
     
     # Segment the resampled ECG signal into individual beats:
     #segmentation.segment_data()
+    segmentation_2.segment_data()
 
-    count = segmentation.count_heartbeats('100')
-    print(f"Number of heartbeats for record 100: {count}")
+    #count = segmentation.count_heartbeats('100')
+    #print(f"Number of heartbeats for record 100: {count}")
     
     #plotting.plot_heartbeat('100', 0)  # Record '100', 5th heartbeat (index 4)
 

@@ -5,7 +5,8 @@ import pandas as pd # Library to work with dataframes
 from scipy.signal import find_peaks
 import pickle # Library to work with pickle files
 from .ecgtypes import BeatType
-from Feature_Extraction_Utils.pqrs_features import ExtractQRS
+from .Feature_Extraction_Utils.pqrs_features import ExtractQRS
+
 
 
 
@@ -92,17 +93,17 @@ def segment_data():
     if not os.path.exists(SEGMENTED_PATH):
         os.makedirs(SEGMENTED_PATH)
 
-    # Get the list of files in the resampled data directory
-    resampled_files = os.listdir(RESAMPLED_PATH)
-    segmented_records = {f.split('_')[0] for f in resampled_files if 'segmented' in f}
+    # Get the list of segmented files to check if they have already been processed
+    segmented_records = {f.split('_')[0] for f in os.listdir(SEGMENTED_PATH) if f.endswith('_segmented.pkl')}
 
     # List all annotation files in the original dataset directory
     annotation_files = [f for f in os.listdir(ORIGINAL_PATH) if f.endswith('.atr')]
 
     # Extract unique record numbers from annotation files
-    records = set(f.split('.')[0] for f in annotation_files)
+    #records = set(f.split('.')[0] for f in annotation_files)
+    records = {'100'}
 
-    # Create an instance of ExtractQRS class for extracting the QRS complex and other fiducial points from each segmented heartbeat:
+    # Create an instance of ExtractQRS class
     qrs_extractor = ExtractQRS()
     
     for record in records:

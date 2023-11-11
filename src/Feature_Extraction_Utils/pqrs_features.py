@@ -77,7 +77,30 @@ class SignalBuffer:
 
 
 
+# Function to calculate the derivative of a signal:
+def derivative(X, dt):
+    dXdt = array('f', [0 for x in range(len(X))])
+    for n in range(1, len(X)):
+        dXdt[n] = (X[n] - X[n - 1]) / dt
+    dXdt[0] = dXdt[1]
+    return dXdt
+
+
+# Function to calculate the zero-crossing points of a signal:
+def zeroCrossPoints(X):
+    zeroCross = array('B', [False for _ in range(len(X))])
+    lastSign = X[0] >= 0
+    for n in range(1, len(X)):
+        currentSign = X[n] >= 0
+        if currentSign != lastSign:
+            zeroCross[n] = True
+        lastSign = currentSign
+    return zeroCross
+
+
+
 # Class for QRS detection based on the Pan&Tompkins algorithm:
+# The ExtractQRS class is used to extract features related to the QRS complex of each heartbeat.
 class ExtractQRS():
     
     # This function
@@ -105,11 +128,12 @@ class ExtractQRS():
     # the amplitude of the Q, R, and S peaks, and the time differences between these peaks. 
     # These features are then returned as a dictionary.
     def findQRSInSignalBuffer(self):
+        self.fs = 256
         signal_mean = self.signalBuffer.mean()
         signal = array('f', [s - signal_mean for s in self.signalBuffer.getBuffer()])
         L = len(signal)
-        startIndex = L - 55                 
-        endIndex = L - 25
+        startIndex = L - int(55 * (256/150))  # Adjusted for 256 Hz
+        endIndex = L - int(25 * (256/150))  # Adjusted for 256 Hz
         signalMax = max(signal[startIndex:endIndex])
         sMaxIndex = signal[startIndex:endIndex].index(signalMax) + startIndex
         signalMin = min(signal[startIndex:endIndex])
@@ -120,7 +144,7 @@ class ExtractQRS():
             signalPeak = signalMin
             signalPeakIndex = sMinIndex
 
-        maxQRSWidth = 30
+        maxQRSWidth = int(30 * (256/150))  # Adjusted for 256 Hz
         startIndex = int(signalPeakIndex - maxQRSWidth / 2)
         if startIndex < 0:
             startIndex = 0 
@@ -132,7 +156,7 @@ class ExtractQRS():
         derivativeZeroCrosses = zeroCrossPoints(signalDerivative)
         zeroCrosses = 0
         qrsStartIndex = startIndex
-        qrsWaveform = array('f', [0 for i in range(31)])
+        qrsWaveform = array('f', [0 for i in range(maxQRSWidth + 1)])
         k = 15
         rPeak = 0
         rIndex = signalPeakIndex
@@ -223,13 +247,13 @@ class ExtractQRS():
         if sIndex == 0:
             sIndex = qrsEndIndex
         # P wave finding
-        pStart = qrsStartIndex - 35
-        if pStart < 10:
-            pStart = 10
-        pEnd = qrsStartIndex - 10
-        baseStart = pStart - 10
-        if pEnd < 20:
-            pEnd = 20
+        pStart = qrsStartIndex - int(35 * (256/150))  # Adjusted for 256 Hz
+        if pStart < int(10 * (256/150)):  # Adjusted for 256 Hz
+            pStart = int(10 * (256/150))  # Adjusted for 256 Hz
+        pEnd = qrsStartIndex - int(10 * (256/150))  # Adjusted for 256 Hz
+        baseStart = pStart - int(10 * (256/150))  # Adjusted for 256 Hz
+        if pEnd < int(20 * (256/150)):  # Adjusted for 256 Hz
+            pEnd = int(20 * (256/150))  # Adjusted for 256 Hz
         std_noise = stats.stdev(signal[baseStart:pStart])
         mean_noise = stats.mean(signal[baseStart:pStart])
         pPeak = max(signal[pStart:pEnd])
@@ -299,8 +323,12 @@ class ExtractQRS():
     # and then calls the findQRSInSignalBuffer method to extract features from the QRS complex in the buffered signal. 
     def __call__(self, beatTime, signal):
         beatSample = int(beatTime * self.fs)
-        for n in range(beatSample - 128, beatSample + 40):
+        # Adjust the window size around the R peak for 256 Hz
+        pre_samples = int(128 * (256 / 150))  # Adjusted for 256 Hz
+        post_samples = int(40 * (256 / 150))  # Adjusted for 256 Hz
+        for n in range(beatSample - pre_samples, beatSample + post_samples):
             rawSample = signal[n]
             self.signalBuffer.push(rawSample)
         return self.findQRSInSignalBuffer()
+
                         
