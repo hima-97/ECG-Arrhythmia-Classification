@@ -128,7 +128,6 @@ class ExtractQRS():
     # the amplitude of the Q, R, and S peaks, and the time differences between these peaks. 
     # These features are then returned as a dictionary.
     def findQRSInSignalBuffer(self):
-        self.fs = 256
         signal_mean = self.signalBuffer.mean()
         signal = array('f', [s - signal_mean for s in self.signalBuffer.getBuffer()])
         L = len(signal)
@@ -322,7 +321,7 @@ class ExtractQRS():
     # This method takes a beat time and a signal as input, pushes the samples around the beat time into a signal buffer, 
     # and then calls the findQRSInSignalBuffer method to extract features from the QRS complex in the buffered signal. 
     def __call__(self, beatTime, signal):
-        beatSample = int(beatTime * self.fs)
+        beatSample = int(beatTime * 256)
         # Adjust the window size around the R peak for 256 Hz
         pre_samples = int(128 * (256 / 150))  # Adjusted for 256 Hz
         post_samples = int(40 * (256 / 150))  # Adjusted for 256 Hz

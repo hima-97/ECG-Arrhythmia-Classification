@@ -42,26 +42,44 @@ def log_segmentation_error(record, error_message):
 # The length of this segment is determined by the window parameter.
 def get_qrs_waveform(beatTime, signal, window=46, sample_rate=256):
     
+    print(f"Signal type: {type(signal)}, Signal shape: {signal.shape}")
+
+    # Extract the first lead if the signal is multi-dimensional
+    if len(signal.shape) > 1:
+        signal = signal[:, 0]
+
+    print(f"Updated signal shape: {signal.shape}")
+
     # The window size is 46 samples for 256 Hz sampling rate
-    # This is equivalent to 0.18 seconds (180 ms) around the R peak
-    
+    # This is equivalent to approximately 0.18 seconds (180 ms) around the R peak
     beatSample = int(beatTime * sample_rate)
+
+    # Check if beatSample index is within the bounds of the signal array
+    if beatSample >= len(signal) or beatSample < 0:
+        print(f"Error: beatSample index {beatSample} out of bounds for signal length {len(signal)}")
+        return np.zeros(window)  # Return a default waveform
+
     qrsWaveform = np.zeros(window)
     k = int(window / 2)
+
     for n in range(beatSample, -1, -1):
         if k >= 0:
             qrsWaveform[k] = signal[n]
         else: 
             break
         k -= 1
+
     k = int(window / 2 + 1)
+
     for n in range(beatSample + 1, len(signal)):
         if k < window:
             qrsWaveform[k] = signal[n]
         else:
             break
         k += 1
+
     return qrsWaveform
+
 
 
 
@@ -130,12 +148,17 @@ def segment_data():
             segmented_heartbeats = []
 
             for ann_index, ann_symbol in adjusted_annotations:
+                # Initialize beatSample and window before the try block
+                beatSample = 0
+                window = 46  # Update this if necessary
+                
                 try:
                     # Convert annotation index to time in seconds
                     beatTime = ann_index / SAMPLE_RATE
+                    beatSample = int(beatTime * SAMPLE_RATE)  # Update beatSample here
 
                     # Segment the heartbeat using the adapted get_qrs_waveform function
-                    heartbeat_segment = get_qrs_waveform(beatTime, signal, sample_rate=SAMPLE_RATE)
+                    heartbeat_segment = get_qrs_waveform(beatTime, signal, window, SAMPLE_RATE)
                     
                     # Extract fiducial points using ExtractQRS
                     fiducial_points = extract_fiducial_points(heartbeat_segment, qrs_extractor, beatTime)
@@ -143,11 +166,12 @@ def segment_data():
                     # Store the segmented heartbeat and its fiducial points
                     segmented_heartbeat = {
                         'heartbeat_segment': heartbeat_segment,
-                        'fiducial_points': fiducial_points  # Updated to include the extracted fiducial points
+                        'fiducial_points': fiducial_points
                     }
                     segmented_heartbeats.append(segmented_heartbeat)
 
                 except Exception as inner_e:
+                    print(f"Error at beatSample: {beatSample}, Signal length: {len(signal)}, Window: {window}")
                     log_segmentation_error(record, f"Error segmenting heartbeat at index {ann_index}: {inner_e}")
 
             # Save the segmented data to the new 'Segmented Data' directory using pickle
