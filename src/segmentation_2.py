@@ -73,6 +73,11 @@ def extract_fiducial_points(qrs_waveform, qrs_extractor, beatTime):
     q_index = qrs_features.get('Qpeak', None)  # Adjust key names based on actual keys in the dictionary
     r_index = qrs_features.get('Rpeak', None)
     s_index = qrs_features.get('Speak', None)
+
+    # Assert that the returned values are of the expected type (int or float)
+    assert isinstance(q_index, (int, float)), "Qpeak should be a single numeric value"
+    assert isinstance(r_index, (int, float)), "Rpeak should be a single numeric value"
+    assert isinstance(s_index, (int, float)), "Speak should be a single numeric value"
     
     # Return a dictionary with fiducial point indices
     return {
