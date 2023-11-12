@@ -1,79 +1,8 @@
-import statistics as stats
 from array import array
 import math
-
-
-# This function is used to safely normalize a value x with respect to its mean x_mean.
-# Normalization is a common operation in data preprocessing that scales numeric values to a standard range 
-# to ensure that different features contribute equally to a model.
-def safe_normalizer(x, x_mean):
-    # Prevents division by zero and handles edge cases where x equals its mean.
-    if x == x_mean and x != 0:
-        return 1
-    elif x_mean == 0:
-        return x
-    else:
-        return x / x_mean
-
-
-
-
-# This class is used to manage a buffer of recent signal samples:
-# It basically represents a buffer with the last x samples of a signal.
-class SignalBuffer:
-    
-    def __init__(self, size, initialValue=None):
-        self.size = size
-        self.empty = False
-        if initialValue == None:
-            initialValue = 0
-            self.empty = True
-        self.array = array('f', [initialValue for i in range(self.size * 2)])
-        self.index = self.size
-        self.sum = 0
-        
-    # Add a new sample to the buffer:    
-    def push(self, x):
-        self.sum -= self.array[self.index]
-        self.array[self.index] = x
-        self.array[self.index - self.size] =  x
-        self.sum += x
-        self.index += 1
-        if self.index >= len(self.array):
-            self.index = self.size  
-            self.empty = False
-            
-    # Retrieve the current contents of the buffer:      
-    def getBuffer(self):
-        return self.array[self.index - self.size : self.index]
-    
-    # Calculate the mean of the buffer's contents:
-    def mean(self):
-        if self.empty and self.index == self.size:
-            return 0
-        return self.sum / (self.size if not self.empty else (self.index - self.size))
-
-    # Calculate the standard deviation of the buffer's contents:
-    def std(self):
-        if self.empty and self.index <= self.size + 1:
-            return 0
-        return stats.stdev(self.array[self.index - self.size:self.index] if self.empty else self.array[:self.size])
-    
-    # Calculate the mean of the most recent 'samples' number of entries in the buffer:
-    def partialMean(self, samples):
-        # Calculate the mean of the most recent 'samples' number of entries in the buffer
-        if samples <= self.size:
-            if self.empty and (samples > self.index - self.size):
-                if self.index == self.size:
-                    return 0
-                samples = self.index - self.size
-            partialBuffer = self.getBuffer()[self.size - samples:self.size]
-            return stats.mean(partialBuffer)
-        else:
-            # If the number of samples requested exceeds the size of the buffer,
-            # return the mean of the entire buffer.
-            return self.mean()
-
+from .signal_buffer import SignalBuffer
+from .signal_buffer import safe_normalizer
+import statistics as stats
 
 
 
@@ -81,7 +10,7 @@ class SignalBuffer:
 def derivative(X, dt):
     dXdt = array('f', [0 for x in range(len(X))])
     for n in range(1, len(X)):
-        dXdt[n] = (X[n] - X[n - 1]) / dt
+        dXdt[n] = (X[n] - X[n - 1]) / dt # / 20 (when ploting)
     dXdt[0] = dXdt[1]
     return dXdt
 
@@ -150,13 +79,13 @@ class ExtractQRS():
         endIndex = int(signalPeakIndex + maxQRSWidth / 2)
         if endIndex >=  L:
             endIndex = L
-        dt = 1 / self.fs
+        dt = 1 / self.fs # This line calculates the time step dt based on the sampling rate
         signalDerivative = derivative(signal, dt)
         derivativeZeroCrosses = zeroCrossPoints(signalDerivative)
         zeroCrosses = 0
         qrsStartIndex = startIndex
         qrsWaveform = array('f', [0 for i in range(maxQRSWidth + 1)])
-        k = 15
+        k = int(15 * (256/150))  # Adjusted for 256 Hz
         rPeak = 0
         rIndex = signalPeakIndex
         qPeak = 0
@@ -210,18 +139,19 @@ class ExtractQRS():
         if qIndex == 0:
             qIndex = qrsStartIndex
         qrsEndIndex = endIndex
-        k = 16
+        k = int(16 * (256/150))
         zeroCrosses = 0
         lastSample = signalPeak
         qrsEndReady = False
-        halfQrsEndIndex = 30
-        quarterQrsEndIndex = 30
+        halfQrsEndIndex = int(30 * (256/150))
+        quarterQrsEndIndex = int(30 * (256/150))
+
         for n in range(signalPeakIndex + 1, endIndex):  
             qrsWaveform[k] = signal[n]
             k += 1
-            if math.fabs(signal[n]) <= math.fabs(signalPeak) / 2 and halfQrsEndIndex == 30:
+            if math.fabs(signal[n]) <= math.fabs(signalPeak) / 2 and halfQrsEndIndex == int(30 * (256/150)):
                 halfQrsEndIndex = k
-            if math.fabs(signal[n]) <= math.fabs(signalPeak) / 2 and quarterQrsEndIndex == 30:
+            if math.fabs(signal[n]) <= math.fabs(signalPeak) / 2 and quarterQrsEndIndex == int(30 * (256/150)):
                 quarterQrsEndIndex = k
             if qrsEndReady == True and signal[n] * lastSample <= 0:
                 # Found a signal sign change (zero cross) while ready to finish
@@ -324,15 +254,15 @@ class ExtractQRS():
         
         beatSample = int(beatTime * 256)
         
-        # Add this print statement to check the value of beatTime
-        print(f"beatTime: {beatTime}, beatSample: {beatSample}")
-        
         # Adjust the window size around the R peak for 256 Hz
         pre_samples = int(128 * (256 / 150))  # Adjusted for 256 Hz
         post_samples = int(40 * (256 / 150))  # Adjusted for 256 Hz
+        
         for n in range(beatSample - pre_samples, beatSample + post_samples):
             rawSample = signal[n]
             self.signalBuffer.push(rawSample)
+            
+            
         return self.findQRSInSignalBuffer()
 
                         

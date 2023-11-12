@@ -5,9 +5,9 @@ import numpy as np
 
 # Constants for dataset paths
 ORIGINAL_PATH = './data/mit-bih-arrhythmia-database-1.0.0/'
-RESAMPLED_DIRECTORY = './data/Preprocessed Data 256 Hz'
-TRAINING_DIRECTORY = './data/Training/'
-TESTING_DIRECTORY = './data/Testing/'
+RESAMPLED_PATH = './data/Preprocessed Data 256 Hz'
+TRAINING_PATH = './data/Training/'
+TESTING_PATH = './data/Testing/'
 
 # Defining training and testing datasets
 training_dataset = {"101", "106", "108", "109", "112", "114", "115", "116", "118", "119", "122", "124", "201", "203", "205", "207", "208", "209", "215", "220", "223", "230"}
@@ -98,9 +98,9 @@ def view_testing_pickle_file():
 
 def split_and_save_datasets():
     print("Splitting and saving training dataset...")
-    train_signals, train_labels, train_headers = split_dataset(training_dataset, RESAMPLED_DIRECTORY, ORIGINAL_PATH)
-    save_dataset(train_signals, train_labels, train_headers, TRAINING_DIRECTORY, 'training_dataset_signals.pickle')
+    train_signals, train_labels, train_headers = split_dataset(training_dataset, RESAMPLED_PATH, ORIGINAL_PATH)
+    save_dataset(train_signals, train_labels, train_headers, TRAINING_PATH, 'training_dataset_signals.pickle')
 
     print("Splitting and saving testing dataset...")
-    test_signals, test_labels, test_headers = split_dataset(testing_dataset, RESAMPLED_DIRECTORY, ORIGINAL_PATH)
-    save_dataset(test_signals, test_labels, test_headers, TESTING_DIRECTORY, 'testing_dataset_signals.pickle')
+    test_signals, test_labels, test_headers = split_dataset(testing_dataset, RESAMPLED_PATH, ORIGINAL_PATH)
+    save_dataset(test_signals, test_labels, test_headers, TESTING_PATH, 'testing_dataset_signals.pickle')
