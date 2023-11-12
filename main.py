@@ -1,26 +1,27 @@
 import os
 import pandas as pd # Library to work with dataframes
-from src import preprocessing, plotting, resampling, segmentation, segmentation_2
+from src import preprocessing, plotting, resampling, split_dataset, segmentation, segmentation_2
 import matplotlib.pyplot as plt
 
 
 # Constants for dataset paths:
 ORIGINAL_PATH = './data/mit-bih-arrhythmia-database-1.0.0/'
 PREPROCESSED_PATH = './data/Preprocessed Data 360 Hz/'
+RESAMPLED_DIRECTORY = './data/Preprocessed Data 256 Hz'  # Directory containing resampled files
 
 
 # Main Function:
 def main():
 
     # Get the set of already preprocessed records
-    preprocessed_files = os.listdir(PREPROCESSED_PATH)
-    preprocessed_records = {f.split('_')[0] for f in preprocessed_files if f.endswith('_preprocessed_360hz.dat')}
+    #preprocessed_files = os.listdir(PREPROCESSED_PATH)
+    #preprocessed_records = {f.split('_')[0] for f in preprocessed_files if f.endswith('_preprocessed_360hz.dat')}
 
     # List all .dat files in the dataset directory
-    all_dat_files = [f for f in os.listdir(ORIGINAL_PATH) if f.endswith('.dat')]
+    #all_dat_files = [f for f in os.listdir(ORIGINAL_PATH) if f.endswith('.dat')]
 
     # Extract unique record numbers
-    records = set(f.split('.')[0] for f in all_dat_files)
+    #records = set(f.split('.')[0] for f in all_dat_files)
 
     # Preprocess each record that hasn't been preprocessed yet
     #for record in records:
@@ -35,8 +36,16 @@ def main():
     # Resample preprocessed data from 360 Hz to 256 Hz:
     #resampling.resample_preprocessed_data()
     
+    # Now each resampled ECG signal has the following properties:
+    # Resampled Length: 462222
+    # Actual Sampling Rate: 256.0 Hz
+    
     # Check if all preprocessed files have been resampled:
     #resampling.check_all_files_resampled()
+    
+    
+    # Split the dataset into training and testing datasets:
+    split_dataset.split_and_save_datasets()
     
     
     
@@ -44,7 +53,7 @@ def main():
     
     # Segment the resampled ECG signal into individual beats:
     #segmentation.segment_data()
-    segmentation_2.segment_data()
+    #segmentation_2.segment_data()
 
     #count = segmentation.count_heartbeats('100')
     #print(f"Number of heartbeats for record 100: {count}")

@@ -321,7 +321,12 @@ class ExtractQRS():
     # This method takes a beat time and a signal as input, pushes the samples around the beat time into a signal buffer, 
     # and then calls the findQRSInSignalBuffer method to extract features from the QRS complex in the buffered signal. 
     def __call__(self, beatTime, signal):
+        
         beatSample = int(beatTime * 256)
+        
+        # Add this print statement to check the value of beatTime
+        print(f"beatTime: {beatTime}, beatSample: {beatSample}")
+        
         # Adjust the window size around the R peak for 256 Hz
         pre_samples = int(128 * (256 / 150))  # Adjusted for 256 Hz
         post_samples = int(40 * (256 / 150))  # Adjusted for 256 Hz
