@@ -1,6 +1,6 @@
 import os
 import pandas as pd # Library to work with dataframes
-from src import preprocessing, plotting, resampling, split_dataset, feature_extraction, segmentation, segmentation_2
+from src import preprocessing, plotting, resampling, split_data, feature_extraction, segmentation, segmentation_2
 import matplotlib.pyplot as plt
 import wfdb
 import numpy as np
@@ -46,17 +46,17 @@ def main():
     #resampling.check_all_files_resampled()
     
     
-    
-    
-    
-    
     # Split the dataset into training and testing datasets:
-    #split_dataset.split_and_save_datasets()
+    #split_data.split_and_save_dataset()
+    #split_data.view_training_pickle_file()
+    #split_data.view_testing_pickle_file()
     
-    # split_dataset.view_training_pickle_file()
-    # split_dataset.view_testing_pickle_file()
     
-    feature_extraction.segment_and_extract_features()
+    
+    
+    
+    
+    #feature_extraction.segment_and_extract_features()
     
 
     

@@ -3,7 +3,6 @@
 # The HeartRhythm enumeration defines the different types of heart rhythms that can be present in an ECG signal.
 # The BeatType enumeration defines the different types of heartbeats that can be present in an ECG signal.
 
-
 from enum import Enum
 
 class HeartRhythm(Enum):
