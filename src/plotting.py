@@ -87,16 +87,6 @@ def plot_preprocessed_ecg_with_rpeaks(record_name, start, end, preprocessed_path
     plt.show()
 
 
-
-import matplotlib.pyplot as plt
-import pickle
-
-# Define the path to the segmented data
-SEGMENTED_PATH = './data/Segmented Data/'
-
-import matplotlib.pyplot as plt
-import pickle
-
 # Define the path to the segmented data
 SEGMENTED_PATH = './data/Segmented Data/'
 

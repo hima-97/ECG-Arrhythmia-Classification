@@ -2,13 +2,15 @@ import os
 import pandas as pd # Library to work with dataframes
 from src import preprocessing, plotting, resampling, split_dataset, segmentation, segmentation_2
 import matplotlib.pyplot as plt
+import wfdb
+import numpy as np
+import pickle
 
 
 # Constants for dataset paths:
 ORIGINAL_PATH = './data/mit-bih-arrhythmia-database-1.0.0/'
 PREPROCESSED_PATH = './data/Preprocessed Data 360 Hz/'
 RESAMPLED_DIRECTORY = './data/Preprocessed Data 256 Hz'  # Directory containing resampled files
-
 
 # Main Function:
 def main():
@@ -44,10 +46,19 @@ def main():
     #resampling.check_all_files_resampled()
     
     
+    
+    
+    
+    
     # Split the dataset into training and testing datasets:
-    split_dataset.split_and_save_datasets()
+    #split_dataset.split_and_save_datasets()
     
+    split_dataset.view_training_pickle_file()
+    split_dataset.view_testing_pickle_file()
     
+
+    
+
     
     
     

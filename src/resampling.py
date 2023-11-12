@@ -40,24 +40,27 @@ def resample_preprocessed_data():
             print(f"{output_filename} already exists. Skipping resampling for {file}.")
             continue
         
-        # Load preprocessed data
+        # Load preprocessed data, assuming it's a multi-column array with the first column as the first lead
         data = np.loadtxt(os.path.join(SOURCE_DIRECTORY, file), delimiter=',')
-        
-        # Calculate the number of samples for resampling the data.
-        num_samples_original = data.shape[0]
-        num_samples_resampled = int((256/360) * num_samples_original)
-        
-        # Resample the data to 256 Hz
-        resampled_data = resample(data, num_samples_resampled)
-        
-        # Save the resampled data to the target directory
+        first_lead_data = data[:, 0] if data.ndim > 1 else data
+
+        original_duration = first_lead_data.shape[0] / 360
+        new_length = int(np.ceil(original_duration) * 360)
+
+        # Extend the original signal
+        extended_data = np.zeros(new_length)
+        extended_data[0:first_lead_data.shape[0]] = first_lead_data
+
+        # Resample the extended data to 256 Hz
+        resampled_duration = int(np.ceil(original_duration) * 256)
+        resampled_data = resample(extended_data, resampled_duration)
+
+        # Save the resampled data
         np.savetxt(os.path.join(TARGET_DIRECTORY, output_filename), resampled_data, delimiter=',')
         
         print(f"Resampled and saved {file} to {output_filename}.")
-        
-        resampled_count += 1  # Increment the counter for each successfully resampled file
+        resampled_count += 1
 
-    # Print a summary message at the end
     print(f"\nResampled {resampled_count} out of {len(preprocessed_files)} preprocessed files successfully.")
         
 

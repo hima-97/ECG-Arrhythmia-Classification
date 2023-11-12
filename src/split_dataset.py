@@ -1,10 +1,11 @@
 import os
 import wfdb
 import pickle
+import numpy as np
 
 # Constants for dataset paths
 ORIGINAL_PATH = './data/mit-bih-arrhythmia-database-1.0.0/'
-RESAMPLED_DIRECTORY = './data/Preprocessed Data 256 Hz'  # Directory containing resampled files
+RESAMPLED_DIRECTORY = './data/Preprocessed Data 256 Hz'
 TRAINING_DIRECTORY = './data/Training/'
 TESTING_DIRECTORY = './data/Testing/'
 
@@ -12,43 +13,94 @@ TESTING_DIRECTORY = './data/Testing/'
 training_dataset = {"101", "106", "108", "109", "112", "114", "115", "116", "118", "119", "122", "124", "201", "203", "205", "207", "208", "209", "215", "220", "223", "230"}
 testing_dataset = {"100", "103", "105", "111", "113", "117", "121", "123", "200", "202", "210", "212", "213", "214", "219", "221", "222", "228", "231", "232", "233", "234"}
 
-# Function to read the resampled data
 def read_resampled_data(record_name, directory):
     file_path = os.path.join(directory, f"{record_name}_preprocessed_256hz.dat")
-    with open(file_path, 'rb') as file:
-        data = pickle.load(file)
-    return data
+    try:
+        # Load resampled preprocessed signal from the directory
+        data = np.loadtxt(file_path, delimiter=',')
+        return {'signal': data}
+    except IOError as e:
+        print(f"Error reading file {file_path}: {e}")
+        return None
 
-# Function to read labels from the original .atr files
+
 def read_labels(record_name, directory):
     record_path = os.path.join(directory, record_name)
     annotation = wfdb.rdann(record_path, 'atr')
     labels = []
     for ann_sample, ann_symbol in zip(annotation.sample, annotation.symbol):
-        labels.append({'time': ann_sample / 360, 'symbol': ann_symbol})  # Convert time to seconds
+        labels.append({'time': ann_sample / 360, 'symbol': ann_symbol})
     return labels
 
-# Function to split the dataset
+def read_header_info(record_name, directory):
+    record_path = os.path.join(directory, record_name)
+    record = wfdb.rdrecord(record_path)
+    return {
+        "label": record.sig_name[0],
+        "dimension": record.units[0],
+        "sample_rate": record.fs,
+        "digital_max": (2 ** record.adc_res[0]) - 1,
+        "digital_min": 0,
+        "physical_max": (record.adc_zero[0] - record.baseline[0]) / record.adc_gain[0],
+        "physical_min": (-record.baseline[0]) / record.adc_gain[0],
+        "transducer": "transducer type not recorded",
+        "prefilter": "prefiltering not recorded"
+    }
+
 def split_dataset(dataset, resampled_directory, original_directory):
-    signals, labels = [], []
+    signals, labels, headers = [], [], []
     for record in dataset:
         data = read_resampled_data(record, resampled_directory)
         label = read_labels(record, original_directory)
-        signals.append(data['signal'])  # Assuming data has 'signal'
+        header = read_header_info(record, original_directory)
+        signals.append(data['signal'])
         labels.append(label)
-    return signals, labels
+        headers.append(header)
+    return signals, labels, headers
 
-# Function to save the split datasets
-def save_dataset(data, labels, directory, filename):
+def save_dataset(data, labels, headers, directory, filename):
     with open(os.path.join(directory, filename), 'wb') as file:
-        pickle.dump({'signals': data, 'labels': labels}, file)
+        pickle.dump({'signals': data, 'labels': labels, 'headers': headers}, file)
 
-# Main function to split datasets and save them
+
+
+def view_training_pickle_file():
+    # Path to one of the saved pickle files
+    file_path = './data/Training/training_dataset_signals.pickle'
+
+    # Load the data
+    with open(file_path, 'rb') as file:
+        data = pickle.load(file)
+
+    # Inspect the contents
+    print("Number of records:", len(data['signals']))
+    print("Sample record signal:", data['signals'][0])
+    print("Sample record labels:", data['labels'][0])
+    print("Sample record header:", data['headers'][0])
+    
+    
+def view_testing_pickle_file():
+    # Path to one of the saved pickle files
+    file_path = './data/Testing/testing_dataset_signals.pickle'
+
+    # Load the data
+    with open(file_path, 'rb') as file:
+        data = pickle.load(file)
+
+    # Inspect the contents
+    print("Number of records:", len(data['signals']))
+    print("Sample record signal:", data['signals'][0])
+    print("Sample record labels:", data['labels'][0])
+    print("Sample record header:", data['headers'][0])
+
+
+
+
 def split_and_save_datasets():
     print("Splitting and saving training dataset...")
-    train_signals, train_labels = split_dataset(training_dataset, RESAMPLED_DIRECTORY, ORIGINAL_PATH)
-    save_dataset(train_signals, train_labels, TRAINING_DIRECTORY, 'training_dataset_signals.pickle')
+    train_signals, train_labels, train_headers = split_dataset(training_dataset, RESAMPLED_DIRECTORY, ORIGINAL_PATH)
+    save_dataset(train_signals, train_labels, train_headers, TRAINING_DIRECTORY, 'training_dataset_signals.pickle')
 
     print("Splitting and saving testing dataset...")
-    test_signals, test_labels = split_dataset(testing_dataset, RESAMPLED_DIRECTORY, ORIGINAL_PATH)
-    save_dataset(test_signals, test_labels, TESTING_DIRECTORY, 'testing_dataset_signals.pickle')
+    test_signals, test_labels, test_headers = split_dataset(testing_dataset, RESAMPLED_DIRECTORY, ORIGINAL_PATH)
+    save_dataset(test_signals, test_labels, test_headers, TESTING_DIRECTORY, 'testing_dataset_signals.pickle')
