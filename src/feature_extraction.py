@@ -41,18 +41,18 @@ DEBUG = False
 DEBUG_RECORD = '207'
 DEBUG_BEAT = 0
 
-# Timer for measuring the execution time of feature extractors
+# Timer for measuring the execution time of feature extractors:
 timer = time.process_time()
 
 
-# Ensure the logs directory exists
+# Ensure the logs directory exists:
 if not os.path.exists(LOGS_PATH):
     os.makedirs(LOGS_PATH)
 
 
-# Function to log segmentation errors
-def log_segmentation_error(record, error_message):
-    with open(os.path.join(LOGS_PATH, 'segmentation_errors.log'), 'a') as log_file:
+# Function to log segmentation errors:
+def log_feature_extraction_error(record, error_message):
+    with open(os.path.join(LOGS_PATH, 'feature_extraction_errors.log'), 'a') as log_file:
         log_file.write(f"Record {record}: {error_message}\n")
 
 
@@ -137,7 +137,7 @@ def extract_heartbeat_features(signals, labels, records):
             morph_time = toc(True)
             
             # Get the QRS waveform around the labeled R peak with the adjusted window size for 256 Hz
-            qrsWaveform = get_qrs_waveform(labeledBeatTime, signals[recordIndex], window=int((76) *(256 / 150)))  # Adjust window size based on sampling rate of 256 Hz
+            qrsWaveform = get_qrs_waveform(labeledBeatTime, signals[recordIndex], window=int((76) *(SAMPLE_RATE / 150)))  # Adjust window size based on sampling rate of 256 Hz
             
             # If in debug mode and the current heartbeat is beyond the debug index, plot the signal
             if DEBUG and labelIndex >= DEBUG_BEAT:

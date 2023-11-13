@@ -45,7 +45,6 @@ def main():
     # Check if all preprocessed files have been resampled:
     #resampling.check_all_files_resampled()
     
-    
     # Split the dataset into training and testing datasets:
     #split_data.split_and_save_dataset()
     #split_data.view_training_pickle_file()
@@ -56,7 +55,7 @@ def main():
     
     
     
-    #feature_extraction.segment_and_extract_features()
+    feature_extraction.segment_and_extract_features()
     
 
     

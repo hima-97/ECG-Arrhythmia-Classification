@@ -89,20 +89,24 @@ class ExtractQRS():
     def __init__(self):
         self.fs = 256  # Adjusted sampling rate (from 150 Hz to 256 Hz)
         # Initialize buffers with adjusted sizes for the new sampling rate:
-        self.signalBuffer = SignalBuffer(164)
-        self.pPeakBuffer = SignalBuffer(int(32 * (256 / 150)))
-        self.rPeakBuffer = SignalBuffer(int(32 * (256 / 150)))
-        self.qPeakBuffer = SignalBuffer(int(32 * (256 / 150)))
-        self.sPeakBuffer = SignalBuffer(int(32 * (256 / 150)))
-        self.prWidthBuffer = SignalBuffer(int(32 * (256 / 150)))
-        self.qsWidthBuffer = SignalBuffer(int(32 * (256 / 150)))
-        self.qrsWidthBuffer = SignalBuffer(int(32 * (256 / 150)))
-        self.qrsWidth2Buffer = SignalBuffer(int(32 * (256 / 150)))
-        self.qrsWidth4Buffer = SignalBuffer(int(32 * (256 / 150)))
-        self.qrsSlopeBuffer = SignalBuffer(int(32 * (256 / 150)))
-        self.pqDiffBuffer = SignalBuffer(int(32 * (256 / 150)))
-        self.rqDiffBuffer = SignalBuffer(int(32 * (256 / 150)))
-        self.rsDiffBuffer = SignalBuffer(int(32 * (256 / 150)))
+        self.signalBuffer = SignalBuffer(164) # Adjusted buffer size for 256 Hz (164 samples = 640 ms)
+        
+        # The class uses several SignalBuffer objects to store different features of the QRS complex:
+        # Each buffer stores a certain number of the most recent values of a particular feature.
+        # The SignalBuffer size of 32 for most of the buffers likely represents the number of heartbeats used to calculate certain features.
+        self.pPeakBuffer = SignalBuffer(32)
+        self.rPeakBuffer = SignalBuffer(32)
+        self.qPeakBuffer = SignalBuffer(32)
+        self.sPeakBuffer = SignalBuffer(32)
+        self.prWidthBuffer = SignalBuffer(32)
+        self.qsWidthBuffer = SignalBuffer(32)
+        self.qrsWidthBuffer = SignalBuffer(32)
+        self.qrsWidth2Buffer = SignalBuffer(32)
+        self.qrsWidth4Buffer = SignalBuffer(32)
+        self.qrsSlopeBuffer = SignalBuffer(32)
+        self.pqDiffBuffer = SignalBuffer(32)
+        self.rqDiffBuffer = SignalBuffer(32)
+        self.rsDiffBuffer = SignalBuffer(32)
     
     
     # The findQRSInSignalBuffer method primarily applies the Pan & Tompkins QRS detection algorithm to the buffered signal. 
@@ -153,8 +157,16 @@ class ExtractQRS():
         derivativeZeroCrosses = zeroCrossPoints(signalDerivative)
         zeroCrosses = 0
         qrsStartIndex = startIndex
-        qrsWaveform = array('f', [0 for i in range(31)])
-        k = 26 # Adjusted for 256 Hz
+        
+        # Initializing `qrsWaveform`:
+        # This is an array that stores a portion of the ECG signal, specifically the segment encompassing the QRS complex and some surrounding signal.
+        # Array of floats ('f') with 52 elements, each initialized to 0
+        # The length of 52 is chosen because it's one more than the maxQRSWidth of 51, which represents the window around the QRS peak in which the algorithm is interested.
+        qrsWaveform = array('f', [0 for i in range(52)])
+        # Index for the middle of the array (note: arrays are 0-indexed):
+        k = 25 # Adjusted for 256 Hz (25 is half of 51, the maxQRSWidth)
+               # k is rounded down to 25 because of bacward analysis from QRSmax
+
         
         # 1) Assuming Qpeak, Rpeak, Speak, and Ppeak Equal Zero (Initial Assumption):
         rPeak = 0
@@ -225,22 +237,23 @@ class ExtractQRS():
         # Setting the end index of the QRS complex analysis window:
         qrsEndIndex = endIndex
         # Resetting variables for forward analysis from QRSmax:
-        k = 16  # Counter for indexing into the qrsWaveform array
+        k = 26  # Adjusted for 256 Hz (26 is half of 51, the maxQRSWidth)
+                # k is rounded up this time to 26 because of forward analysis from QRSmax
         zeroCrosses = 0  # Counter for the number of zero crossings found in the forward search
         lastSample = signalPeak  # Last sample analyzed, initialized to signalPeak
         qrsEndReady = False  # Flag to indicate readiness to mark the end of the QRS complex
-        halfQrsEndIndex = 30  # Index for the point where the signal is half of the QRS peak, initialized to a default value
-        quarterQrsEndIndex = 30  # Index for the point where the signal is a quarter of the QRS peak, initialized to a default value
+        halfQrsEndIndex = 51 # Adjusted index for 256 Hz
+        quarterQrsEndIndex = 51 # Adjusted index for 256 Hz
                 
         # 4) Looking Forward from QRSmax and evaluating the signal and its inflection points:
         for n in range(signalPeakIndex + 1, endIndex):  
             qrsWaveform[k] = signal[n]
             k += 1
             # 4a) Make QRSmax/2b Equal to the First Location Where the Signal Goes Below Half of QRSmax:
-            if math.fabs(signal[n]) <= math.fabs(signalPeak) / 2 and halfQrsEndIndex == 30:
+            if math.fabs(signal[n]) <= math.fabs(signalPeak) / 2 and halfQrsEndIndex == 51:
                 halfQrsEndIndex = k
             # 4b) Make QRSmax/4b Equal to the First Location Where the Signal Goes Below a Quarter of QRSmax:
-            if math.fabs(signal[n]) <= math.fabs(signalPeak) / 2 and quarterQrsEndIndex == 30:
+            if math.fabs(signal[n]) <= math.fabs(signalPeak) / 2 and quarterQrsEndIndex == 51:
                 quarterQrsEndIndex = k
             # 4c) Identifying the S peak if the first inflection point is negative and Rpeak is not zero:
             if qrsEndReady == True and signal[n] * lastSample <= 0:
@@ -270,13 +283,13 @@ class ExtractQRS():
             sIndex = qrsEndIndex
             
         # 5) Finding Ppeak: Determine maximum value of the signal in the segment before QRSstart:
-        pStart = qrsStartIndex - 35
-        if pStart < 10:
-            pStart = 10
-        pEnd = qrsStartIndex - 10
-        baseStart = pStart - 10
-        if pEnd < 20:
-            pEnd = 20
+        pStart = qrsStartIndex - 60 # Adjusted index for 256 Hz (60 samples = 233 ms)
+        if pStart < 17: # Adjusted index for 256 Hz (17 samples = 67 ms)
+            pStart = 17
+        pEnd = qrsStartIndex - 17
+        baseStart = pStart - 17
+        if pEnd < 34:
+            pEnd = 34
         std_noise = stats.stdev(signal[baseStart:pStart])
         mean_noise = stats.mean(signal[baseStart:pStart])
         pPeak = max(signal[pStart:pEnd])
@@ -357,11 +370,14 @@ class ExtractQRS():
     # and then calls the findQRSInSignalBuffer method to extract features from the QRS complex in the buffered signal. 
     def __call__(self, beatTime, signal):
         
+        # beatTime is multiplied by 256 to convert the time of the beat (in seconds) to an index in the sampled signal:
         beatSample = int(beatTime * 256)
         
-        # Adjust the window size around the R peak for 256 Hz
-        pre_samples = int(128 * (256 / 150))  # Adjusted for 256 Hz
-        post_samples = int(40 * (256 / 150))  # Adjusted for 256 Hz
+        # At each beat location, a segment of 640 ms of signal (164 samples for 256 Hz) is considered, 
+        # 373 ms before the annotation (95 samples for 256 Hz), and 267 ms (68 samples for 256 Hz) after it. 
+        # Adjust the window size around the R peak for 256 Hz.
+        pre_samples = int(128 * (256 / 150))  # 95 samples for 256 Hz
+        post_samples = int(40 * (256 / 150))  # 68 samples for 256 Hz
         
         for n in range(beatSample - pre_samples, beatSample + post_samples):
             rawSample = signal[n]

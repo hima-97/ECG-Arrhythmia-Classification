@@ -5,6 +5,17 @@ from .signal_buffer import safe_normalizer
 
 # This file is used to extract R-R interval related features.
 
+# Normalized heart rate features (6 features): 
+# 𝑅𝑅0 divided by the average of the last 32 beats (𝑅𝑅0/𝑎𝑣𝑔𝑅𝑅), 
+# 𝑅𝑅−1 divided by the average of the last 32 R–R intervals (𝑅𝑅−1/𝑎𝑣𝑔𝑅𝑅), 
+# 𝑅𝑅+1 divided by the average of the last 32 R–R intervals (𝑅𝑅+1/𝑎𝑣𝑔𝑅𝑅), 
+# 𝑅𝑅−1 divided by 𝑅𝑅0 (𝑅𝑅−1/𝑅𝑅0), 𝑅𝑅+1 divided by 𝑅𝑅0 (𝑅𝑅+1/𝑅𝑅0), 
+# and the t-statistic of 𝑅𝑅0 (𝑡𝑅𝑅0) defined by the difference between 𝑅𝑅0 and 𝑎𝑣𝑔𝑅𝑅 divided by the standard deviation of the last 32 R–R intervals.
+
+# Normalized QRS temporal characteristics and amplitude differences (12 features): 
+# the same QRS temporal characteristics and amplitude differences previously specified, except that they are divided by their average value in the last 32 heartbeats.
+
+
 
 class RRFeatures():
 
