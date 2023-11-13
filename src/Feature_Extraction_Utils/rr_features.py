@@ -8,11 +8,22 @@ from .signal_buffer import safe_normalizer
 
 class RRFeatures():
 
+    # This is the constructor method for the RRFeatures class:
+    # It's called when an object of this class is instantiated.
     def __init__(self):
-        self.rrBuffer = SignalBuffer(int(32 * (256 / 150)))
+        # This creates a SignalBuffer object with a size of 32 and assigns it to the rrBuffer attribute of the RRFeatures object:
+        # This is independent of the sampling rate of the ECG signal.
+        # That is because the buffer is used to store the last 32 R-R intervals. 
+        # This size is not related to the sampling rate, but rather to the number of heartbeats you want to consider for your calculations.
+        self.rrBuffer = SignalBuffer(32)
 
+    # This method is called when the class instance is "called" like a function:
+    # See `feature_extraction.py` for an example of how this class is used.
     def __call__(self, beats, beat_index):
-        labeledBeatTime = beats[beat_index]['time']
+        
+        labeledBeatTime = beats[beat_index]['time'] # This gets the 'time' value of the beat at the given index.
+        
+        # These lines calculate the times of the previous, current, and next beats based on the given beat index:
         if beat_index < 2:
             prevLabeledBeatTime = 0
         else:
@@ -25,25 +36,32 @@ class RRFeatures():
             nextLabeledBeatTime = beats[-1]['time']
         else:
             nextLabeledBeatTime = beats[beat_index + 1]['time']
-        if beat_index < (int(32 * (256 / 150))):
+        if beat_index < 32:
             startbeat_index = 0
         else:
-            startbeat_index = beat_index - (int(32 * (256 / 150)))
+            startbeat_index = beat_index - 32
+            
+        # This loop calculates the R-R intervals for the last 32 beats (or fewer if there are less) and stores them in rrBuffer:
         rrBuffer = []
         for k in range(startbeat_index, beat_index):
             rrBuffer.append(beats[k + 1]
                             ['time'] - beats[k]['time'])
 
+        # Calculating the previous, current, and next RR intervals:
         previousRR = lastLabeledBeatTime - prevLabeledBeatTime
         currentRR = labeledBeatTime - lastLabeledBeatTime
         nextRR = nextLabeledBeatTime - labeledBeatTime
-        self.rrBuffer.push(currentRR)
-        averageRR = self.rrBuffer.mean()
-        stddevRR = self.rrBuffer.std()
+        
+        self.rrBuffer.push(currentRR) # Pushing the current RR interval to the rrBuffer
+        averageRR = self.rrBuffer.mean() # Calculating the mean of the R-R intervals in the rrBuffer
+        stddevRR = self.rrBuffer.std() # Calculating the standard deviation of the R-R intervals in the rrBuffer
+        
         if stddevRR == 0:
             student = 0
         else:
             student = (currentRR - averageRR) / stddevRR
+            
+        # Return a dictionary containing the calculated features:
         return {
             'RR0': currentRR,
             'RR-1': previousRR,

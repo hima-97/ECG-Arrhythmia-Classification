@@ -5,6 +5,59 @@ from .signal_buffer import safe_normalizer
 import statistics as stats
 
 
+# This file is dedicated to extacting features from the QRS complex of each heartbeat.
+# the following temporal characteristics of the QRS complex are calculated: 
+# the total duration of the QRS complex (𝑄𝑅𝑆𝑤), 
+# the width of the QRS complex at half of the peak value (𝑄𝑅𝑆𝑤2), 
+# the width of the QRS complex at a quarter of the peak value (𝑄𝑅𝑆𝑤4), 
+# the distance between the peak of the Q wave, 
+# and the peak of the S wave (𝑄𝑆𝑑).
+
+
+# A detailed description of the extraction procedure is provided below:
+
+# The R spike annotations provided with the MIT-BIH Arrhythmia Database are used as a marker to separate and identify the beats. 
+# At each beat location, a segment of 640 ms of signal (164 samples for 256 Hz) is considered, 
+# 373 ms before the annotation (95 samples for 256 Hz), and 267 ms (68 samples for 256 Hz) after it. 
+# The mean of the signal segment is subtracted from each sample in order to remove the baseline. 
+# The absolute maximum value of the signal 100 ms before and after the annotation (𝑄𝑅𝑆𝑚𝑎𝑥) is considered as a reference point. 
+# Though such value usually corresponds to the database R spike annotation and the peak of the R wave in typical normal heartbeats, 
+# this is not always the case because the QRS may have a complex morphology 
+# and fall into one of the broad categories of the standard nomenclature where the R wave is not the one with the highest amplitude [39]. 
+# Therefore, only if 𝑄𝑅𝑆𝑚𝑎𝑥 is positive is it immediately marked as the peak of the R wave (𝑅𝑝𝑒𝑎𝑘). 
+# Starting from 𝑄𝑅𝑆𝑚𝑎𝑥, ten fiducial points are identified: the two locations where the signal reaches half the value of 𝑄𝑅𝑆𝑚𝑎𝑥 (𝑄𝑅𝑆𝑚𝑎𝑥/2𝑎,𝑏), 
+# the two locations where the signal reaches a quarter of the value of 𝑄𝑅𝑆𝑚𝑎𝑥 (𝑄𝑅𝑆𝑚𝑎𝑥/4𝑎,𝑏), the peak value of the R wave (𝑅𝑝𝑒𝑎𝑘), the peak value of the Q wave (𝑄𝑝𝑒𝑎𝑘), 
+# the peak value of the S wave (𝑆𝑝𝑒𝑎𝑘), the beginning of the QRS complex (𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡), the end of the QRS complex (𝑄𝑅𝑆𝑒𝑛𝑑), and the peak value of the P wave (𝑃𝑝𝑒𝑎𝑘). 
+
+# Many of the mentioned fiducial points are individuated by looking for the inflection points in the signal 
+# and identifying the locations where the signal's first derivative changes direction. For this, a two-point numerical differentiation is applied to the signal. 
+# The procedure for identifying the fiducial points can be described with the following steps:
+
+# 1) Assume that 𝑄𝑝𝑒𝑎𝑘, 𝑅𝑝𝑒𝑎𝑘, 𝑆𝑝𝑒𝑎𝑘, and 𝑃𝑝𝑒𝑎𝑘 equal zero and that the corresponding waves are not present.
+
+# 2) If 𝑄𝑅𝑆𝑚𝑎𝑥 is positive, then make 𝑅𝑝𝑒𝑎𝑘 equal to 𝑄𝑅𝑆𝑚𝑎𝑥.
+
+# 3) Look backward from 𝑄𝑅𝑆𝑚𝑎𝑥 and evaluate the signal and its inflection points in this way:
+# (a) Make 𝑄𝑅𝑆𝑚𝑎𝑥/2𝑎 equal to the first location where the signal goes below half of 𝑄𝑅𝑆𝑚𝑎𝑥.
+# (b) Make 𝑄𝑅𝑆𝑚𝑎𝑥/4𝑎 equal to the first location where the signal goes below a quarter of 𝑄𝑅𝑆𝑚𝑎𝑥.
+# (c) If the first inflection point is negative and 𝑅𝑝𝑒𝑎𝑘 is not zero, then 𝑄𝑝𝑒𝑎𝑘 equals the value at such point.
+# (d) If the first inflection point is positive or zero and 𝑅𝑝𝑒𝑎𝑘 is not zero, then it is marked as 𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡, and 𝑄𝑝𝑒𝑎𝑘 is considered zero.
+# (e) If the first inflection point is positive and 𝑅𝑝𝑒𝑎𝑘 is zero, then make 𝑅𝑝𝑒𝑎𝑘 equal to the value at such point and make 𝑆𝑝𝑒𝑎𝑘 equal to QRS max.
+# (f) If the second inflection point is negative, 𝑄𝑝𝑒𝑎𝑘 is zero, and 𝑄𝑅𝑆𝑚𝑎𝑥 is positive, then make 𝑄𝑝𝑒𝑎𝑘 equal to the value at such point.
+# (g) If 𝑄𝑝𝑒𝑎𝑘 is not zero and the signal crosses zero, then the first non-negative point is marked as 𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡.
+# (h) If the second inflection point is positive or zero and 𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡 has not been found yet, then it is marked as 𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡.
+
+# 4) Look forward from 𝑄𝑅𝑆𝑚𝑎𝑥 and evaluate the signal and its inflection points in this way:
+# (a) Make 𝑄𝑅𝑆𝑚𝑎𝑥/2𝑏 equal to the first location where the signal goes below half of 𝑄𝑅𝑆𝑚𝑎𝑥.
+# (b) Make 𝑄𝑅𝑆𝑚𝑎𝑥/4𝑏 equal to the first location where the signal goes below a quarter of 𝑄𝑅𝑆𝑚𝑎𝑥.
+# (c) If the first inflection point is negative and 𝑅𝑝𝑒𝑎𝑘 is not zero, then make 𝑆𝑝𝑒𝑎𝑘 equal to the value at such point.
+# (d) If 𝑆𝑝𝑒𝑎𝑘 is not zero and the signal cross zero, then the first non-negative point is marked as 𝑄𝑅𝑆𝑒𝑛𝑑.
+# (e) If the second inflection point is positive or zero and 𝑄𝑅𝑆𝑒𝑛𝑑 has not been found yet, then it is marked as 𝑄𝑅𝑆𝑒𝑛𝑑.
+
+# 5) Find the maximum value of the signal in the segment that goes between 233 ms (60 samples for 256 Hz) and 67 ms (17 samples for 256 Hz) before 𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡. 
+# If such value is greater than three times, the standard deviation of the signal during the 67 ms preceding the segment in consideration, 
+# and its position corresponds to an inflection point in the signal, then make 𝑃𝑝𝑒𝑎𝑘 equal to such a value.
+
 
 # Function to calculate the derivative of a signal:
 def derivative(X, dt):
@@ -36,7 +89,7 @@ class ExtractQRS():
     def __init__(self):
         self.fs = 256  # Adjusted sampling rate (from 150 Hz to 256 Hz)
         # Initialize buffers with adjusted sizes for the new sampling rate:
-        self.signalBuffer = SignalBuffer(int(96 * (256 / 150)))
+        self.signalBuffer = SignalBuffer(164)
         self.pPeakBuffer = SignalBuffer(int(32 * (256 / 150)))
         self.rPeakBuffer = SignalBuffer(int(32 * (256 / 150)))
         self.qPeakBuffer = SignalBuffer(int(32 * (256 / 150)))
@@ -52,16 +105,24 @@ class ExtractQRS():
         self.rsDiffBuffer = SignalBuffer(int(32 * (256 / 150)))
     
     
-    # The findQRSInSignalBuffer method applies the Pan & Tompkins QRS detection algorithm to the buffered signal. 
+    # The findQRSInSignalBuffer method primarily applies the Pan & Tompkins QRS detection algorithm to the buffered signal. 
     # It calculates various features related to the QRS complex, such as the width of the QRS complex, 
     # the amplitude of the Q, R, and S peaks, and the time differences between these peaks. 
     # These features are then returned as a dictionary.
     def findQRSInSignalBuffer(self):
+        
+        # Calculate the mean of the buffered signal:
         signal_mean = self.signalBuffer.mean()
+        
+        # Normalizing the signal by subtracting the mean, making the signal centered around zero:
         signal = array('f', [s - signal_mean for s in self.signalBuffer.getBuffer()])
+        
+        # Here, the code is setting up to analyze a segment of the ECG signal.
+        # It calculates the maximum and minimum values within a window towards the end of the buffered signal.
+        # This window is presumably chosen based on the expected location of QRS complexes.
         L = len(signal)
-        startIndex = L - int(55 * (256/150))  # Adjusted for 256 Hz
-        endIndex = L - int(25 * (256/150))  # Adjusted for 256 Hz
+        startIndex = L - int(55 * (256 / 150)) # Adjusted index for 256 Hz                
+        endIndex = L - int(25 * (256 / 150)) # Adjusted index for 256 Hz    
         signalMax = max(signal[startIndex:endIndex])
         sMaxIndex = signal[startIndex:endIndex].index(signalMax) + startIndex
         signalMin = min(signal[startIndex:endIndex])
@@ -72,46 +133,65 @@ class ExtractQRS():
             signalPeak = signalMin
             signalPeakIndex = sMinIndex
 
-        maxQRSWidth = int(30 * (256/150))  # Adjusted for 256 Hz
+
+        # `maxQRSWidth` is set to 30, which is used to define a window around the signal peak (maximum or minimum).
+        # This window is assumed to contain the QRS complex.
+        # The window's start and end points are adjusted to ensure they don't exceed the boundaries of the signal.
+        # The derivative of the signal is calculated, which is used for finding inflection points.
+        # `derivativeZeroCrosses` stores the locations where the derivative of the signal crosses zero.
+        # A waveform (`qrsWaveform`) is initialized to store a part of the signal around the QRS complex.
+
+        maxQRSWidth = 51 # Adjusted window size for 256 Hz (corresponds to 200 ms)
         startIndex = int(signalPeakIndex - maxQRSWidth / 2)
         if startIndex < 0:
             startIndex = 0 
         endIndex = int(signalPeakIndex + maxQRSWidth / 2)
         if endIndex >=  L:
             endIndex = L
-        dt = 1 / self.fs # This line calculates the time step dt based on the sampling rate
+        dt = 1 / self.fs
         signalDerivative = derivative(signal, dt)
         derivativeZeroCrosses = zeroCrossPoints(signalDerivative)
         zeroCrosses = 0
         qrsStartIndex = startIndex
-        qrsWaveform = array('f', [0 for i in range(maxQRSWidth + 1)])
-        k = int(15 * (256/150))  # Adjusted for 256 Hz
+        qrsWaveform = array('f', [0 for i in range(31)])
+        k = 26 # Adjusted for 256 Hz
+        
+        # 1) Assuming Qpeak, Rpeak, Speak, and Ppeak Equal Zero (Initial Assumption):
         rPeak = 0
         rIndex = signalPeakIndex
         qPeak = 0
         qIndex = 0
         sIndex = 0
         sPeak = 0
+        
+        # 2) If QRSmax is Positive, Make Rpeak Equal to QRSmax:
         if signalPeak >= 0:
             rPeak = signalPeak
         lastSample = signalPeak
         halfQrsStartIndex = 0
         quarterQrsStartIndex = 0
+        
+        # 3) Looking Backward from QRSmax and evaluating the signal and its inflection points:
         for n in range(signalPeakIndex, startIndex, -1):    
             qrsWaveform[k] = signal[n]
-            k -= 1  
+            k -= 1
+            # 3a) Make QRSmax/2a Equal to the First Location Where the Signal Goes Below Half of QRSmax:
             if math.fabs(signal[n]) <= math.fabs(signalPeak) / 2 and halfQrsStartIndex == 0:
                 halfQrsStartIndex = k
+            # 3b) Make QRSmax/4a Equal to the First Location Where the Signal Goes Below a Quarter of QRSmax:
             if math.fabs(signal[n]) <= math.fabs(signalPeak) / 4 and quarterQrsStartIndex == 0:
                 quarterQrsStartIndex = k
+            # Handling different cases based on zero crossings and the state of Rpeak:
             if derivativeZeroCrosses[n] and n < signalPeakIndex - 1:
                 zeroCrosses += 1
+                # 3c) If the first inflection point is negative and Rpeak is not zero, then Qpeak equals the value at such point.
                 if zeroCrosses == 1 and rPeak > 0:
                     # First peak before R peak
                     if signal[n-1] < 0:
                         # If negative then it's a Q peak
                         qPeak = signal[n-1]
-                        qIndex = n - 1                    
+                        qIndex = n - 1
+                # 3e) If the first inflection point is positive and Rpeak is zero, then make Rpeak equal to the value at such point and make Speak equal to QRSmax.                    
                 elif zeroCrosses == 1 and rPeak == 0:
                     # First peak before a main negative peak (Q or S)
                     if signal[n-1] > 0:
@@ -125,38 +205,49 @@ class ExtractQRS():
                         # Main peak is a Q peak
                         qPeak = signalPeak
                         qIndex = signalPeakIndex
+                # 3f) If the second inflection point is negative, Qpeak is zero, and QRSmax is positive, then make Qpeak equal to the value at such point.
+                # 3g) Handling the second negative peak when Qpeak is zero, marking QRSstart.
+                # 3h) If the second inflection point is positive or zero, mark it as QRSstart.
                 if zeroCrosses == 2:
                     if qPeak == 0 and signal[n-1] < 0:
                         qPeak = signal[n-1]
                         qIndex = n - 1
                     else:
-                        # Found a second positive peak before R or Q Peak
                         qrsStartIndex = n -1
                         break
             
             lastSample = signal[n]
             
+        # Check if Q peak index (qIndex) is not set (i.e., remains 0). If it is, then set it to the QRS start index:
         if qIndex == 0:
             qIndex = qrsStartIndex
-        qrsEndIndex = endIndex
-        k = int(16 * (256/150))
-        zeroCrosses = 0
-        lastSample = signalPeak
-        qrsEndReady = False
-        halfQrsEndIndex = int(30 * (256/150))
-        quarterQrsEndIndex = int(30 * (256/150))
 
+        # Setting the end index of the QRS complex analysis window:
+        qrsEndIndex = endIndex
+        # Resetting variables for forward analysis from QRSmax:
+        k = 16  # Counter for indexing into the qrsWaveform array
+        zeroCrosses = 0  # Counter for the number of zero crossings found in the forward search
+        lastSample = signalPeak  # Last sample analyzed, initialized to signalPeak
+        qrsEndReady = False  # Flag to indicate readiness to mark the end of the QRS complex
+        halfQrsEndIndex = 30  # Index for the point where the signal is half of the QRS peak, initialized to a default value
+        quarterQrsEndIndex = 30  # Index for the point where the signal is a quarter of the QRS peak, initialized to a default value
+                
+        # 4) Looking Forward from QRSmax and evaluating the signal and its inflection points:
         for n in range(signalPeakIndex + 1, endIndex):  
             qrsWaveform[k] = signal[n]
             k += 1
-            if math.fabs(signal[n]) <= math.fabs(signalPeak) / 2 and halfQrsEndIndex == int(30 * (256/150)):
+            # 4a) Make QRSmax/2b Equal to the First Location Where the Signal Goes Below Half of QRSmax:
+            if math.fabs(signal[n]) <= math.fabs(signalPeak) / 2 and halfQrsEndIndex == 30:
                 halfQrsEndIndex = k
-            if math.fabs(signal[n]) <= math.fabs(signalPeak) / 2 and quarterQrsEndIndex == int(30 * (256/150)):
+            # 4b) Make QRSmax/4b Equal to the First Location Where the Signal Goes Below a Quarter of QRSmax:
+            if math.fabs(signal[n]) <= math.fabs(signalPeak) / 2 and quarterQrsEndIndex == 30:
                 quarterQrsEndIndex = k
+            # 4c) Identifying the S peak if the first inflection point is negative and Rpeak is not zero:
             if qrsEndReady == True and signal[n] * lastSample <= 0:
                 # Found a signal sign change (zero cross) while ready to finish
                 qrsEndIndex = n
                 break
+            # 4d) & 4e) Determining QRSend based on signal crossing zero and second inflection point:
             if derivativeZeroCrosses[n] and n > signalPeakIndex + 2:
                 zeroCrosses += 1
                 if zeroCrosses == 1 and rPeak == signalPeak:
@@ -173,23 +264,30 @@ class ExtractQRS():
                     break
             
             lastSample = signal[n]
+        
+        # Handling case where S peak is not identified in the forward loop:
         if sIndex == 0:
             sIndex = qrsEndIndex
-        # P wave finding
-        pStart = qrsStartIndex - int(35 * (256/150))  # Adjusted for 256 Hz
-        if pStart < int(10 * (256/150)):  # Adjusted for 256 Hz
-            pStart = int(10 * (256/150))  # Adjusted for 256 Hz
-        pEnd = qrsStartIndex - int(10 * (256/150))  # Adjusted for 256 Hz
-        baseStart = pStart - int(10 * (256/150))  # Adjusted for 256 Hz
-        if pEnd < int(20 * (256/150)):  # Adjusted for 256 Hz
-            pEnd = int(20 * (256/150))  # Adjusted for 256 Hz
+            
+        # 5) Finding Ppeak: Determine maximum value of the signal in the segment before QRSstart:
+        pStart = qrsStartIndex - 35
+        if pStart < 10:
+            pStart = 10
+        pEnd = qrsStartIndex - 10
+        baseStart = pStart - 10
+        if pEnd < 20:
+            pEnd = 20
         std_noise = stats.stdev(signal[baseStart:pStart])
         mean_noise = stats.mean(signal[baseStart:pStart])
         pPeak = max(signal[pStart:pEnd])
         pIndex = signal[pStart:pEnd].index(pPeak) + pStart
+        
+        # Validate Ppeak based on noise thresholding:
         if pPeak < mean_noise + 3 * std_noise or pIndex == pStart or pIndex == pEnd:
             pPeak = 0
             pIndex = qrsStartIndex
+            
+        # Calculate various widths and differences between peaks:
         qsWidth = (sIndex - qIndex) * dt
         prWidth = (qrsStartIndex - pIndex) * dt
         maxSlope = abs(max(signalDerivative[qrsStartIndex:qrsEndIndex]))
@@ -202,9 +300,13 @@ class ExtractQRS():
                      sPeak, 'r+', qrsStartIndex, signal[qrsStartIndex], 'g.', qrsEndIndex, signal[qrsEndIndex], 'g.')
             plt.show()
         
+        
+        # Calculate differences between various peaks:
         pqDiff = pPeak - qPeak
         rqDiff = rPeak - qPeak
         rsDiff = rPeak - sPeak
+        
+        # Update buffers with the newly calculated values:
         self.pPeakBuffer.push(pPeak)
         self.rPeakBuffer.push(rPeak)
         self.qPeakBuffer.push(qPeak)
@@ -218,6 +320,8 @@ class ExtractQRS():
         self.pqDiffBuffer.push(pqDiff)
         self.rqDiffBuffer.push(rqDiff)
         self.rsDiffBuffer.push(rsDiff)
+        
+        # Return a dictionary with the calculated features related to the QRS complex:
         return {
             'QRSw': qrsWidth, 
             'QRSw2': halfQrsWidth,
@@ -231,6 +335,7 @@ class ExtractQRS():
             'PQa': pqDiff,
             'RQa': rqDiff,
             'RSa': rsDiff,
+            # Normalized values of the features:
             'Ppeak_norm': safe_normalizer(pPeak,self.pPeakBuffer.mean()),
             'Rpeak_norm': safe_normalizer(rPeak,self.rPeakBuffer.mean()),
             'Qpeak_norm': safe_normalizer(qPeak,self.qPeakBuffer.mean()),

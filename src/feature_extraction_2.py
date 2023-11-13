@@ -7,6 +7,11 @@ import pickle # Library to work with pickle files
 from .ecgtypes import BeatType
 from .Feature_Extraction_Utils.pqrs_features import ExtractQRS
 from .Feature_Extraction_Utils.rr_features import RRFeatures
+# from .Feature_Extraction_Utils.rr_features import compute_wavelet_descriptor as wt_features
+# from .Feature_Extraction_Utils.rr_features import compute_hos_descriptor as hos_features
+# from .Feature_Extraction_Utils.rr_features import compute_my_own_descriptor as mg_features
+# from .Feature_Extraction_Utils.rr_features import compute_HBF as hbf_features
+# from .Feature_Extraction_Utils.rr_features import compute_Uniform_LBP as lbp_features
 import matplotlib.pyplot as plt
 import time
 
@@ -27,7 +32,7 @@ import time
 # Constants for dataset paths:
 ORIGINAL_PATH = './data/mit-bih-arrhythmia-database-1.0.0/'
 RESAMPLED_PATH = './data/Preprocessed Data 256 Hz'
-HEARTBEATS_PATH = './data/Heartbeats Data/'
+SEGMENTED_PATH = './data/Segmented Data/'
 TRAINING_PATH = './data/Training/'
 TESTING_PATH = './data/Testing/'
 LOGS_PATH = './logs/'
@@ -145,14 +150,36 @@ def extract_heartbeat_features(signals, labels, records):
                 plt.title(labeledBeat.symbol())
                 plt.show()
             
+            # Extract additional features from the QRS waveform using various methods
+            # wt = wt_features(qrsWaveform)
+            # wt_time = toc(True)
+            # hos = hos_features(qrsWaveform)
+            # hos_time = toc(True)
+            # mg = mg_features(qrsWaveform)
+            # mg_time = toc(True)
+            # hbf = hbf_features(qrsWaveform)
+            # hbf_time = toc(True)
+            # lbp = lbp_features(qrsWaveform)
+            # lbp_time = toc(True)
+            
             # Create a dictionary to store all the extracted features for the current heartbeat
             beat = {
                 'beatType': labeledBeat,  # Heartbeat type (e.g., 'N', 'V', etc.)
                 'source': recordName,
                 'rr': rr,  # RR interval features
                 'morph': morph,  # QRS morphology features
+                #'wt': wt,  # Wavelet features
+                #'hos': hos,  # Higher-order statistics features
                 'rr_time': rr_time,  # Execution time for RR interval feature extraction
                 'morph_time': morph_time,  # Execution time for QRS morphology feature extraction
+                #'wt_time': wt_time,  # Execution time for wavelet feature extraction
+                #'hos_time': hos_time,  # Execution time for higher-order statistics feature extraction
+                #'mg': mg,  # Custom feature
+                #'mg_time': mg_time,  # Execution time for custom feature extraction
+                #'hbf': hbf,  # Custom feature (replace with an appropriate description)
+                #'hbf_time': hbf_time,  # Execution time for custom feature extraction
+                #'lbp': lbp,  # Local binary pattern feature
+                #'lbp_time': lbp_time  # Execution time for LBP feature extraction
             }
             
             # Append the dictionary of features to the list of beats
@@ -183,10 +210,10 @@ def segment_and_extract_features():
     beats = extract_heartbeat_features(data['signals'], data['labels'], data['records'])
     
     # Print a message indicating that the training set beat features are being saved
-    print('Saving training_dataset_heartbeats.pickle...')
+    print('Saving train_set_beats.pickle...')
     
     # Save the extracted training dataset beat features to a pickle file
-    save_beat_features(beats, HEARTBEATS_PATH + 'training_dataset_heartbeats.pickle')
+    save_beat_features(beats, SEGMENTED_PATH + 'training_dataset_heartbeats.pickle')
 
 
 
@@ -204,7 +231,7 @@ def segment_and_extract_features():
     beats = extract_heartbeat_features(data['signals'], data['labels'], data['records'])
     
     # Print a message indicating that the test set beat features are being saved
-    print('Saving testing_dataset_heartbeats.pickle...')
+    print('Saving test_set_beats.pickle...')
     
     # Save the extracted testind dataset beat features to a pickle file
-    save_beat_features(beats, HEARTBEATS_PATH + 'testing_dataset_heartbeats.pickle')
+    save_beat_features(beats, SEGMENTED_PATH + 'testing_dataset_heartbeats.pickle')

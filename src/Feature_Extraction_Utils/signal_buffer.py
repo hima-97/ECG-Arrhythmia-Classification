@@ -23,8 +23,9 @@ def safe_normalizer(x, x_mean):
 # It basically represents a buffer with the last x samples of a signal.
 class SignalBuffer:
     
-    def __init__(self, size, initialValue=None): # def __init__(self, size, initialValue=None, SAMPLE_RATE=256):
-        self.size = size # size * SAMPLE_RATE
+    # Constructor method for the SignalBuffer class:
+    def __init__(self, size, initialValue=None):
+        self.size = size
         self.empty = False
         if initialValue == None:
             initialValue = 0
@@ -66,7 +67,6 @@ class SignalBuffer:
     
     # Calculate the mean of the most recent 'samples' number of entries in the buffer:
     def partialMean(self, samples):
-        # Calculate the mean of the most recent 'samples' number of entries in the buffer
         if samples <= self.size:
             if self.empty and (samples > self.index - self.size):
                 if self.index == self.size:
