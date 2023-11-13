@@ -165,15 +165,23 @@ def extract_heartbeat_features(signals, labels, records):
 # Function to save extracted beat features to a pickle file:
 def save_beat_features(beats, output_path):
     
+    # Extract the directory from the output path
+    directory = os.path.dirname(output_path)
+    
+    # Check if the directory exists, if not, create it
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    
+    # Open a binary file for writing (specified by 'wb')
+    # Create a dictionary with a key 'beats' and the list of beat features as its value
     with open(output_path, 'wb') as file:
-        # Open a binary file for writing (specified by 'wb')
-        # Create a dictionary with a key 'beats' and the list of beat features as its value
         pickle.dump({'beats': beats}, file)
 
 
+# Function to orchestrate the segmentation and feature extraction process:
 def segment_and_extract_features():
     
-    print('Extracting training dataset heartbeats features...')
+    print('\nExtracting training dataset heartbeats features...')
     # Load the resampled training dataset from a pickle file
     pickle_in = open(TRAINING_PATH + 'training_dataset_signals.pickle', "rb")
     data = pickle.load(pickle_in)
@@ -183,18 +191,13 @@ def segment_and_extract_features():
     beats = extract_heartbeat_features(data['signals'], data['labels'], data['records'])
     
     # Print a message indicating that the training set beat features are being saved
-    print('Saving training_dataset_heartbeats.pickle...')
+    print('\nSaving training_dataset_heartbeats.pickle...')
     
     # Save the extracted training dataset beat features to a pickle file
     save_beat_features(beats, HEARTBEATS_PATH + 'training_dataset_heartbeats.pickle')
 
 
-
-
-
-
-
-    print('Extracting testing dataset heartbeats features...')
+    print('\nExtracting testing dataset heartbeats features...')
     # Load the resampled testing dataset from a pickle file
     pickle_in = open(TESTING_PATH + 'testing_dataset_signals.pickle', "rb")
     data = pickle.load(pickle_in)
@@ -204,7 +207,7 @@ def segment_and_extract_features():
     beats = extract_heartbeat_features(data['signals'], data['labels'], data['records'])
     
     # Print a message indicating that the test set beat features are being saved
-    print('Saving testing_dataset_heartbeats.pickle...')
+    print('\nSaving testing_dataset_heartbeats.pickle...')
     
     # Save the extracted testind dataset beat features to a pickle file
     save_beat_features(beats, HEARTBEATS_PATH + 'testing_dataset_heartbeats.pickle')
