@@ -1,6 +1,6 @@
 import os
 import pandas as pd # Library to work with dataframes
-from src import preprocessing, plotting, resampling, split_data, feature_extraction
+from src import preprocessing, plotting, resampling, split_data, feature_extraction, feature_selection
 import matplotlib.pyplot as plt
 import wfdb
 import numpy as np
@@ -54,46 +54,14 @@ def main():
     #split_data.view_testing_pickle_file()
     
     
-    
-    
-    
-    
     #feature_extraction.segment_and_extract_features(debug=False)
     #feature_extraction.verify_heartbeats_and_features('101', num_beats_to_inspect=1) # Verify that the heartbeats and features were extracted correctly
     #plotting.plot_training_heartbeat_with_features('100', heartbeats_number=5)
+    
+    
+    # Function for feature selection process and constructing the training and testing features datasets:
+    feature_selection.rank_features_and_construct_features_datasets()
 
-    
-
-    
-    
-    
-    # Segment the resampled ECG signal into individual beats:
-    #segmentation.segment_data()
-    #segmentation_2.segment_data()
-
-    #count = segmentation.count_heartbeats('100')
-    #print(f"Number of heartbeats for record 100: {count}")
-    
-    #plotting.plot_heartbeat('100', 0)  # Record '100', 5th heartbeat (index 4)
-
-    
-    # Chek if all resampled files have been segmented:
-    #segmentation.check_all_files_segmented()
-    
-    
-    
-    
-    
-    
-    # Plot original ECG segment:
-    #plotting.plot_original_ecg('100', 0, 1000)
-    
-    # Plot preprocessed ECG segment with R-peaks:
-    #plotting.plot_preprocessed_ecg_with_rpeaks('100', 0, 1000)
-    
-    # Plot a resampled ECG segment with adjusted PQRST annotations:
-    #plotting.plot_resampled_ecg_segment_with_pqrst4('202', 324864, 328472) # Example of Atrial Fibrillation, PVC
-    #plotting.plot_resampled_ecg_segment_with_pqrst4('100', 0, 2000)
 
 
 
