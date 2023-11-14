@@ -13,8 +13,7 @@ PREPROCESSED_PATH = './data/Preprocessed Data 360 Hz/'
 RESAMPLED_DIRECTORY = './data/Preprocessed Data 256 Hz'  # Directory containing resampled files
 HEARTBEATS_PATH = './data/Heartbeats Data/' # Directory containing segmented heartbeats with extracted features
 
-import pickle
-import matplotlib.pyplot as plt
+
 
 def verify_extracted_features(pickle_file_path, num_beats_to_inspect=5):
     """
@@ -97,19 +96,8 @@ def main():
     
     
     #feature_extraction.segment_and_extract_features()
-    verify_extracted_features(os.path.join(HEARTBEATS_PATH, 'training_dataset_heartbeats.pickle'))
-
-    # Load the data from the pickle file
-    with open(os.path.join(HEARTBEATS_PATH, 'training_dataset_heartbeats.pickle'), 'rb') as file:
-        data = pickle.load(file)
-
-    # Print the keys of the first few heartbeats
-    for i, beat in enumerate(data['beats'][:5]):
-        print(f"\nHeartbeat {i} keys: {beat.keys()}")
-        if 'morph' in beat:
-            print(f"Morph keys: {beat['morph'].keys()}")
-        else:
-            print("Morph key is missing")
+    #feature_extraction.verify_extracted_features()
+    plotting.plot_training_heartbeat_with_features('100', heartbeats_number=5)
 
     
 

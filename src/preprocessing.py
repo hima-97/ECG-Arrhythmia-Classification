@@ -8,7 +8,7 @@ from scipy.signal import BadCoefficients, butter, filtfilt # Library to apply fi
 
 # Constants for dataset paths:
 DATASET_PATH = './data/mit-bih-arrhythmia-database-1.0.0'
-SAVE_DATASET_PATH = './data/Preprocessed Data 360 Hz'
+PREPROCESSED_PATH = './data/Preprocessed Data 360 Hz'
 
 # Set up logging:
 # if you're processing many records in batch mode, you can log these errors to a file for easier post-processing. 
@@ -227,7 +227,7 @@ def load_and_preprocess_signal(record_name, dataset_path):
 
 
 # Function to pre-process and clean an ECG signal, and then save it:
-def preprocess_record(record_name, dataset_path=DATASET_PATH, save_dataset_path=SAVE_DATASET_PATH):
+def preprocess_record(record_name, dataset_path=DATASET_PATH, save_dataset_path=PREPROCESSED_PATH):
     
     logging.info(f"Starting preprocessing for record: {record_name}")
     
@@ -278,7 +278,7 @@ def check_all_files_preprocessed():
     original_files = [f for f in os.listdir(DATASET_PATH) if f.endswith('.dat')]
     
     # List of all preprocessed files in the 'Preprocessed Data 360 Hz' directory
-    preprocessed_files = [f for f in os.listdir(SAVE_DATASET_PATH) if f.endswith('_preprocessed_360hz.dat')]
+    preprocessed_files = [f for f in os.listdir(PREPROCESSED_PATH) if f.endswith('_preprocessed_360hz.dat')]
     
     # Check if each original .dat file has a corresponding preprocessed file
     missing_files = []

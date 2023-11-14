@@ -90,7 +90,6 @@ class ExtractQRS():
         self.fs = 256  # Adjusted sampling rate (from 150 Hz to 256 Hz)
         # Initialize buffers with adjusted sizes for the new sampling rate:
         self.signalBuffer = SignalBuffer(164) # Adjusted buffer size for 256 Hz (164 samples = 640 ms)
-        
         # The class uses several SignalBuffer objects to store different features of the QRS complex:
         # Each buffer stores a certain number of the most recent values of a particular feature.
         # The SignalBuffer size of 32 for most of the buffers likely represents the number of heartbeats used to calculate certain features.
@@ -121,9 +120,10 @@ class ExtractQRS():
         # Normalizing the signal by subtracting the mean, making the signal centered around zero:
         signal = array('f', [s - signal_mean for s in self.signalBuffer.getBuffer()])
         
-        # Here, the code is setting up to analyze a segment of the ECG signal.
-        # It calculates the maximum and minimum values within a window towards the end of the buffered signal.
-        # This window is presumably chosen based on the expected location of QRS complexes.
+        # This is where you're looking for the maximum and minimum values in a specific segment of the signal to identify QRSmax:
+        # This window is chosen based on the expected location of QRS complexes.
+        # Note: There is a window of 51 samples (i.e. 200 ms) between the start and end indices.
+        # This means that the absolute maximum value of the signal 100 ms before and 100 ms after the annotation (𝑄𝑅𝑆𝑚𝑎𝑥) is considered as a reference point.
         L = len(signal)
         startIndex = L - int(55 * (256 / 150)) # Adjusted index for 256 Hz                
         endIndex = L - int(25 * (256 / 150)) # Adjusted index for 256 Hz    
@@ -131,6 +131,9 @@ class ExtractQRS():
         sMaxIndex = signal[startIndex:endIndex].index(signalMax) + startIndex
         signalMin = min(signal[startIndex:endIndex])
         sMinIndex = signal[startIndex:endIndex].index(signalMin) + startIndex
+        
+        # The QRSmax is then determined as the absolute highest peak within the window, whether it is a maximum or a minimum peak:
+        # Here `signalPeak` represents QRSmax, and `signalPeakIndex` represents the index of QRSmax.
         signalPeak = signalMax
         signalPeakIndex = sMaxIndex
         if math.fabs(signalMin) > signalPeak:
@@ -335,7 +338,10 @@ class ExtractQRS():
         self.rsDiffBuffer.push(rsDiff)
         
         # Return a dictionary with the calculated features related to the QRS complex:
+        # This dictionary returns indices that are relative to the segment of the signal that was analyzed.
         return {
+            'QRSstart': qrsStartIndex,
+            'QRSend': qrsEndIndex,
             'QRSw': qrsWidth, 
             'QRSw2': halfQrsWidth,
             'QRSw4': quarterQrsWidth,
@@ -385,5 +391,3 @@ class ExtractQRS():
             
             
         return self.findQRSInSignalBuffer()
-
-                        

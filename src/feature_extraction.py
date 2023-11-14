@@ -211,3 +211,18 @@ def segment_and_extract_features():
     
     # Save the extracted testind dataset beat features to a pickle file
     save_beat_features(beats, HEARTBEATS_PATH + 'testing_dataset_heartbeats.pickle')
+
+
+# Function to verify the extracted features:
+def verify_extracted_features():
+    # Load the data from the pickle file
+    with open(os.path.join(HEARTBEATS_PATH, 'training_dataset_heartbeats.pickle'), 'rb') as file:
+        data = pickle.load(file)
+
+    # Print the keys of the first few heartbeats
+    for i, beat in enumerate(data['beats'][:5]): # First 5 heartbeats
+        print(f"\nHeartbeat {i} keys: {beat.keys()}")
+        if 'morph' in beat:
+            print(f"Morph keys: {beat['morph'].keys()}")
+        else:
+            print("Morph key is missing")
