@@ -24,15 +24,7 @@ SAMPLE_RATE = 256 # Sample rate in Hz
 
 # Function to plot original ECG signal:
 def plot_original_ecg(record_name, start, end, original_path=ORIGINAL_PATH):
-    """
-    Plot the ECG signal for a specified record from start to end samples.
-
-    Parameters:
-    - record_name (str): The name of the record.
-    - start (int): The starting sample number to plot.
-    - end (int): The ending sample number to plot.
-    - data_path (str): The directory path where the data files are located.
-    """
+    
     # Load the specified record
     record = wfdb.rdrecord(f'{original_path}/{record_name}')
     

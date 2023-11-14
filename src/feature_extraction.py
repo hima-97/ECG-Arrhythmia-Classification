@@ -4,11 +4,16 @@ import wfdb
 import pandas as pd # Library to work with dataframes
 from scipy.signal import find_peaks
 import pickle # Library to work with pickle files
-from .ecgtypes import BeatType
-from .Feature_Extraction_Utils.pqrs_features import ExtractQRS
-from .Feature_Extraction_Utils.rr_features import RRFeatures
-import matplotlib.pyplot as plt
 import time
+import matplotlib.pyplot as plt
+from .ecgtypes import BeatType
+from .Feature_Extraction_Utils.pqrs_features import ExtractPQRS
+from .Feature_Extraction_Utils.rr_features import RRFeatures
+from .Feature_Extraction_Utils.advanced_features import compute_wavelet_descriptor as wt_features
+from .Feature_Extraction_Utils.advanced_features import compute_hos_descriptor as hos_features
+from .Feature_Extraction_Utils.advanced_features import compute_HBF as hbf_features
+from .Feature_Extraction_Utils.advanced_features import compute_Uniform_LBP as lbp_features
+from .Feature_Extraction_Utils.advanced_features import compute_morphological_features as m_features
 
 
 
@@ -103,10 +108,10 @@ def get_qrs_waveform(beatTime, signal, window=((180) * (SAMPLE_RATE / 150))):  #
 
 
 # Function to extract features from all labeled heartbeats in the given dataset:
-def extract_heartbeat_features(signals, labels, records):
+def extract_heartbeat_features(signals, labels, records, debug=False):
     
     beats = []  # Create an empty list to store extracted features for each heartbeat
-    morph_features = ExtractQRS()  # Initialize an object for extracting QRS morphology features
+    qrs_morph_features = ExtractPQRS(debug)  # Initialize an object for extracting QRS morphology features
     rr_features = RRFeatures()  # Initialize an object for extracting RR interval features
     
     # Iterate through the records in the dataset
@@ -133,8 +138,8 @@ def extract_heartbeat_features(signals, labels, records):
             rr_time = toc(True)  # Stop the timer and record the execution time
             
             # Extract QRS morphology features from the signal around the labeled R peak
-            morph = morph_features(labeledBeatTime, signals[recordIndex])
-            morph_time = toc(True)
+            qrs_morph = qrs_morph_features(labeledBeatTime, signals[recordIndex])
+            qrs_morph_time = toc(True)
             
             # Get the QRS waveform around the labeled R peak with the adjusted window size for 256 Hz
             qrsWaveform = get_qrs_waveform(labeledBeatTime, signals[recordIndex], window=int((76) *(SAMPLE_RATE / 150)))  # Adjust window size based on sampling rate of 256 Hz
@@ -144,15 +149,38 @@ def extract_heartbeat_features(signals, labels, records):
                 plt.plot(signals[recordIndex])
                 plt.title(labeledBeat.symbol())
                 plt.show()
+                pass
+            
+            # Getting advanced features:
+            wt = wt_features(qrsWaveform)
+            wt_time = toc(True)
+            hos = hos_features(qrsWaveform)
+            hos_time = toc(True)
+            mg = m_features(qrsWaveform)
+            mg_time = toc(True)
+            hbf = hbf_features(qrsWaveform)
+            hbf_time = toc(True)
+            lbp = lbp_features(qrsWaveform)
+            lbp_time = toc(True)
             
             # Create a dictionary to store all the extracted features for the current heartbeat
             beat = {
                 'beatType': labeledBeat,  # Heartbeat type (e.g., 'N', 'V', etc.)
                 'source': recordName,
                 'rr': rr,  # RR interval features
-                'morph': morph,  # QRS morphology features
+                'morph': qrs_morph,  # QRS morphology features
+                'wt': wt, # Wavelet features
+                'hos': hos, # HOS features
                 'rr_time': rr_time,  # Execution time for RR interval feature extraction
-                'morph_time': morph_time,  # Execution time for QRS morphology feature extraction
+                'morph_time': qrs_morph_time,  # Execution time for QRS morphology feature extraction
+                'wt_time': wt_time,
+                'hos_time': hos_time,
+                'mg': mg,
+                'mg_time': mg_time,
+                'hbf': hbf,
+                'hbf_time': hbf_time,
+                'lbp': lbp,
+                'lbp_time': lbp_time
             }
             
             # Append the dictionary of features to the list of beats
@@ -179,7 +207,7 @@ def save_beat_features(beats, output_path):
 
 
 # Function to orchestrate the segmentation and feature extraction process:
-def segment_and_extract_features():
+def segment_and_extract_features(debug=False):
     
     print('\nExtracting training dataset heartbeats features...')
     # Load the resampled training dataset from a pickle file
@@ -188,7 +216,7 @@ def segment_and_extract_features():
     pickle_in.close()
     
     # Extract beat features from the training dataset
-    beats = extract_heartbeat_features(data['signals'], data['labels'], data['records'])
+    beats = extract_heartbeat_features(data['signals'], data['labels'], data['records'], debug)
     
     # Print a message indicating that the training set beat features are being saved
     print('\nSaving training_dataset_heartbeats.pickle...')
@@ -204,7 +232,7 @@ def segment_and_extract_features():
     pickle_in.close()
     
     # Extract beat features from the testing dataset
-    beats = extract_heartbeat_features(data['signals'], data['labels'], data['records'])
+    beats = extract_heartbeat_features(data['signals'], data['labels'], data['records'], debug)
     
     # Print a message indicating that the test set beat features are being saved
     print('\nSaving testing_dataset_heartbeats.pickle...')
@@ -213,16 +241,48 @@ def segment_and_extract_features():
     save_beat_features(beats, HEARTBEATS_PATH + 'testing_dataset_heartbeats.pickle')
 
 
-# Function to verify the extracted features:
-def verify_extracted_features():
-    # Load the data from the pickle file
-    with open(os.path.join(HEARTBEATS_PATH, 'training_dataset_heartbeats.pickle'), 'rb') as file:
-        data = pickle.load(file)
+# Function to verify segmented heartbeats and the extracted features:
+# This function will load the pickle file, iterate through the first few heartbeats (up to the specified num_beats_to_inspect), 
+# and print various details about each heartbeat, including its type, source, RR interval features, and morphological features.
+def verify_heartbeats_and_features(record_name, num_beats_to_inspect=5):
+    
+    try:
+        # Load the data from the pickle file
+        with open(os.path.join(HEARTBEATS_PATH, 'training_dataset_heartbeats.pickle'), 'rb') as file:
+            data = pickle.load(file)
+    except Exception as e:
+        print(f"Error loading pickle file: {e}")
+        return
+    
+    heartbeats = data['beats']
+    
+    print(f"\nTotal heartbeats in the file: {len(heartbeats)}")
+    
+    filtered_heartbeats = [beat for beat in heartbeats if beat['source'] == record_name]
 
-    # Print the keys of the first few heartbeats
-    for i, beat in enumerate(data['beats'][:5]): # First 5 heartbeats
-        print(f"\nHeartbeat {i} keys: {beat.keys()}")
-        if 'morph' in beat:
-            print(f"Morph keys: {beat['morph'].keys()}")
+    if not filtered_heartbeats:
+        print(f"Error: Record '{record_name}' not found in the dataset.")
+        return
+
+    # Print the number of heartbeats extracted for the specified record:
+    print(f"\nTotal heartbeats extracted for record '{record_name}': {len(filtered_heartbeats)}")
+    
+    # Inspect first few heartbeats for of the record, until the specified `num_beats_to_inspect`` is reached:
+    for i, beat in enumerate(filtered_heartbeats[:num_beats_to_inspect]):
+        print(f"\nHeartbeat {i}:")
+        print(f"Keys: {beat.keys()}")
+        
+        if 'beatType' in beat:
+            print(f"Type: {beat['beatType']}")
+        
+        if 'rr' in beat:
+            print("RR Features:", beat['rr'])
         else:
-            print("Morph key is missing")
+            print("RR Features key is missing")
+
+        if 'morph' in beat:
+            print("Morphological Features:", beat['morph'])
+            if 'morph' in beat:
+                print(f"Morph keys: {beat['morph'].keys()}")
+        else:
+            print("Morphological Features key is missing")

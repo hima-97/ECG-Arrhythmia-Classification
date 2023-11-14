@@ -3,6 +3,7 @@ import math
 from .signal_buffer import SignalBuffer
 from .signal_buffer import safe_normalizer
 import statistics as stats
+import matplotlib.pyplot as plt
 
 
 # This file is dedicated to extacting features from the QRS complex of each heartbeat.
@@ -83,10 +84,10 @@ def zeroCrossPoints(X):
 
 # Class for QRS detection based on the Pan&Tompkins algorithm:
 # The ExtractQRS class is used to extract features related to the QRS complex of each heartbeat.
-class ExtractQRS():
+class ExtractPQRS():
     
     # This function
-    def __init__(self):
+    def __init__(self, debug=False):
         self.fs = 256  # Adjusted sampling rate (from 150 Hz to 256 Hz)
         # Initialize buffers with adjusted sizes for the new sampling rate:
         self.signalBuffer = SignalBuffer(164) # Adjusted buffer size for 256 Hz (164 samples = 640 ms)
@@ -106,6 +107,9 @@ class ExtractQRS():
         self.pqDiffBuffer = SignalBuffer(32)
         self.rqDiffBuffer = SignalBuffer(32)
         self.rsDiffBuffer = SignalBuffer(32)
+        
+        # If this flag is true, then for each processed heartbeat, a plot is generated to show its signal along with the extracted fiducial points:
+        self.debug = debug  # Debug flag
     
     
     # The findQRSInSignalBuffer method primarily applies the Pan & Tompkins QRS detection algorithm to the buffered signal. 
@@ -293,8 +297,12 @@ class ExtractQRS():
         baseStart = pStart - 17
         if pEnd < 34:
             pEnd = 34
+        
+        # Calculate standard deviation and mean of noise:
         std_noise = stats.stdev(signal[baseStart:pStart])
         mean_noise = stats.mean(signal[baseStart:pStart])
+        
+        # Calculate Ppeak and its index:
         pPeak = max(signal[pStart:pEnd])
         pIndex = signal[pStart:pEnd].index(pPeak) + pStart
         
@@ -310,10 +318,23 @@ class ExtractQRS():
         qrsWidth = (qrsEndIndex - qrsStartIndex) * dt
         halfQrsWidth = (halfQrsEndIndex - halfQrsStartIndex) * dt
         quarterQrsWidth = (quarterQrsEndIndex - quarterQrsStartIndex) * dt
-        if False: #Debug
-            import matplotlib.pyplot as plt
-            plt.plot(signal, '-', pIndex, pPeak, 'r*', qIndex, qPeak, 'ro', rIndex, rPeak, 'rx', sIndex,
-                     sPeak, 'r+', qrsStartIndex, signal[qrsStartIndex], 'g.', qrsEndIndex, signal[qrsEndIndex], 'g.')
+        
+        # If this flag is true, then for each processed heartbeat, a plot is generated to show its signal along with the extracted fiducial points:
+        if self.debug == True:
+            
+            plt.figure(figsize=(15, 6))
+            plt.grid(True)
+            plt.plot(signal, '-', label='ECG Signal')
+            plt.plot(pIndex, pPeak, 'r*', label='Ppeak')
+            plt.plot(qIndex, qPeak, 'rx', label='Qpeak')
+            plt.plot(rIndex, rPeak, 'ro', label='Rpeak')
+            plt.plot(sIndex, sPeak, 'r+', label='Speak')
+            plt.plot(qrsStartIndex, signal[qrsStartIndex], 'g.', label='QRSstart')
+            plt.plot(qrsEndIndex, signal[qrsEndIndex], 'g.', label='QRSend')
+
+            # Adding the legend outside the plot
+            plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+            #plt.title('Heartbeat number ' + str(heartbeat_number) + ' for record ' + str(record_name))
             plt.show()
         
         
