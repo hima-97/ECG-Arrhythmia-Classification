@@ -32,7 +32,7 @@ def compute_wavelet_descriptor(beat, family='db1', level=3):
 # Compute the HOS descriptor for a heartbeat:
 # Skewness (3 cumulant) and kurtosis (4 cumulant)
 # The third-, and fourth-order cumulant functions (kurtosis and skewness, respectively) for each beat segment are computed. 
-# The lag parameters range from −250 ms to 250 ms centered on the R spike and five equally spaced sample points.
+# The lag parameters range from âˆ’250 ms to 250 ms centered on the R spike and five equally spaced sample points.
 def compute_hos_descriptor(beat, n_intervals=6):
     
     # The length of the beat signal is divided by the number of intervals to determine the size of each interval:

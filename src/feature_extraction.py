@@ -25,8 +25,6 @@ from .Feature_Extraction_Utils.advanced_features import compute_morphological_fe
 
 # File Structure after this file is run:
 # Each pickle file contains a list of dictionaries, with each dictionary representing a single heartbeat and its corresponding fiducial points.
-# The keys in each dictionary correspond to the beat label and the fiducial points, like 'q_peak', 'r_peak', 's_peak', 'p_peak', 'qrs_start', and 'qrs_end'.
-# The values are the indices within the signal where these fiducial points occur.
 
 
 # Constants for dataset paths:

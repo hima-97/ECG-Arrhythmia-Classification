@@ -4,7 +4,18 @@ from .ecgtypes import BeatType
 from sklearn.feature_selection import mutual_info_classif
 
 # This file is dedicated to the feature selection/ranking process and constructing the training and testing features datasets.
+# Feature ranking/selection is a process used to select a subset of relevant features for use in model construction. 
+# It involves ranking all available features by some criterion before training the model.
 
+# Mutual information (MI) between each feature and the class labels is used here.
+# Mutual Information measures the amount of information gained about one random variable through observing another random variable. 
+# In this case, it quantifies the amount of information each feature provides about the heartbeat type classes. 
+# The higher the MI score, the more relevant the feature is in predicting the class.
+# MI measures how much information the presence/absence of a feature contributes to making the correct prediction on the class.
+# The aim is to reduce the number of input variables to those that are believed to be most useful to predict the target variable. 
+# This can improve model accuracy, reduce overfitting, and decrease computational cost.
+# Feature ranking/selection is typically done before training the model. 
+# Itâ€™s part of data preprocessing and can be independent of the model choice.
 
 # Constants for dataset paths:
 HEARTBEATS_PATH = './data/Heartbeats Data/'
@@ -121,8 +132,8 @@ def construct_training_features_dataset():
     # Retrieving the names of the higher ranked features:
     ranked_features_names = train_features_names[mi_rank]
 
-    print("MI ranked features: " + str(ranked_features_names))
-    print("MI of ranked features: " + str(mi_features[mi_rank]))
+    print("\nMI ranked features: " + str(ranked_features_names))
+    print("\nMI of ranked features: " + str(mi_features[mi_rank]))
 
     # Saving the ranked features and their mutual information scores to a pickle file:
     print("\nSaving features rank file...")

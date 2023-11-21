@@ -84,7 +84,7 @@ def plot_preprocessed_ecg_with_rpeaks(record_name, start, end, preprocessed_path
 # Plot a resampled ECG segment with adjusted PQRST annotations:
 # Since I am resampling the signal, the sample points of the annotations will also change.
 # You can calculate the new sample points using a simple ratio based on the resampling rate:
-# new_sample_point = original_sample_point × (new_sampling_rate / original_sampling_rate).
+# new_sample_point = original_sample_point Ã— (new_sampling_rate / original_sampling_rate).
 def plot_resampled_ecg_segment_with_pqrst4(record, start, end, resampled_path=RESAMPLED_PATH):
     
     # Load resampled preprocessed signal from the directory

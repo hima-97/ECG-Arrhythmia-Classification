@@ -6,11 +6,11 @@ from .signal_buffer import safe_normalizer
 # This file is used to extract R-R interval related features.
 
 # Normalized heart rate features (6 features): 
-# 𝑅𝑅0 divided by the average of the last 32 beats (𝑅𝑅0/𝑎𝑣𝑔𝑅𝑅), 
-# 𝑅𝑅−1 divided by the average of the last 32 R–R intervals (𝑅𝑅−1/𝑎𝑣𝑔𝑅𝑅), 
-# 𝑅𝑅+1 divided by the average of the last 32 R–R intervals (𝑅𝑅+1/𝑎𝑣𝑔𝑅𝑅), 
-# 𝑅𝑅−1 divided by 𝑅𝑅0 (𝑅𝑅−1/𝑅𝑅0), 𝑅𝑅+1 divided by 𝑅𝑅0 (𝑅𝑅+1/𝑅𝑅0), 
-# and the t-statistic of 𝑅𝑅0 (𝑡𝑅𝑅0) defined by the difference between 𝑅𝑅0 and 𝑎𝑣𝑔𝑅𝑅 divided by the standard deviation of the last 32 R–R intervals.
+# ð‘…ð‘…0 divided by the average of the last 32 beats (ð‘…ð‘…0/ð‘Žð‘£ð‘”ð‘…ð‘…), 
+# ð‘…ð‘…âˆ’1 divided by the average of the last 32 Râ€“R intervals (ð‘…ð‘…âˆ’1/ð‘Žð‘£ð‘”ð‘…ð‘…), 
+# ð‘…ð‘…+1 divided by the average of the last 32 Râ€“R intervals (ð‘…ð‘…+1/ð‘Žð‘£ð‘”ð‘…ð‘…), 
+# ð‘…ð‘…âˆ’1 divided by ð‘…ð‘…0 (ð‘…ð‘…âˆ’1/ð‘…ð‘…0), ð‘…ð‘…+1 divided by ð‘…ð‘…0 (ð‘…ð‘…+1/ð‘…ð‘…0), 
+# and the t-statistic of ð‘…ð‘…0 (ð‘¡ð‘…ð‘…0) defined by the difference between ð‘…ð‘…0 and ð‘Žð‘£ð‘”ð‘…ð‘… divided by the standard deviation of the last 32 Râ€“R intervals.
 
 # Normalized QRS temporal characteristics and amplitude differences (12 features): 
 # the same QRS temporal characteristics and amplitude differences previously specified, except that they are divided by their average value in the last 32 heartbeats.

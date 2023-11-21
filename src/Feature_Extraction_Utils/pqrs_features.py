@@ -8,11 +8,11 @@ import matplotlib.pyplot as plt
 
 # This file is dedicated to extacting features from the QRS complex of each heartbeat.
 # the following temporal characteristics of the QRS complex are calculated: 
-# the total duration of the QRS complex (𝑄𝑅𝑆𝑤), 
-# the width of the QRS complex at half of the peak value (𝑄𝑅𝑆𝑤2), 
-# the width of the QRS complex at a quarter of the peak value (𝑄𝑅𝑆𝑤4), 
+# the total duration of the QRS complex (ð‘„ð‘…ð‘†ð‘¤), 
+# the width of the QRS complex at half of the peak value (ð‘„ð‘…ð‘†ð‘¤2), 
+# the width of the QRS complex at a quarter of the peak value (ð‘„ð‘…ð‘†ð‘¤4), 
 # the distance between the peak of the Q wave, 
-# and the peak of the S wave (𝑄𝑆𝑑).
+# and the peak of the S wave (ð‘„ð‘†ð‘‘).
 
 
 # A detailed description of the extraction procedure is provided below:
@@ -21,43 +21,43 @@ import matplotlib.pyplot as plt
 # At each beat location, a segment of 640 ms of signal (164 samples for 256 Hz) is considered, 
 # 373 ms before the annotation (95 samples for 256 Hz), and 267 ms (68 samples for 256 Hz) after it. 
 # The mean of the signal segment is subtracted from each sample in order to remove the baseline. 
-# The absolute maximum value of the signal 100 ms before and after the annotation (𝑄𝑅𝑆𝑚𝑎𝑥) is considered as a reference point. 
+# The absolute maximum value of the signal 100 ms before and after the annotation (ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥) is considered as a reference point. 
 # Though such value usually corresponds to the database R spike annotation and the peak of the R wave in typical normal heartbeats, 
 # this is not always the case because the QRS may have a complex morphology 
 # and fall into one of the broad categories of the standard nomenclature where the R wave is not the one with the highest amplitude [39]. 
-# Therefore, only if 𝑄𝑅𝑆𝑚𝑎𝑥 is positive is it immediately marked as the peak of the R wave (𝑅𝑝𝑒𝑎𝑘). 
-# Starting from 𝑄𝑅𝑆𝑚𝑎𝑥, ten fiducial points are identified: the two locations where the signal reaches half the value of 𝑄𝑅𝑆𝑚𝑎𝑥 (𝑄𝑅𝑆𝑚𝑎𝑥/2𝑎,𝑏), 
-# the two locations where the signal reaches a quarter of the value of 𝑄𝑅𝑆𝑚𝑎𝑥 (𝑄𝑅𝑆𝑚𝑎𝑥/4𝑎,𝑏), the peak value of the R wave (𝑅𝑝𝑒𝑎𝑘), the peak value of the Q wave (𝑄𝑝𝑒𝑎𝑘), 
-# the peak value of the S wave (𝑆𝑝𝑒𝑎𝑘), the beginning of the QRS complex (𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡), the end of the QRS complex (𝑄𝑅𝑆𝑒𝑛𝑑), and the peak value of the P wave (𝑃𝑝𝑒𝑎𝑘). 
+# Therefore, only if ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥ is positive is it immediately marked as the peak of the R wave (ð‘…ð‘ð‘’ð‘Žð‘˜). 
+# Starting from ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥, ten fiducial points are identified: the two locations where the signal reaches half the value of ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥ (ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥/2ð‘Ž,ð‘), 
+# the two locations where the signal reaches a quarter of the value of ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥ (ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥/4ð‘Ž,ð‘), the peak value of the R wave (ð‘…ð‘ð‘’ð‘Žð‘˜), the peak value of the Q wave (ð‘„ð‘ð‘’ð‘Žð‘˜), 
+# the peak value of the S wave (ð‘†ð‘ð‘’ð‘Žð‘˜), the beginning of the QRS complex (ð‘„ð‘…ð‘†ð‘ ð‘¡ð‘Žð‘Ÿð‘¡), the end of the QRS complex (ð‘„ð‘…ð‘†ð‘’ð‘›ð‘‘), and the peak value of the P wave (ð‘ƒð‘ð‘’ð‘Žð‘˜). 
 
 # Many of the mentioned fiducial points are individuated by looking for the inflection points in the signal 
 # and identifying the locations where the signal's first derivative changes direction. For this, a two-point numerical differentiation is applied to the signal. 
 # The procedure for identifying the fiducial points can be described with the following steps:
 
-# 1) Assume that 𝑄𝑝𝑒𝑎𝑘, 𝑅𝑝𝑒𝑎𝑘, 𝑆𝑝𝑒𝑎𝑘, and 𝑃𝑝𝑒𝑎𝑘 equal zero and that the corresponding waves are not present.
+# 1) Assume that ð‘„ð‘ð‘’ð‘Žð‘˜, ð‘…ð‘ð‘’ð‘Žð‘˜, ð‘†ð‘ð‘’ð‘Žð‘˜, and ð‘ƒð‘ð‘’ð‘Žð‘˜ equal zero and that the corresponding waves are not present.
 
-# 2) If 𝑄𝑅𝑆𝑚𝑎𝑥 is positive, then make 𝑅𝑝𝑒𝑎𝑘 equal to 𝑄𝑅𝑆𝑚𝑎𝑥.
+# 2) If ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥ is positive, then make ð‘…ð‘ð‘’ð‘Žð‘˜ equal to ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥.
 
-# 3) Look backward from 𝑄𝑅𝑆𝑚𝑎𝑥 and evaluate the signal and its inflection points in this way:
-# (a) Make 𝑄𝑅𝑆𝑚𝑎𝑥/2𝑎 equal to the first location where the signal goes below half of 𝑄𝑅𝑆𝑚𝑎𝑥.
-# (b) Make 𝑄𝑅𝑆𝑚𝑎𝑥/4𝑎 equal to the first location where the signal goes below a quarter of 𝑄𝑅𝑆𝑚𝑎𝑥.
-# (c) If the first inflection point is negative and 𝑅𝑝𝑒𝑎𝑘 is not zero, then 𝑄𝑝𝑒𝑎𝑘 equals the value at such point.
-# (d) If the first inflection point is positive or zero and 𝑅𝑝𝑒𝑎𝑘 is not zero, then it is marked as 𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡, and 𝑄𝑝𝑒𝑎𝑘 is considered zero.
-# (e) If the first inflection point is positive and 𝑅𝑝𝑒𝑎𝑘 is zero, then make 𝑅𝑝𝑒𝑎𝑘 equal to the value at such point and make 𝑆𝑝𝑒𝑎𝑘 equal to QRS max.
-# (f) If the second inflection point is negative, 𝑄𝑝𝑒𝑎𝑘 is zero, and 𝑄𝑅𝑆𝑚𝑎𝑥 is positive, then make 𝑄𝑝𝑒𝑎𝑘 equal to the value at such point.
-# (g) If 𝑄𝑝𝑒𝑎𝑘 is not zero and the signal crosses zero, then the first non-negative point is marked as 𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡.
-# (h) If the second inflection point is positive or zero and 𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡 has not been found yet, then it is marked as 𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡.
+# 3) Look backward from ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥ and evaluate the signal and its inflection points in this way:
+# (a) Make ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥/2ð‘Ž equal to the first location where the signal goes below half of ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥.
+# (b) Make ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥/4ð‘Ž equal to the first location where the signal goes below a quarter of ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥.
+# (c) If the first inflection point is negative and ð‘…ð‘ð‘’ð‘Žð‘˜ is not zero, then ð‘„ð‘ð‘’ð‘Žð‘˜ equals the value at such point.
+# (d) If the first inflection point is positive or zero and ð‘…ð‘ð‘’ð‘Žð‘˜ is not zero, then it is marked as ð‘„ð‘…ð‘†ð‘ ð‘¡ð‘Žð‘Ÿð‘¡, and ð‘„ð‘ð‘’ð‘Žð‘˜ is considered zero.
+# (e) If the first inflection point is positive and ð‘…ð‘ð‘’ð‘Žð‘˜ is zero, then make ð‘…ð‘ð‘’ð‘Žð‘˜ equal to the value at such point and make ð‘†ð‘ð‘’ð‘Žð‘˜ equal to QRS max.
+# (f) If the second inflection point is negative, ð‘„ð‘ð‘’ð‘Žð‘˜ is zero, and ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥ is positive, then make ð‘„ð‘ð‘’ð‘Žð‘˜ equal to the value at such point.
+# (g) If ð‘„ð‘ð‘’ð‘Žð‘˜ is not zero and the signal crosses zero, then the first non-negative point is marked as ð‘„ð‘…ð‘†ð‘ ð‘¡ð‘Žð‘Ÿð‘¡.
+# (h) If the second inflection point is positive or zero and ð‘„ð‘…ð‘†ð‘ ð‘¡ð‘Žð‘Ÿð‘¡ has not been found yet, then it is marked as ð‘„ð‘…ð‘†ð‘ ð‘¡ð‘Žð‘Ÿð‘¡.
 
-# 4) Look forward from 𝑄𝑅𝑆𝑚𝑎𝑥 and evaluate the signal and its inflection points in this way:
-# (a) Make 𝑄𝑅𝑆𝑚𝑎𝑥/2𝑏 equal to the first location where the signal goes below half of 𝑄𝑅𝑆𝑚𝑎𝑥.
-# (b) Make 𝑄𝑅𝑆𝑚𝑎𝑥/4𝑏 equal to the first location where the signal goes below a quarter of 𝑄𝑅𝑆𝑚𝑎𝑥.
-# (c) If the first inflection point is negative and 𝑅𝑝𝑒𝑎𝑘 is not zero, then make 𝑆𝑝𝑒𝑎𝑘 equal to the value at such point.
-# (d) If 𝑆𝑝𝑒𝑎𝑘 is not zero and the signal cross zero, then the first non-negative point is marked as 𝑄𝑅𝑆𝑒𝑛𝑑.
-# (e) If the second inflection point is positive or zero and 𝑄𝑅𝑆𝑒𝑛𝑑 has not been found yet, then it is marked as 𝑄𝑅𝑆𝑒𝑛𝑑.
+# 4) Look forward from ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥ and evaluate the signal and its inflection points in this way:
+# (a) Make ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥/2ð‘ equal to the first location where the signal goes below half of ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥.
+# (b) Make ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥/4ð‘ equal to the first location where the signal goes below a quarter of ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥.
+# (c) If the first inflection point is negative and ð‘…ð‘ð‘’ð‘Žð‘˜ is not zero, then make ð‘†ð‘ð‘’ð‘Žð‘˜ equal to the value at such point.
+# (d) If ð‘†ð‘ð‘’ð‘Žð‘˜ is not zero and the signal cross zero, then the first non-negative point is marked as ð‘„ð‘…ð‘†ð‘’ð‘›ð‘‘.
+# (e) If the second inflection point is positive or zero and ð‘„ð‘…ð‘†ð‘’ð‘›ð‘‘ has not been found yet, then it is marked as ð‘„ð‘…ð‘†ð‘’ð‘›ð‘‘.
 
-# 5) Find the maximum value of the signal in the segment that goes between 233 ms (60 samples for 256 Hz) and 67 ms (17 samples for 256 Hz) before 𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡. 
+# 5) Find the maximum value of the signal in the segment that goes between 233 ms (60 samples for 256 Hz) and 67 ms (17 samples for 256 Hz) before ð‘„ð‘…ð‘†ð‘ ð‘¡ð‘Žð‘Ÿð‘¡. 
 # If such value is greater than three times, the standard deviation of the signal during the 67 ms preceding the segment in consideration, 
-# and its position corresponds to an inflection point in the signal, then make 𝑃𝑝𝑒𝑎𝑘 equal to such a value.
+# and its position corresponds to an inflection point in the signal, then make ð‘ƒð‘ð‘’ð‘Žð‘˜ equal to such a value.
 
 
 # Function to calculate the derivative of a signal:
@@ -127,7 +127,7 @@ class ExtractPQRS():
         # This is where you're looking for the maximum and minimum values in a specific segment of the signal to identify QRSmax:
         # This window is chosen based on the expected location of QRS complexes.
         # Note: There is a window of 51 samples (i.e. 200 ms) between the start and end indices.
-        # This means that the absolute maximum value of the signal 100 ms before and 100 ms after the annotation (𝑄𝑅𝑆𝑚𝑎𝑥) is considered as a reference point.
+        # This means that the absolute maximum value of the signal 100 ms before and 100 ms after the annotation (ð‘„ð‘…ð‘†ð‘šð‘Žð‘¥) is considered as a reference point.
         L = len(signal)
         startIndex = L - int(55 * (256 / 150)) # Adjusted index for 256 Hz                
         endIndex = L - int(25 * (256 / 150)) # Adjusted index for 256 Hz    
