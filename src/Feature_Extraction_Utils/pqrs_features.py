@@ -136,9 +136,8 @@ class ExtractPQRS():
         # Note: There is a window of 51 samples (i.e. 200 ms) between the start and end indices.
         # This means that the absolute maximum value of the signal 100 ms before and 100 ms after the annotation (𝑄𝑅𝑆𝑚𝑎𝑥) is considered as a reference point. 
         L = len(signal)
-        startIndex = L - 121 # Start index is at sample 43 (164 samples - 121 samples = 43 samples) of the 164 samples segment
-        endIndex = L - 70 # End index is at sample (164 samples - 70 samples = 94 samples) of the 164 samples segment             
-    
+        startIndex = L - int(55 * (256 / 150)) # Adjusted index for 256 Hz                
+        endIndex = L - int(25 * (256 / 150)) # Adjusted index for 256 Hz
         signalMax = max(signal[startIndex:endIndex])
         sMaxIndex = signal[startIndex:endIndex].index(signalMax) + startIndex
         signalMin = min(signal[startIndex:endIndex])
@@ -414,8 +413,8 @@ class ExtractPQRS():
         # At each beat location, a segment of 640 ms of signal (164 samples for 256 Hz) is considered, 
         # 373 ms before the annotation (95 samples for 256 Hz), and 267 ms (68 samples for 256 Hz) after it. 
         # Adjust the window size around the R peak for 256 Hz:
-        pre_samples = 95  # 95 samples for 256 Hz
-        post_samples = 68  # 68 samples for 256 Hz
+        pre_samples = int(128 * (256 / 150))
+        post_samples = int(40 * (256 / 150))
         
         for n in range(beatSample - pre_samples, beatSample + post_samples):
             rawSample = signal[n]

@@ -7,6 +7,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, f1_score, precision_recall_fscore_support
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 
 
 # This file is dedicated to training the Random Forest classifier and evaluating its performance.
@@ -162,43 +163,6 @@ def evaluate_classifier(conf_matrix, output_class_labels):
 
 
 
-# Function to evaluate the trained Random Forest classifier:
-# The trained Random Forest classifier is used to predict the labels of the test set features.
-def evaluate_model(rf_classifier, test_features, test_set_labels):
-    
-    # The commented line below should scale the training features using the standard scaler:
-    # However, the results might be better without scaling the data.
-    # Therefore, we must test both approaches and see what's best.
-    #print('\nScaling testing features...')
-    #test_features = SCALER.fit_transform(test_features)
-    
-    print('\nValidating model...')
-    test_predictions = rf_classifier.predict(test_features)
-    
-    # Calculating the confusion matrix for the testing set predictions:
-    conf_matrix = confusion_matrix(test_set_labels, test_predictions)
-    print('\nConfusion_matrix:\n', conf_matrix)
-    
-    # Calculating the accuracy of the model on the testing data:
-    accuracy = accuracy_score(test_set_labels, test_predictions)
-    print('\nAccuracy:', accuracy)
-    
-    # Generating and printing classification report:
-    # `digits=4` specifies the number of digits after the decimal point.
-    print('\nClassification report:\n', classification_report(test_set_labels, test_predictions, target_names=CLASS_LABELS, digits=4, zero_division=1))
-    
-    
-    # Calling function to calculate the quality measures for the testing set predictions, based on the confusion matrix:
-    evaluation_test = evaluate_classifier(conf_matrix, CLASS_LABELS)
-    print(f'\nEvaluation details with {NUMBER_OF_FEATURES} features, and {NUMBER_OF_TREES} trees:\n')
-    print(evaluation_test)
-    
-    # Returning the confusion matrix, the accuracy, and the evaluation test of the model on the testing data:
-    return conf_matrix, accuracy, evaluation_test
-
-
-
-
 # Defining a custom function for leave-one-out cross-validation:
 # This function will be used to generate train-test splits for cross-validation.
 def leave_one_out_cv(train_set_sources):
@@ -229,7 +193,7 @@ def leave_one_out_cv(train_set_sources):
 
 
 # Function to save the trained model to a pickle file:
-def save_trained_rf_model(rf_classifier, evaluation_test, output_directory):
+def save_trained_rf_model(rf_classifier, output_directory):
     
     # Defining the path and the name of the output pickle file:
     output_path = os.path.join(output_directory, 'heartbeats_rf_classifier.pickle')
@@ -241,31 +205,88 @@ def save_trained_rf_model(rf_classifier, evaluation_test, output_directory):
     # Saving the trained model to a pickle file:
     print('\nSaving model...')
     with open(output_path, "wb") as file:
-        pickle.dump({'preprocessor': None, 'model': rf_classifier, 'Evaluation_test': evaluation_test}, file)
+        pickle.dump({'preprocessor': None, 'model': rf_classifier}, file)
         print('\nModel saved successfully.')
 
         
         
 
-# Function to orchestrate the training and testing process:
-def train_and_test_model(training_path, testing_path, classifier_path):
+def hyperparameter_tuning(train_features, train_labels):
+    # Define the parameter grid or range
+    param_grid = {
+        'n_estimators': np.arange(1, 101, 1),  # Number of trees from 1 to 100
+        'max_features': np.arange(1, 21, 1)    # Top ranked features from 1 to 20
+    }
+
+    # Initialize a Random Forest Classifier
+    rf = RandomForestClassifier(random_state=42)
+
+    # Initialize Grid Search with multi-metric evaluation
+    search = GridSearchCV(rf, param_grid, cv=5, scoring=['accuracy', 'f1_weighted'], refit='f1_weighted', verbose=2, n_jobs=-1)
+
+    # Fit the model
+    search.fit(train_features, train_labels)
+
+    # Storing results for plotting
+    results = []
     
+    # Iterating through GridSearch results and printing them
+    for i in range(len(search.cv_results_['params'])):
+        n_trees = search.cv_results_['params'][i]['n_estimators']
+        n_features = search.cv_results_['params'][i]['max_features']
+        accuracy = search.cv_results_['mean_test_accuracy'][i]
+        f1_score = search.cv_results_['mean_test_f1_weighted'][i]
+        
+        print(f'Number of trees: {n_trees}, Number of features: {n_features}, Accuracy: {accuracy:.3f}%, F1 Score: {f1_score:.3f}')
+        
+        # Adding results to the list for plotting
+        results.append((n_trees, n_features, accuracy, f1_score))
+
+    print("Best Parameters:", search.best_params_)
+    print("Best Accuracy:", search.best_score_)
+
+    # Returning the best estimator and the results for plotting
+    return search.best_estimator_, results
+
+
+
+# Function to orchestrate the training and testing process:
+def train_rf_model(classifier_path):
+    
+    # # Start hyperparameter tuning and capture results for plotting
+    # print("Starting hyperparameter tuning...")
+    # # Load datasets with the number of all features:
+    # train_features, train_labels, train_sources = load_dataset(training_path + "training_dataset_features.pickle", [count of all features])
+    # test_features, test_labels, test_sources = load_dataset(testing_path + "testing_dataset_features.pickle", [count of all features])
+    
+    # best_rf_classifier, tuning_results = hyperparameter_tuning(train_features, train_labels)
+
+    # # Determine the number of features used by the best performing model:
+    # num_features_used = best_rf_classifier.max_features
+
+    # # Load datasets with the number of features determined by the best model
+    # train_features, train_labels, train_sources = load_dataset(training_path + "training_dataset_features.pickle", num_features_used)
+    # test_features, test_labels, test_sources = load_dataset(testing_path + "testing_dataset_features.pickle", num_features_used)
+
     # Load datasets:
-    train_features, train_labels, train_sources = load_dataset(training_path + "training_dataset_features.pickle")
-    test_features, test_labels, test_sources = load_dataset(testing_path + "testing_dataset_features.pickle")
+    # Comment this line when you perform hyperparameter tuning.
+    train_features, train_labels, train_sources = load_dataset('./data/Training/training_dataset_features.pickle')
+    test_features, test_labels, test_sources = load_dataset('./data/Testing/testing_dataset_features.pickle')
+
 
     # Extracting the names of the top-ranked features:
-    with open(training_path + "training_dataset_mi_ranked_features.pickle", "rb") as file:
+    with open('./data/Training/training_dataset_mi_ranked_features.pickle', "rb") as file:
         mi_data = pickle.load(file)
-    top_feature_names = mi_data["ranked_features_names"][:NUMBER_OF_FEATURES]
+    top_feature_names = mi_data["ranked_features_names"][:NUMBER_OF_FEATURES] # Replace with `num_features_used` when performing hyperparameter tuning.
 
     # Verify the order of features before training the model
     verify_feature_order(train_features, top_feature_names)
 
     # Train model with top feature names:
+    # Comment this line when you perform hyperparameter tuning.
     rf_classifier = train_model(train_features, train_labels, top_feature_names)
 
-    # Using the Random Forest classifier to perform predictions on the training set using the custom cross-validation strategy:
+    # Using the Random Forest classifier to perform predictions on the training set applying the custom cross-validation strategy:
     # This function will generate predictions for each part of the data when it is in the test fold.
     train_predictions = cross_val_predict(rf_classifier, train_features, train_labels, cv=leave_one_out_cv(train_sources))
 
@@ -273,9 +294,50 @@ def train_and_test_model(training_path, testing_path, classifier_path):
     train_accuracy = accuracy_score(train_labels, train_predictions)
     print(f'\nTraining accuracy with {NUMBER_OF_FEATURES} features, and {NUMBER_OF_TREES} trees:')
     print(train_accuracy)
-
-    # Evaluating the model on the testing set:
-    conf_matrix, test_accuracy, evaluation_test = evaluate_model(rf_classifier, test_features, test_labels)
     
     # Saving the trained Random Forest classifier:
-    save_trained_rf_model(rf_classifier, evaluation_test, classifier_path)
+    save_trained_rf_model(rf_classifier, classifier_path)
+    
+    
+    
+    
+# Function to evaluate the trained Random Forest classifier:
+# The trained Random Forest classifier is used to predict the labels of the test set features.
+def evaluate_model(classifier_path, testing_path):
+    
+    # Load the trained Random Forest classifier:
+    with open(classifier_path + 'heartbeats_rf_classifier.pickle', 'rb') as file:
+        loaded_data = pickle.load(file)
+        rf_classifier = loaded_data['model']
+    
+    test_features, test_labels, test_sources = load_dataset(testing_path + "testing_dataset_features.pickle")
+    
+    # The commented line below should scale the training features using the standard scaler:
+    # However, the results might be better without scaling the data.
+    # Therefore, we must test both approaches and see what's best.
+    #print('\nScaling testing features...')
+    #test_features = SCALER.fit_transform(test_features)
+    
+    print('\nValidating model...')
+    test_predictions = rf_classifier.predict(test_features)
+    
+    # Calculating the confusion matrix for the testing set predictions:
+    conf_matrix = confusion_matrix(test_labels, test_predictions)
+    print('\nConfusion_matrix:\n', conf_matrix)
+    
+    # Calculating the accuracy of the model on the testing data:
+    accuracy = accuracy_score(test_labels, test_predictions)
+    print('\nAccuracy:', accuracy)
+    
+    # Generating and printing classification report:
+    # `digits=4` specifies the number of digits after the decimal point.
+    print('\nClassification report:\n', classification_report(test_labels, test_predictions, target_names=CLASS_LABELS, digits=4, zero_division=1))
+    
+    
+    # Calling function to calculate the quality measures for the testing set predictions, based on the confusion matrix:
+    evaluation_test = evaluate_classifier(conf_matrix, CLASS_LABELS)
+    print(f'\nEvaluation details with {NUMBER_OF_FEATURES} features, and {NUMBER_OF_TREES} trees:\n')
+    print(evaluation_test)
+    
+    # Returning the confusion matrix, the accuracy, and the evaluation test of the model on the testing data:
+    return conf_matrix, accuracy, evaluation_test

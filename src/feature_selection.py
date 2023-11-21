@@ -26,7 +26,7 @@ def construct_vectors(beats):
     features_names += list(beats[0]["morph"].keys())
     features_names += ["wt_coef_" + str(i) for i, x in enumerate(beats[0]["wt"])]
     features_names += ["hos_" + str(i) for i, x in enumerate(beats[0]["hos"])]
-    #features_names += ["mg_" + str(i) for i, x in enumerate(beats[0]["mg"])]
+    features_names += ["mg_" + str(i) for i, x in enumerate(beats[0]["mg"])]
     features_names += ["hbf_" + str(i) for i, x in enumerate(beats[0]["hbf"])]
     features_names += ["lbp_" + str(i) for i, x in enumerate(beats[0]["lbp"])]
 
@@ -50,7 +50,7 @@ def construct_vectors(beats):
         beat_features += list(beat["morph"].values())
         beat_features += list(beat["wt"])
         beat_features += list(beat["hos"])
-        #beat_features += list(beat["mg"])
+        beat_features += list(beat["mg"])
         beat_features += list(beat["hbf"])
         beat_features += list(beat["lbp"])
 
@@ -176,7 +176,7 @@ def construct_testing_features_dataset(heartbeats_path, testing_path, mi_rank, r
     test_features, test_features_names, test_labels, test_sources = construct_vectors(data["beats"])
 
     # Saving the entire set of testing features, feature names, labels, sources, ranked features, and ranked feature names to a pickle file:
-    print("\nSaving test set file...")
+    print("\nSaving test set file...\n\n")
     pickle_out = open(testing_path + "testing_dataset_features.pickle", "wb")
     pickle.dump(
         {

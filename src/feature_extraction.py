@@ -1,6 +1,5 @@
 import os
 import numpy as np
-import pandas as pd # Library to work with dataframes
 from scipy.signal import find_peaks
 import pickle # Library to work with pickle files
 import time
@@ -77,7 +76,7 @@ def toc(reset=False):
 
 # Function to extract a segment from ECG signal around the R peak:
 # The length of this segment is determined by the window parameter.
-def get_qrs_waveform(beatTime, signal, window):
+def get_qrs_waveform(beatTime, signal, window=((180) * (256 / 150))):
     
     # Calculate the sample index of the R peak:                                                                   
     beatSample = int(beatTime * 256)
@@ -150,7 +149,7 @@ def extract_heartbeat_features(signals, labels, records, debug=False):
             
             # Get the QRS waveform around the labeled R peak with the adjusted window size for 256 Hz:
             # At each beat location, a segment of 640 ms of signal (164 samples for 256 Hz) is considered,
-            qrsWaveform = get_qrs_waveform(labeledBeatTime, signals[recordIndex], window=164)
+            qrsWaveform = get_qrs_waveform(labeledBeatTime, signals[recordIndex], window=int((76) *(256 / 150)))
             
             # If in debug mode and the current heartbeat is beyond the debug index, plot the signal:
             if DEBUG and labelIndex >= DEBUG_BEAT:
@@ -164,8 +163,8 @@ def extract_heartbeat_features(signals, labels, records, debug=False):
             wt_time = toc(True)
             hos = hos_features(qrsWaveform)
             hos_time = toc(True)
-            #mg = m_features(qrsWaveform)
-            #mg_time = toc(True)
+            mg = m_features(qrsWaveform)
+            mg_time = toc(True)
             hbf = hbf_features(qrsWaveform)
             hbf_time = toc(True)
             lbp = lbp_features(qrsWaveform)
@@ -183,8 +182,8 @@ def extract_heartbeat_features(signals, labels, records, debug=False):
                 'morph_time': qrs_morph_time, # Execution time for QRS morphology feature extraction
                 'wt_time': wt_time,
                 'hos_time': hos_time,
-                #'mg': mg,
-                #'mg_time': mg_time,
+                'mg': mg,
+                'mg_time': mg_time,
                 'hbf': hbf,
                 'hbf_time': hbf_time,
                 'lbp': lbp,
