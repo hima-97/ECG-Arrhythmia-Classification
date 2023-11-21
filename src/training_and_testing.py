@@ -13,7 +13,7 @@ from sklearn.metrics import confusion_matrix, accuracy_score, classification_rep
 
 
 # Number of top ranked features to consider:
-NUMBER_OF_FEATURES = 6
+NUMBER_OF_FEATURES = 5
 # Number of trees to use for the Random Forest classifier:
 NUMBER_OF_TREES = 40
 # Initializing a standard scaler object for normalizing the feature data:
@@ -59,9 +59,9 @@ def verify_feature_order(train_set_features, train_set_ranked_feature_names):
     # Assuming train_set_features is a NumPy array, and the features are ordered in columns
     # We can't directly compare the column names (since it's an array), but we can ensure the number of features matches
     if train_set_features.shape[1] != len(train_set_ranked_feature_names):
-        print("Warning: The number of features in the training set does not match the number of ranked feature names.")
+        print("\nWarning: The number of features in the training set does not match the number of ranked feature names.")
     else:
-        print("Feature number is consistent with ranked feature names.")
+        print("\nFeature number is consistent with ranked feature names.")
 
 
 
@@ -116,7 +116,7 @@ def train_model(train_set_features, train_set_labels, feature_names):
 # Function to calculate various quality parameters or performance metrics for a classifier, based on its confusion matrix:
 def evaluate_classifier(conf_matrix, output_class_labels):
     
-    print('calculating quality parameters...')
+    print('\nCalculating quality parameters...')
 
     # List of quality measures:
     # The list includes the following measures: Sensitivity, Specificity, Positive Predictivity value, False Positive Rate, Accuracy, and F1 Score.
@@ -242,20 +242,20 @@ def save_trained_rf_model(rf_classifier, evaluation_test, output_directory):
     print('\nSaving model...')
     with open(output_path, "wb") as file:
         pickle.dump({'preprocessor': None, 'model': rf_classifier, 'Evaluation_test': evaluation_test}, file)
-        print('Model saved successfully.')
+        print('\nModel saved successfully.')
 
         
         
 
 # Function to orchestrate the training and testing process:
-def train_and_test_model():
+def train_and_test_model(training_path, testing_path, classifier_path):
     
     # Load datasets:
-    train_features, train_labels, train_sources = load_dataset(TRAINING_PATH + "training_dataset_features.pickle")
-    test_features, test_labels, test_sources = load_dataset(TESTING_PATH + "testing_dataset_features.pickle")
+    train_features, train_labels, train_sources = load_dataset(training_path + "training_dataset_features.pickle")
+    test_features, test_labels, test_sources = load_dataset(testing_path + "testing_dataset_features.pickle")
 
     # Extracting the names of the top-ranked features:
-    with open(TRAINING_PATH + "training_dataset_mi_ranked_features.pickle", "rb") as file:
+    with open(training_path + "training_dataset_mi_ranked_features.pickle", "rb") as file:
         mi_data = pickle.load(file)
     top_feature_names = mi_data["ranked_features_names"][:NUMBER_OF_FEATURES]
 
@@ -278,4 +278,4 @@ def train_and_test_model():
     conf_matrix, test_accuracy, evaluation_test = evaluate_model(rf_classifier, test_features, test_labels)
     
     # Saving the trained Random Forest classifier:
-    save_trained_rf_model(rf_classifier, evaluation_test, CLASSIFIER_PATH)
+    save_trained_rf_model(rf_classifier, evaluation_test, classifier_path)

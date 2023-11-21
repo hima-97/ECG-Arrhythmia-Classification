@@ -1,0 +1,56 @@
+Feature number is consistent with ranked feature names.
+
+Training model...
+
+Feature Importances:
+RR0/avgRR: 0.29109750419840663
+RR+1/RR0: 0.2473282479371691
+hbf_5: 0.2185812768829342
+hbf_7: 0.015081333578642822
+hbf_6: 0.2279116374028473
+
+Cross-validating model...
+
+Training accuracy with 5 features, and 40 trees:
+0.9095078497089434
+
+Validating model...
+
+Confusion_matrix:
+ [[43039   157   797   265     1]
+ [ 1355   325   157     0     0]
+ [  337    72  2750    62     0]
+ [  305     0    51    32     0]
+ [    3     0     4     0     0]]
+
+Accuracy: 0.9282668168651432
+
+Classification report:
+               precision    recall  f1-score   support
+
+           N     0.9556    0.9724    0.9639     44259
+           S     0.5866    0.1769    0.2719      1837
+           V     0.7316    0.8538    0.7880      3221
+           F     0.0891    0.0825    0.0857       388
+           Q     0.0000    0.0000    1.0000         7
+
+    accuracy                         0.9283     49712
+   macro avg     0.4726    0.4171    0.6219     49712
+weighted avg     0.9205    0.9283    0.9201     49712
+
+
+Calculating quality parameters...
+
+Evaluation details with 5 features, and 40 trees:
+
+            N         S         V         F         Q
+Se   0.972435  0.176919  0.853772  0.082474  0.000000
+Sp   0.731652  0.995239  0.978758  0.993414  0.999980
+Pp   0.955594  0.586643  0.731578  0.089136  0.000000
+FPR  0.045189  0.124660  0.313257  0.842784  0.142857
+Ac   0.937732  0.965139  0.970821  0.986351  0.999839
+F1   0.963941  0.271853  0.787966  0.085676  0.000000
+
+Saving model...
+
+Model saved successfully.

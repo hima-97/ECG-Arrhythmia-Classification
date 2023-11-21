@@ -51,12 +51,12 @@ def main():
     #split_data.view_testing_pickle_file()
     
     # Segment ECG signals into heartbeats and extract features:
-    feature_extraction.segment_and_extract_features(TRAINING_PATH, TESTING_PATH, HEARTBEATS_PATH, debug=False)
+    #feature_extraction.segment_and_extract_features(TRAINING_PATH, TESTING_PATH, HEARTBEATS_PATH, debug=False)
     
     # Function to verify segmented heartbeats and the extracted features for a specific record:
     # This function will load the pickle file, iterate through the first few heartbeats (up to the specified num_beats_to_inspect), 
     # and print various details about each heartbeat, including its type, source, RR interval features, and morphological features.
-    feature_extraction.verify_heartbeats_and_features(HEARTBEATS_PATH, '101', num_beats_to_inspect=1)
+    #feature_extraction.verify_heartbeats_and_features(HEARTBEATS_PATH, '101', num_beats_to_inspect=1)
     
     
     
@@ -66,17 +66,7 @@ def main():
     #feature_selection.rank_features_and_construct_features_datasets(HEARTBEATS_PATH, TRAINING_PATH, TESTING_PATH)
     
     # Function to train and test the model:
-    #tuning_results = training_and_testing2.train_and_test_model()
-    #training_and_testing.train_and_test_model()
-    
-    
-    
-    # Optionally, find optimal number of features
-    # Uncomment the following lines if feature optimization analysis is needed
-    # best_num_features, best_accuracy, results = find_optimal_features()
-    # print(f"Optimal number of features: {best_num_features} with accuracy: {best_accuracy}")
-    # for num_features, accuracy in results.items():
-    #     print(f"{num_features} features: Accuracy = {accuracy}")
+    training_and_testing.train_and_test_model(TRAINING_PATH, TESTING_PATH, CLASSIFIER_PATH)
 
 
 
