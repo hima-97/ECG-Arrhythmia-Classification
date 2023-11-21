@@ -240,6 +240,9 @@ def preprocess_data(source_dataset_path, save_dataset_path):
     preprocessed_files = os.listdir(save_dataset_path)
     preprocessed_records = {f.split('_')[0] for f in preprocessed_files if f.endswith('_preprocessed_360hz.dat')}
     
+    # Print a new line before preprocessing of the records starts:
+    print("\n")
+    
     # Preprocess each record from the original dataset that hasn't been preprocessed yet:
     for record_name in records:
         if record_name in preprocessed_records:
@@ -304,7 +307,7 @@ def check_all_files_preprocessed(source_dataset_path, save_dataset_path):
     
     # Display the results
     if not missing_files:
-        print("\nAll .dat files have been successfully preprocessed and saved in the 'Preprocessed Data 360 Hz' directory.\n")
+        print(f"\nAll .dat files have been successfully preprocessed and saved in the {save_dataset_path} directory.\n")
     else:
         print("\nThe following files have not been preprocessed:")
         for missing in missing_files:

@@ -11,10 +11,10 @@ import re
 
 
 # Constants for dataset paths:
-ORIGINAL_PATH = './data/mit-bih-arrhythmia-database-1.0.0/'
-PREPROCESSED_PATH = './data/Preprocessed Data 360 Hz/'
+ORIGINAL_PATH = './data/mit-bih-arrhythmia-database-1.0.0'
+PREPROCESSED_PATH = './data/Preprocessed Data 360 Hz'
 RESAMPLED_PATH = './data/Preprocessed Data 256 Hz'  # Directory containing resampled files
-HEARTBEATS_PATH = './data/Heartbeats Data/' # Directory containing segmented heartbeats with extracted features
+HEARTBEATS_PATH = './data/Heartbeats Data' # Directory containing segmented heartbeats with extracted features
 
 
 
@@ -138,14 +138,16 @@ def main():
     preprocessing.check_all_files_preprocessed(ORIGINAL_PATH, PREPROCESSED_PATH)
     
     # Resample preprocessed data from 360 Hz to 256 Hz:
-    #resampling.resample_preprocessed_data()
+    resampling.resample_preprocessed_data(PREPROCESSED_PATH, RESAMPLED_PATH)
+    
+    # Check if all preprocessed files have been resampled:
+    resampling.check_all_files_resampled(PREPROCESSED_PATH, RESAMPLED_PATH)
     
     # Now each resampled ECG signal has the following properties:
     # Resampled Length: 462222
     # Actual Sampling Rate: 256.0 Hz
     
-    # Check if all preprocessed files have been resampled:
-    #resampling.check_all_files_resampled()
+    
     
     # Split the dataset into training and testing datasets:
     #split_data.split_and_save_dataset()
