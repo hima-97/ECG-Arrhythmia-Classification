@@ -17,6 +17,11 @@ RESAMPLED_PATH = './data/Preprocessed Data 256 Hz/'  # Directory containing resa
 HEARTBEATS_PATH = './data/Heartbeats Data/' # Directory containing segmented heartbeats with extracted features
 TRAINING_PATH = './data/Training/'
 TESTING_PATH = './data/Testing/'
+CLASSIFIER_PATH = './data/Heartbeats Classifier/'
+LOGS_PATH = './logs/'
+
+# Constant for sampling rate:
+SAMPLE_RATE = 256 # Sample rate in Hz
 
 
 
@@ -25,58 +30,44 @@ TESTING_PATH = './data/Testing/'
 def main():
 
     # Preprocess original data:
-    preprocessing.preprocess_data(ORIGINAL_PATH, PREPROCESSED_PATH)
+    #preprocessing.preprocess_data(ORIGINAL_PATH, PREPROCESSED_PATH)
     
     # Check if all files have been preprocessed:
-    preprocessing.check_all_files_preprocessed(ORIGINAL_PATH, PREPROCESSED_PATH)
+    #preprocessing.check_all_files_preprocessed(ORIGINAL_PATH, PREPROCESSED_PATH)
     
     # Resample preprocessed data from 360 Hz to 256 Hz:
-    resampling.resample_preprocessed_data(PREPROCESSED_PATH, RESAMPLED_PATH)
+    #resampling.resample_preprocessed_data(PREPROCESSED_PATH, RESAMPLED_PATH)
     
     # Check if all preprocessed files have been resampled:
-    resampling.check_all_files_resampled(PREPROCESSED_PATH, RESAMPLED_PATH)
+    #resampling.check_all_files_resampled(PREPROCESSED_PATH, RESAMPLED_PATH, SAMPLE_RATE)
     
     # Split and save the dataset into training and testing sets:
-    split_data.split_and_save_dataset(ORIGINAL_PATH, RESAMPLED_PATH, TRAINING_PATH, TESTING_PATH)
+    #split_data.split_and_save_dataset(ORIGINAL_PATH, RESAMPLED_PATH, TRAINING_PATH, TESTING_PATH)
     
     # Function to view and print first 10 samples and first 5 labels of first record in training dataset:
-    split_data.view_training_pickle_file()
+    #split_data.view_training_pickle_file()
     
     # Function to view and print first 10 samples and first 5 labels of first record in testing dataset:
-    split_data.view_testing_pickle_file()
+    #split_data.view_testing_pickle_file()
+    
+    # Segment ECG signals into heartbeats and extract features:
+    feature_extraction.segment_and_extract_features(TRAINING_PATH, TESTING_PATH, HEARTBEATS_PATH, debug=False)
+    
+    # Function to verify segmented heartbeats and the extracted features for a specific record:
+    # This function will load the pickle file, iterate through the first few heartbeats (up to the specified num_beats_to_inspect), 
+    # and print various details about each heartbeat, including its type, source, RR interval features, and morphological features.
+    feature_extraction.verify_heartbeats_and_features(HEARTBEATS_PATH, '101', num_beats_to_inspect=1)
     
     
-    #feature_extraction.segment_and_extract_features(debug=False)
-    #feature_extraction.verify_heartbeats_and_features('101', num_beats_to_inspect=1) # Verify that the heartbeats and features were extracted correctly
-    #plotting.plot_training_heartbeat_with_features('100', heartbeats_number=5)
+    
     
     
     # Function for feature selection process and constructing the training and testing features datasets:
-    #feature_selection.rank_features_and_construct_features_datasets()
-    
+    #feature_selection.rank_features_and_construct_features_datasets(HEARTBEATS_PATH, TRAINING_PATH, TESTING_PATH)
     
     # Function to train and test the model:
     #tuning_results = training_and_testing2.train_and_test_model()
     #training_and_testing.train_and_test_model()
-    
-    # # Splitting the results
-    # trees, features, accuracies, f1_scores = zip(*tuning_results)
-    # # Plotting Accuracy vs Number of Trees
-    # plt.figure(figsize=(10, 6))
-    # plt.plot(trees, accuracies, marker='o')
-    # plt.title('Accuracy vs Number of Trees')
-    # plt.xlabel('Number of Trees')
-    # plt.ylabel('Accuracy')
-    # plt.grid(True)
-    # plt.show()
-    # # Plotting Accuracy vs Number of Features
-    # plt.figure(figsize=(10, 6))
-    # plt.plot(features, accuracies, marker='o', color='red')
-    # plt.title('Accuracy vs Number of Features')
-    # plt.xlabel('Number of Features')
-    # plt.ylabel('Accuracy')
-    # plt.grid(True)
-    # plt.show()
     
     
     
@@ -86,26 +77,9 @@ def main():
     # print(f"Optimal number of features: {best_num_features} with accuracy: {best_accuracy}")
     # for num_features, accuracy in results.items():
     #     print(f"{num_features} features: Accuracy = {accuracy}")
-    
-    
-    
-    
-    
-    # # Load training and testing data
-    # train_features, train_labels = load_dataset("./data/Training/training_dataset_features.pickle")
-    # test_features, test_labels = load_dataset("./data/Testing/testing_dataset_features.pickle")
-
-    # # Find the optimal number of trees
-    # optimal_trees_results = find_optimal_trees(train_features, train_labels, test_features, test_labels)
-
-    # # Find the best tree count based on desired criteria (e.g., highest accuracy or F1 score)
-    # best_tree_count = max(optimal_trees_results, key=lambda x: optimal_trees_results[x]['accuracy'])
-    # best_f1_score = optimal_trees_results[best_tree_count]['f1_score']
-    # print(f"Optimal tree count: {best_tree_count} with accuracy: {optimal_trees_results[best_tree_count]['accuracy']} and F1-score: {best_f1_score}")
 
 
 
-
-
+# Call to `main` function:
 if __name__ == '__main__':
     main()

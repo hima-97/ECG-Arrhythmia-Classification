@@ -14,14 +14,7 @@ from sklearn.feature_selection import mutual_info_classif
 # MI measures how much information the presence/absence of a feature contributes to making the correct prediction on the class.
 # The aim is to reduce the number of input variables to those that are believed to be most useful to predict the target variable. 
 # This can improve model accuracy, reduce overfitting, and decrease computational cost.
-# Feature ranking/selection is typically done before training the model. 
-# Itâ€™s part of data preprocessing and can be independent of the model choice.
-
-# Constants for dataset paths:
-HEARTBEATS_PATH = './data/Heartbeats Data/'
-TRAINING_PATH = './data/Training/'
-TESTING_PATH = './data/Testing/'
-LOGS_PATH = './logs/'
+# Feature ranking/selection is typically done before training the model.
 
 
 # Function to construct the features vector, feature names, labels, and source information for each beat from the beats dictionary:
@@ -33,7 +26,7 @@ def construct_vectors(beats):
     features_names += list(beats[0]["morph"].keys())
     features_names += ["wt_coef_" + str(i) for i, x in enumerate(beats[0]["wt"])]
     features_names += ["hos_" + str(i) for i, x in enumerate(beats[0]["hos"])]
-    features_names += ["mg_" + str(i) for i, x in enumerate(beats[0]["mg"])]
+    #features_names += ["mg_" + str(i) for i, x in enumerate(beats[0]["mg"])]
     features_names += ["hbf_" + str(i) for i, x in enumerate(beats[0]["hbf"])]
     features_names += ["lbp_" + str(i) for i, x in enumerate(beats[0]["lbp"])]
 
@@ -57,7 +50,7 @@ def construct_vectors(beats):
         beat_features += list(beat["morph"].values())
         beat_features += list(beat["wt"])
         beat_features += list(beat["hos"])
-        beat_features += list(beat["mg"])
+        #beat_features += list(beat["mg"])
         beat_features += list(beat["hbf"])
         beat_features += list(beat["lbp"])
 
@@ -72,9 +65,9 @@ def construct_vectors(beats):
 
 
 # Function to rank features based on their mutual information scores and construct the training features dataset:
-def construct_training_features_dataset():
+def construct_training_features_dataset(heartbeats_path, training_path):
     print("\nConstructing train set features vector...")
-    pickle_in = open(HEARTBEATS_PATH + "training_dataset_heartbeats.pickle", "rb")
+    pickle_in = open(heartbeats_path + "training_dataset_heartbeats.pickle", "rb")
     data = pickle.load(pickle_in)
     pickle_in.close()
 
@@ -137,7 +130,7 @@ def construct_training_features_dataset():
 
     # Saving the ranked features and their mutual information scores to a pickle file:
     print("\nSaving features rank file...")
-    pickle_out = open(TRAINING_PATH + "training_dataset_mi_ranked_features.pickle", "wb")
+    pickle_out = open(training_path + "training_dataset_mi_ranked_features.pickle", "wb")
     pickle.dump(
         {
             "ranked_features_names": ranked_features_names,
@@ -150,7 +143,7 @@ def construct_training_features_dataset():
 
     # Saving the entire set of training features, feature names, labels, sources, ranked features, and ranked feature names to a pickle file:
     print("\nSaving train set file...")
-    pickle_out = open(TRAINING_PATH + "training_dataset_features.pickle", "wb")
+    pickle_out = open(training_path + "training_dataset_features.pickle", "wb")
     pickle.dump(
         {
             "features": train_features,
@@ -172,10 +165,10 @@ def construct_training_features_dataset():
 
 
 # Function to rank features based on their mutual information scores and construct the training features dataset:
-def construct_testing_features_dataset(mi_rank, ranked_features_names):
+def construct_testing_features_dataset(heartbeats_path, testing_path, mi_rank, ranked_features_names):
     
     print("\nConstructing test set features vector...")
-    pickle_in = open(HEARTBEATS_PATH + "testing_dataset_heartbeats.pickle", "rb")
+    pickle_in = open(heartbeats_path + "testing_dataset_heartbeats.pickle", "rb")
     data = pickle.load(pickle_in)
     pickle_in.close()
     
@@ -184,7 +177,7 @@ def construct_testing_features_dataset(mi_rank, ranked_features_names):
 
     # Saving the entire set of testing features, feature names, labels, sources, ranked features, and ranked feature names to a pickle file:
     print("\nSaving test set file...")
-    pickle_out = open(TESTING_PATH + "testing_dataset_features.pickle", "wb")
+    pickle_out = open(testing_path + "testing_dataset_features.pickle", "wb")
     pickle.dump(
         {
             "features": test_features,
@@ -202,12 +195,12 @@ def construct_testing_features_dataset(mi_rank, ranked_features_names):
 
 
 # Main function to orchestrate the feature selection process and construct the training and testing features datasets:
-def rank_features_and_construct_features_datasets():
+def rank_features_and_construct_features_datasets(heartbeats_path, training_path, testing_path):
     
     # Calling function to rank features based on their mutual information scores and construct the training features dataset:
-    mi_rank, ranked_features_names = construct_training_features_dataset()
+    mi_rank, ranked_features_names = construct_training_features_dataset(heartbeats_path, training_path)
     
     # Calling function to construct the testing features dataset:
     # The top ranked features and their names are passed as arguments to this function.
     # The same feature ranking obtained from the training dataset is also used here in order to ensure consistency.
-    construct_testing_features_dataset(mi_rank, ranked_features_names)
+    construct_testing_features_dataset(heartbeats_path, testing_path, mi_rank, ranked_features_names)

@@ -11,17 +11,11 @@ from sklearn.metrics import confusion_matrix, accuracy_score, classification_rep
 
 # This file is dedicated to training the Random Forest classifier and evaluating its performance.
 
-# Constants for dataset paths:
-HEARTBEATS_PATH = './data/Heartbeats Data/'
-TRAINING_PATH = './data/Training/'
-TESTING_PATH = './data/Testing/'
-LOGS_PATH = './logs/'
-CLASSIFIER_PATH = './data/Heartbeats Classifier/'
 
 # Number of top ranked features to consider:
 NUMBER_OF_FEATURES = 6
 # Number of trees to use for the Random Forest classifier:
-NUMBER_OF_TREES = 70
+NUMBER_OF_TREES = 40
 # Initializing a standard scaler object for normalizing the feature data:
 SCALER = StandardScaler()
 

@@ -12,7 +12,7 @@ from scipy.signal import resample
 
     
 # Function to resample pre-processed data from 360 Hz to 256 Hz:
-def resample_preprocessed_data(source_dataset_path, save_dataset_path):
+def resample_preprocessed_data(source_dataset_path, save_dataset_path, sample_rate):
     
     # Check the existence of the source directory:
     if not os.path.exists(source_dataset_path):
@@ -51,7 +51,7 @@ def resample_preprocessed_data(source_dataset_path, save_dataset_path):
         extended_data[0:first_lead_data.shape[0]] = first_lead_data
 
         # Resample the extended data to 256 Hz:
-        resampled_duration = int(np.ceil(original_duration) * 256)
+        resampled_duration = int(np.ceil(original_duration) * sample_rate)
         resampled_data = resample(extended_data, resampled_duration)
 
         # Save the resampled data:

@@ -1,15 +1,16 @@
-#!/usr/bin/env python
-"""
-Extract heartbeat features according to the work of Mondejar-Guerra et. al (http://www.sciencedirect.com/science/article/pii/S1746809418301976)
-The functions defined here are a modified version of the code avalable on https://github.com/mondejar/ecg-classification/blob/master/python/features_ECG.py
-All modifications to the original code relate only to differences in sampling frequency and format.
-"""
+
+# The code below is an adaptation of the code from Mondejar-Guerra et. al (http://www.sciencedirect.com/science/article/pii/S1746809418301976)
+# The original code is located at https://github.com/mondejar/ecg-classification/blob/master/python/features_ECG.py
+
 
 import numpy as np
 import scipy.stats
 import pywt
 import operator
 from numpy.polynomial.hermite import hermfit
+
+# The code in this file contains an adaptation of the code from Mondejar-Guerra et. al (http://www.sciencedirect.com/science/article/pii/S1746809418301976)
+# which can be found at https://github.com/mondejar/ecg-classification/blob/master/python/features_ECG.py
 
 
 # This file is dedicated to extrating the following types of features:
@@ -18,6 +19,8 @@ from numpy.polynomial.hermite import hermfit
 # DWT coefficients
 # Uniform Local Binary Patterns (LBP)
 # Custom Descriptor Based on Amplitude Intervals
+
+
 
 
 # Function that uses Discrete Wavelet Transform (DWT) to compute coefficients for a heartbeat:
@@ -29,10 +32,13 @@ def compute_wavelet_descriptor(beat, family='db1', level=3):
     coeffs = pywt.wavedec(beat, wave_family, level=level)
     return coeffs[0]
 
+
+
+
 # Compute the HOS descriptor for a heartbeat:
 # Skewness (3 cumulant) and kurtosis (4 cumulant)
 # The third-, and fourth-order cumulant functions (kurtosis and skewness, respectively) for each beat segment are computed. 
-# The lag parameters range from âˆ’250 ms to 250 ms centered on the R spike and five equally spaced sample points.
+# The lag parameters range from a -250 ms to 250 ms centered on the R spike and five equally spaced sample points.
 def compute_hos_descriptor(beat, n_intervals=6):
     
     # The length of the beat signal is divided by the number of intervals to determine the size of each interval:
@@ -165,6 +171,9 @@ def compute_morphological_features(beat):
 
     return my_morph
 
+
+
+
 # https://docs.scipy.org/doc/numpy-1.13.0/reference/routines.polynomials.hermite.html
 # Support Vector Machine-Based Expert System for Reliable Heartbeat Recognition
 # 15 hermite coefficients!
@@ -175,10 +184,9 @@ def compute_morphological_features(beat):
 def compute_HBF(beat):
 
     coeffs_hbf = np.zeros(15, dtype=float)
-    coeffs_HBF_3 = hermfit(range(0, len(beat)), beat, 3)  # 3, 4, 5, 6?
+    coeffs_HBF_3 = hermfit(range(0, len(beat)), beat, 3)
     coeffs_HBF_4 = hermfit(range(0, len(beat)), beat, 4)
     coeffs_HBF_5 = hermfit(range(0, len(beat)), beat, 5)
-    #coeffs_HBF_6 = hermfit(range(0,len(beat)), beat, 6)
 
     coeffs_hbf = np.concatenate((coeffs_HBF_3, coeffs_HBF_4, coeffs_HBF_5))
 
