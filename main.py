@@ -58,10 +58,6 @@ def main():
     # and print various details about each heartbeat, including its type, source, RR interval features, and morphological features.
     #feature_extraction.verify_heartbeats_and_features(HEARTBEATS_PATH, '101', num_beats_to_inspect=1)
     
-    
-    
-    
-    
     # Function for feature selection process and constructing the training and testing features datasets:
     #feature_selection.rank_features_and_construct_features_datasets(HEARTBEATS_PATH, TRAINING_PATH, TESTING_PATH)
     

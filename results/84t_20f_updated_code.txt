@@ -1,0 +1,71 @@
+Feature number is consistent with ranked feature names.
+
+Training model...
+
+Feature Importances:
+RR0/avgRR: 0.13607145949049904
+RR+1/RR0: 0.09497739572605032
+hbf_5: 0.0838425073398339
+hbf_7: 0.00984822176716369
+hbf_6: 0.08235146469588871
+hbf_8: 0.0
+hbf_14: 0.0
+RR-1/RR0: 0.07204988335808582
+RR0: 0.06812437679358999
+hbf_13: 0.0
+RR+1/avgRR: 0.03721270343820302
+hos_2: 0.07214019950793481
+QRSs_norm: 0.05725089583155439
+QRSw2_norm: 0.03051749992944674
+wt_coef_11: 0.05686307425274532
+QRSw4_norm: 0.024551498439695618
+QRSw4: 0.02146950458494245
+QRSend: 0.0881502335017403
+QRSw2: 0.0236978159824969
+QSw: 0.04088126536012898
+
+Cross-validating model...
+
+Training accuracy with 20 features, and 84 trees:
+0.9405342898022383
+
+Validating model...
+
+Confusion_matrix:
+ [[43849   180   219    11     0]
+ [ 1542   182   113     0     0]
+ [  170    12  3003    36     0]
+ [  268     0    15   105     0]
+ [    3     0     4     0     0]]
+
+Accuracy: 0.948241873189572
+
+Classification report:
+               precision    recall  f1-score   support
+
+           N     0.9567    0.9907    0.9734     44259
+           S     0.4866    0.0991    0.1646      1837
+           V     0.8953    0.9323    0.9135      3221
+           F     0.6908    0.2706    0.3889       388
+           Q     1.0000    0.0000    0.0000         7
+
+    accuracy                         0.9482     49712
+   macro avg     0.8059    0.4585    0.4881     49712
+weighted avg     0.9333    0.9482    0.9350     49712
+
+
+Calculating quality parameters...
+
+Evaluation details with 20 features, and 84 trees:
+
+            N         S         V         F         Q
+Se   0.990736  0.099075  0.932319  0.270619  0.000000
+Sp   0.733324  0.996006  0.992507  0.999048  1.000000
+Pp   0.956733  0.486631  0.895349  0.690789  0.000000
+FPR  0.044804  0.104518  0.108972  0.121134  0.000000
+Ac   0.953709  0.962989  0.988634  0.993368  0.999859
+F1   0.973438  0.164631  0.913460  0.388889  0.000000
+
+Saving model...
+
+Model saved successfully.

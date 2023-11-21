@@ -13,9 +13,9 @@ from sklearn.metrics import confusion_matrix, accuracy_score, classification_rep
 
 
 # Number of top ranked features to consider:
-NUMBER_OF_FEATURES = 5
+NUMBER_OF_FEATURES = 20
 # Number of trees to use for the Random Forest classifier:
-NUMBER_OF_TREES = 40
+NUMBER_OF_TREES = 84
 # Initializing a standard scaler object for normalizing the feature data:
 SCALER = StandardScaler()
 
