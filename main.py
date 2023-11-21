@@ -149,10 +149,10 @@ def main():
     split_data.split_and_save_dataset(ORIGINAL_PATH, RESAMPLED_PATH, TRAINING_PATH, TESTING_PATH)
     
     # Function to view and print first 10 samples and first 5 labels of first record in training dataset:
-    #split_data.view_training_pickle_file()
+    split_data.view_training_pickle_file()
     
     # Function to view and print first 10 samples and first 5 labels of first record in testing dataset:
-    #split_data.view_testing_pickle_file()
+    split_data.view_testing_pickle_file()
     
     
     #feature_extraction.segment_and_extract_features(debug=False)

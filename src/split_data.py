@@ -92,18 +92,18 @@ def read_dataset_info(original_dataset_path, resampled_dataset_path, records):
 # Function to create and save training and testing datasets:
 def split_and_save_dataset(original_dataset_path, resampled_dataset_path, training_dataset_path, testing_dataset_path):
     
-    print("Creating training dataset...")
+    print("\nCreating training dataset...")
     signals, labels = read_dataset_info(original_dataset_path, resampled_dataset_path, TRAINING_SET)
     
-    print("Saving training_dataset file...")
+    print("\nSaving training_dataset file...")
     pickle_out = open(training_dataset_path + "training_dataset_signals.pickle", "wb")
     pickle.dump({"signals": signals, "labels": labels, "records": TRAINING_SET}, pickle_out)
     pickle_out.close()
 
-    print("Creating testing dataset...")
+    print("\nCreating testing dataset...")
     signals, labels = read_dataset_info(original_dataset_path, resampled_dataset_path, TESTING_SET)
     
-    print("Saving testing_dataset file...")
+    print("\nSaving testing_dataset file...")
     pickle_out = open(testing_dataset_path + "testing_dataset_signals.pickle", "wb")
     pickle.dump({"signals": signals, "labels": labels, "records": TESTING_SET}, pickle_out)
     pickle_out.close()
@@ -122,9 +122,9 @@ def view_training_pickle_file():
         data = pickle.load(file)
 
     # Print a summary or specific details of the data
-    print("Number of records in training dataset:", len(data['signals']))
-    print("Sample record signal from training dataset:", data['signals'][0][:10])  # prints first 10 samples of the first record
-    print("Sample record labels from training dataset:", data['labels'][0][:5])  # prints first 5 labels of the first record
+    print("\nNumber of records in training dataset:", len(data['signals']))
+    print("\nSample record signal from training dataset:", data['signals'][0][:10])  # prints first 10 samples of the first record
+    print("\nSample record labels from training dataset:", data['labels'][0][:5])  # prints first 5 labels of the first record
     
     
     
@@ -140,6 +140,6 @@ def view_testing_pickle_file():
         data = pickle.load(file)
 
     # Print a summary or specific details of the data
-    print("Number of records in testing dataset:", len(data['signals']))
-    print("Sample record signal from testing dataset:", data['signals'][0][:10])  # prints first 10 samples of the first record
-    print("Sample record labels from testing dataset:", data['labels'][0][:5])  # prints first 5 labels of the first record
+    print("\nNumber of records in testing dataset:", len(data['signals']))
+    print("\nSample record signal from testing dataset:", data['signals'][0][:10])  # prints first 10 samples of the first record
+    print("\nSample record labels from testing dataset:", data['labels'][0][:5])  # prints first 5 labels of the first record
