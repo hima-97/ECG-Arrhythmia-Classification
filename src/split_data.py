@@ -5,21 +5,15 @@ import numpy as np
 from src.ecgtypes import HeartRhythm, BeatType
 
 
+# Defining training and testing datasets:
+TRAINING_SET = {"101", "106", "108", "109", "112", "114", "115", "116", "118", "119", "122", "124", "201", "203", "205", "207", "208", "209", "215", "220", "223", "230"}
+TESTING_SET = {"100", "103", "105", "111", "113", "117", "121", "123", "200", "202", "210", "212", "213", "214", "219", "221", "222", "228", "231", "232", "233", "234"}
 
-# Constants for dataset paths
-ORIGINAL_PATH = './data/mit-bih-arrhythmia-database-1.0.0/'
-RESAMPLED_PATH = './data/Preprocessed Data 256 Hz'
-TRAINING_PATH = './data/Training/'
-TESTING_PATH = './data/Testing/'
-
-# Defining training and testing datasets
-training_dataset = {"101", "106", "108", "109", "112", "114", "115", "116", "118", "119", "122", "124", "201", "203", "205", "207", "208", "209", "215", "220", "223", "230"}
-testing_dataset = {"100", "103", "105", "111", "113", "117", "121", "123", "200", "202", "210", "212", "213", "214", "219", "221", "222", "228", "231", "232", "233", "234"}
 
 
 
 # Function to read the dataset information:
-def read_dataset_info(records):
+def read_dataset_info(original_dataset_path, resampled_dataset_path, records):
 
     # Prepare containers
     signals, labels = [], []
@@ -28,10 +22,10 @@ def read_dataset_info(records):
     for record_name in records:
         
         # Reading annotations from original database
-        annotations = wfdb.rdann(f'{ORIGINAL_PATH}/{record_name}', 'atr')
+        annotations = wfdb.rdann(f'{original_dataset_path}/{record_name}', 'atr')
     
         # Reading original ECG record from original database:
-        original_record = wfdb.rdrecord(os.path.join(ORIGINAL_PATH, record_name))
+        original_record = wfdb.rdrecord(os.path.join(original_dataset_path, record_name))
     
         header = {
             "label": original_record.sig_name[0],
@@ -77,7 +71,7 @@ def read_dataset_info(records):
                 
         
         # Reading resampled ECG signals from local directory
-        record_path = os.path.join(RESAMPLED_PATH, f"{record_name}_preprocessed_256hz.dat")
+        record_path = os.path.join(resampled_dataset_path, f"{record_name}_preprocessed_256hz.dat")
         try:
             # Load resampled preprocessed signal from the directory
             resampled_signal = np.loadtxt(record_path, delimiter=',')
@@ -94,28 +88,30 @@ def read_dataset_info(records):
 
 
 
+
 # Function to create and save training and testing datasets:
-def split_and_save_dataset():
+def split_and_save_dataset(original_dataset_path, resampled_dataset_path, training_dataset_path, testing_dataset_path):
     
     print("Creating training dataset...")
-    signals, labels = read_dataset_info(training_dataset)
+    signals, labels = read_dataset_info(original_dataset_path, resampled_dataset_path, TRAINING_SET)
     
     print("Saving training_dataset file...")
-    pickle_out = open(TRAINING_PATH + "training_dataset_signals.pickle", "wb")
-    pickle.dump({"signals": signals, "labels": labels, "records": training_dataset}, pickle_out)
+    pickle_out = open(training_dataset_path + "training_dataset_signals.pickle", "wb")
+    pickle.dump({"signals": signals, "labels": labels, "records": TRAINING_SET}, pickle_out)
     pickle_out.close()
 
     print("Creating testing dataset...")
-    signals, labels = read_dataset_info(testing_dataset)
+    signals, labels = read_dataset_info(original_dataset_path, resampled_dataset_path, TESTING_SET)
     
     print("Saving testing_dataset file...")
-    pickle_out = open(TESTING_PATH + "testing_dataset_signals.pickle", "wb")
-    pickle.dump({"signals": signals, "labels": labels, "records": testing_dataset}, pickle_out)
+    pickle_out = open(testing_dataset_path + "testing_dataset_signals.pickle", "wb")
+    pickle.dump({"signals": signals, "labels": labels, "records": TESTING_SET}, pickle_out)
     pickle_out.close()
     
     
 
-# Function to view the testing dataset:
+
+# Function to view and print first 10 samples and first 5 labels of first record in training dataset:
 def view_training_pickle_file():
     
     # Path to the training pickle file
@@ -131,8 +127,11 @@ def view_training_pickle_file():
     print("Sample record labels from training dataset:", data['labels'][0][:5])  # prints first 5 labels of the first record
     
     
-# Function to view the testing dataset:
+    
+    
+# Function to view and print first 10 samples and first 5 labels of first record in testing dataset:
 def view_testing_pickle_file():
+    
     # Path to the testing pickle file
     file_path = './data/Testing/testing_dataset_signals.pickle'
 
