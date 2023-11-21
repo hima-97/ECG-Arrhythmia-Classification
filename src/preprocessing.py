@@ -6,10 +6,6 @@ import numpy as np # Library to work with arrays
 from scipy.signal import BadCoefficients, butter, filtfilt # Library to apply filters to the signal
 
 
-# Constants for dataset paths:
-DATASET_PATH = './data/mit-bih-arrhythmia-database-1.0.0'
-PREPROCESSED_PATH = './data/Preprocessed Data 360 Hz'
-
 # Set up logging:
 # if you're processing many records in batch mode, you can log these errors to a file for easier post-processing. 
 # Any errors during preprocessing will be logged to the file `preprocessing_errors.log`, inside the `logs` directory.
@@ -17,12 +13,6 @@ def log_preprocessing_error(error_message):
     with open('./logs/preprocessing_errors.log', 'a') as log_file:
         log_file.write(f"{error_message}\n")
 
-
-# Utility functions:
-# Function to check if the iven directory exists, and create it if necessary:
-def ensure_directory_exists(directory_path):
-    if not os.path.exists(directory_path):
-        os.makedirs(directory_path)
 
 
 
@@ -84,6 +74,7 @@ def highpass_filter_with_padding(signal, lowcut=1, fs=360, order=1, pad_length=1
 # Investigate the frequency content of Lead 2 before filtering to ensure that the high-pass filter isn't overly aggressive.
 # Experiment with different filter parameters or designs to retain more of Lead 2's original content.
 # Consider the possibility that Lead 2 in this specific dataset might inherently have a low frequency content.
+
 
 
 
@@ -198,11 +189,12 @@ def normalize(signal):
 
 
 
+
 # Function to load the original ECG signal and preprocess it:
-def load_and_preprocess_signal(record_name, dataset_path): 
+def load_and_preprocess_signal(record_name, source_dataset_path): 
 
     try:
-        record = wfdb.rdrecord(os.path.join(dataset_path, record_name))
+        record = wfdb.rdrecord(os.path.join(source_dataset_path, record_name))
         original_signal = record.p_signal
 
         # High-pass filtering:
@@ -226,59 +218,82 @@ def load_and_preprocess_signal(record_name, dataset_path):
 
 
 
-# Function to pre-process and clean an ECG signal, and then save it:
-def preprocess_record(record_name, dataset_path=DATASET_PATH, save_dataset_path=PREPROCESSED_PATH):
+# Function to start preprocessing phase for all records in the source dataset directory:
+def preprocess_data(source_dataset_path, save_dataset_path):
     
-    logging.info(f"Starting preprocessing for record: {record_name}")
-    
-    preprocessed_filename = os.path.join(save_dataset_path, f"{record_name}_preprocessed_360hz.dat")
-
-    # Check if the preprocessed file already exists:
-    if os.path.exists(preprocessed_filename):
+    # Check the existence of the source directory:
+    if not os.path.exists(source_dataset_path):
+        print(f"Error: Source directory {source_dataset_path} does not exist.")
         return
 
-    try:
-        if not os.path.exists(os.path.join(dataset_path, f"{record_name}.dat")):
-            raise FileNotFoundError(f"Record {record_name} not found in {dataset_path}")
-
-        preprocessed_signal = load_and_preprocess_signal(record_name, dataset_path)
+    # Create target directory if it doesn't exist:
+    if not os.path.exists(save_dataset_path):
+        os.makedirs(save_dataset_path)
         
-        # Ensure directory exists
-        ensure_directory_exists(save_dataset_path)
-        
-        np.savetxt(preprocessed_filename, preprocessed_signal, delimiter=',')
-        print(f"Successfully preprocessed and saved {record_name} to {preprocessed_filename}.")
+    # List all .dat files (i.e. ECG signal files) in the original dataset directory:
+    all_dat_files = [f for f in os.listdir(source_dataset_path) if f.endswith('.dat')]
 
-    except FileNotFoundError as fnf_error:
-        print(fnf_error)
-        log_preprocessing_error(fnf_error)
-    except ValueError as ve:
-        print(f"ValueError encountered: {ve}")
-        log_preprocessing_error(ve)
-        traceback.print_exc()
-    # To handle cases where filter coefficients might lead to instability:
-    except BadCoefficients as bc:
-        print(f"Bad coefficients encountered during filtering: {bc}")
-        log_preprocessing_error(bc)
-        traceback.print_exc()
-    # To handle potential linear algebra-related errors:
-    except np.linalg.LinAlgError as lae:
-        print(f"Linear algebra error encountered: {lae}")
-        log_preprocessing_error(lae)
-        traceback.print_exc()
-    except Exception as e:
-        print(f"General error processing record {record_name}. Error: {e}")
-        log_preprocessing_error(e)
-        traceback.print_exc()
+    # Extract unique record numbers:
+    records = set(f.split('.')[0] for f in all_dat_files)
+    
+    # Get the set of already preprocessed records:
+    preprocessed_files = os.listdir(save_dataset_path)
+    preprocessed_records = {f.split('_')[0] for f in preprocessed_files if f.endswith('_preprocessed_360hz.dat')}
+    
+    # Preprocess each record from the original dataset that hasn't been preprocessed yet:
+    for record_name in records:
+        if record_name in preprocessed_records:
+            print(f"Record {record_name} has already been preprocessed. Skipping.")
+            continue # Skip to the next record
+        
+        # Start of preprocessing phase for the current record's ECG signal:
+        try:
+            
+            logging.info(f"Starting preprocessing for record: {record_name}")
+            
+            # Calling function to load and preprocess signal of current record:
+            preprocessed_signal = load_and_preprocess_signal(record_name, source_dataset_path)
+            
+            # Construct the filename for the preprocessed signal to be saved:
+            preprocessed_filename = os.path.join(save_dataset_path, f"{record_name}_preprocessed_360hz.dat")
+            
+            # Saving the preprocessed signal:
+            np.savetxt(preprocessed_filename, preprocessed_signal, delimiter=',')
+            print(f"Successfully preprocessed and saved {record_name} to {preprocessed_filename}.")
+            
+        
+        except FileNotFoundError as fnf_error:
+            print(fnf_error)
+            log_preprocessing_error(fnf_error)
+        except ValueError as ve:
+            print(f"ValueError encountered: {ve}")
+            log_preprocessing_error(ve)
+            traceback.print_exc()
+        # To handle cases where filter coefficients might lead to instability:
+        except BadCoefficients as bc:
+            print(f"Bad coefficients encountered during filtering: {bc}")
+            log_preprocessing_error(bc)
+            traceback.print_exc()
+        # To handle potential linear algebra-related errors:
+        except np.linalg.LinAlgError as lae:
+            print(f"Linear algebra error encountered: {lae}")
+            log_preprocessing_error(lae)
+            traceback.print_exc()
+        except Exception as e:
+            print(f"General error processing record {record_name}. Error: {e}")
+            log_preprocessing_error(e)
+            traceback.print_exc()
+
+
 
 
 # Function to check if all files have been preprocessed:
-def check_all_files_preprocessed():
+def check_all_files_preprocessed(source_dataset_path, save_dataset_path):
     # List of all .dat files in the MIT-BIH directory
-    original_files = [f for f in os.listdir(DATASET_PATH) if f.endswith('.dat')]
+    original_files = [f for f in os.listdir(source_dataset_path) if f.endswith('.dat')]
     
     # List of all preprocessed files in the 'Preprocessed Data 360 Hz' directory
-    preprocessed_files = [f for f in os.listdir(PREPROCESSED_PATH) if f.endswith('_preprocessed_360hz.dat')]
+    preprocessed_files = [f for f in os.listdir(save_dataset_path) if f.endswith('_preprocessed_360hz.dat')]
     
     # Check if each original .dat file has a corresponding preprocessed file
     missing_files = []

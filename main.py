@@ -13,7 +13,7 @@ import re
 # Constants for dataset paths:
 ORIGINAL_PATH = './data/mit-bih-arrhythmia-database-1.0.0/'
 PREPROCESSED_PATH = './data/Preprocessed Data 360 Hz/'
-RESAMPLED_DIRECTORY = './data/Preprocessed Data 256 Hz'  # Directory containing resampled files
+RESAMPLED_PATH = './data/Preprocessed Data 256 Hz'  # Directory containing resampled files
 HEARTBEATS_PATH = './data/Heartbeats Data/' # Directory containing segmented heartbeats with extracted features
 
 
@@ -131,25 +131,11 @@ def plot_optimal_trees():
 # Main Function:
 def main():
 
-    # Get the set of already preprocessed records
-    #preprocessed_files = os.listdir(PREPROCESSED_PATH)
-    #preprocessed_records = {f.split('_')[0] for f in preprocessed_files if f.endswith('_preprocessed_360hz.dat')}
-
-    # List all .dat files in the dataset directory
-    #all_dat_files = [f for f in os.listdir(ORIGINAL_PATH) if f.endswith('.dat')]
-
-    # Extract unique record numbers
-    #records = set(f.split('.')[0] for f in all_dat_files)
-
-    # Preprocess each record that hasn't been preprocessed yet
-    #for record in records:
-    #    if record in preprocessed_records:
-    #        print(f"Record {record} has already been preprocessed. Skipping.")
-    #        continue
-    #    preprocessing.preprocess_record(record, ORIGINAL_PATH)
+    # Preprocess original data:
+    preprocessing.preprocess_data(ORIGINAL_PATH, PREPROCESSED_PATH)
     
     # Check if all files have been preprocessed:
-    #preprocessing.check_all_files_preprocessed()
+    preprocessing.check_all_files_preprocessed(ORIGINAL_PATH, PREPROCESSED_PATH)
     
     # Resample preprocessed data from 360 Hz to 256 Hz:
     #resampling.resample_preprocessed_data()
@@ -178,7 +164,7 @@ def main():
     
     # Function to train and test the model:
     #tuning_results = training_and_testing2.train_and_test_model()
-    training_and_testing.train_and_test_model()
+    #training_and_testing.train_and_test_model()
     
     # # Splitting the results
     # trees, features, accuracies, f1_scores = zip(*tuning_results)

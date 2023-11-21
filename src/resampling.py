@@ -44,6 +44,7 @@ def resample_preprocessed_data():
         data = np.loadtxt(os.path.join(SOURCE_DIRECTORY, file), delimiter=',')
         first_lead_data = data[:, 0] if data.ndim > 1 else data
 
+    
         original_duration = first_lead_data.shape[0] / 360
         new_length = int(np.ceil(original_duration) * 360)
 
