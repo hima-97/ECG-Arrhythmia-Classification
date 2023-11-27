@@ -180,8 +180,6 @@ def normalize(signal):
         log_preprocessing_error(f"WARNING: Leads {constant_lead_indices} have constant values. They won't be normalized.")
         range_values[range_values == 0] = 1.0  # Set to 1 to avoid division by zero, but the signal remains unchanged for these leads
     
-    # Normalize the signal to [-1, 1]
-    #normalized_signal = 2 * ((signal - min_values) / range_values) - 1
     # Normalize the signal to [0, 1]
     normalized_signal = (signal - min_values) / range_values
     
