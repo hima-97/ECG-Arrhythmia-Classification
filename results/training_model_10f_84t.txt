@@ -1,0 +1,24 @@
+Feature number is consistent with ranked feature names.
+
+Training model...
+
+Feature Importances:
+QRSw2_norm: 0.1755063769286561
+RR0/avgRR: 0.15186188278735296
+QRSw2: 0.18361532168148126
+QRSw4_norm: 0.08552736145479661
+QRSw4: 0.09790933328276244
+RR+1/RR0: 0.08337255986570459
+hbf_6: 0.06917624103791263
+hbf_7: 0.014616318086259787
+hbf_5: 0.06340205206642358
+Speak_norm: 0.07501255280865018
+
+Cross-validating model...
+
+Training accuracy with 10 features, and 84 trees:
+0.9341447639207385
+
+Saving model...
+
+Model saved successfully.

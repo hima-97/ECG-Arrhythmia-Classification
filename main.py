@@ -26,6 +26,87 @@ SAMPLE_RATE = 256 # Sample rate in Hz
 
 
 
+def read_performance_data(file_path):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+    data = {}
+    current_key = ""
+    
+    for line in lines:
+        if line.strip() == "":
+            continue
+        if 'beats' in line:
+            current_key = line.strip()
+            data[current_key] = {}
+        else:
+            metric, value = line.split(':')
+            data[current_key][metric.strip()] = float(value.strip().rstrip('%'))
+    
+    return pd.DataFrame(data)
+
+
+
+
+import matplotlib.pyplot as plt
+import re
+
+def plot_performance_data(df):
+    # Extracting short labels like 'N', 'S', 'V' from the column names
+    labels = [re.search(r'\((.*?)\)', col).group(1) if re.search(r'\((.*?)\)', col) else col for col in df.columns]
+
+    fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(15, 10))
+    axes = axes.flatten()
+    metrics = ["Precision", "Recall", "F1-Score", "Sensitivity", "Specificity", "Accuracy"]
+
+    for i, metric in enumerate(metrics):
+        ax = df.loc[metric].plot(kind='bar', ax=axes[i], title=metric)
+        ax.set_xticklabels(labels, rotation=0)  # Setting the x-axis to show only the short labels
+        ax.set_ylabel('Percent (%)')
+        ax.set_ylim(0, 100)
+
+    # Setting the overall title for the plot
+    fig.suptitle('Heartbeat Classification Performance Metrics', fontsize=16)
+    
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95])  # Adjust layout to accommodate the overall title
+    plt.show()
+    
+
+
+
+def plot_features_vs_accuracy():
+    # Example data: number of features vs. accuracy
+    features = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+    accuracy = [92.50, 94.94, 94.30, 93.75, 93.20, 92.85, 92.40, 92.00, 91.60, 91.20]
+
+    # Plotting the line and dots
+    plt.figure(figsize=(10, 6))
+    plt.plot(features, accuracy, marker='o')  # Line with dots
+
+    # Highlighting the dot at the peak accuracy
+    max_acc_index = accuracy.index(max(accuracy))
+    max_feature = features[max_acc_index]
+    max_accuracy = accuracy[max_acc_index]
+    plt.scatter([max_feature], [max_accuracy], color='blue', edgecolor='red', s=100)  # Highlighted dot
+
+    # Annotating the peak accuracy
+    plt.annotate(f'Max Accuracy: {max_accuracy}%', xy=(max_feature, max_accuracy), xytext=(max_feature+5, max_accuracy),
+                 arrowprops=dict(facecolor='black', arrowstyle='->'), fontsize=12)
+
+    # Adding labels and title
+    plt.xlabel('Number of Features')
+    plt.ylabel('Overrall Accuracy Score (%)')
+    plt.title('Number of Features vs Accuracy Score')
+
+    # Show the plot
+    plt.grid(True)
+    plt.show()
+
+
+
+
+
+
 def load_dataset(filepath):
     with open(filepath, "rb") as file:
         data = pickle.load(file)
@@ -145,23 +226,23 @@ def plot_optimal_trees():
 def main():
 
     # Preprocess original data:
-    #preprocessing.preprocess_data(ORIGINAL_PATH, PREPROCESSED_PATH)
+    preprocessing.preprocess_data(ORIGINAL_PATH, PREPROCESSED_PATH)
     
     # Check if all files have been preprocessed:
-    #preprocessing.check_all_files_preprocessed(ORIGINAL_PATH, PREPROCESSED_PATH)
+    preprocessing.check_all_files_preprocessed(ORIGINAL_PATH, PREPROCESSED_PATH)
     
     # Resample preprocessed data from 360 Hz to 256 Hz:
-    #resampling.resample_preprocessed_data(PREPROCESSED_PATH, RESAMPLED_PATH)
+    #resampling.resample_preprocessed_data(PREPROCESSED_PATH, RESAMPLED_PATH, SAMPLE_RATE)
     
     # Check if all preprocessed files have been resampled:
-    #resampling.check_all_files_resampled(PREPROCESSED_PATH, RESAMPLED_PATH, SAMPLE_RATE)
+    resampling.check_all_files_resampled(PREPROCESSED_PATH, RESAMPLED_PATH)
     
     # Now each resampled ECG signal has the following properties:
     # Resampled Length: 462222
     # Actual Sampling Rate: 256.0 Hz
     
     # Split and save the dataset into training and testing sets:
-    #split_data.split_and_save_dataset(ORIGINAL_PATH, RESAMPLED_PATH, TRAINING_PATH, TESTING_PATH)
+    split_data.split_and_save_dataset(ORIGINAL_PATH, RESAMPLED_PATH, TRAINING_PATH, TESTING_PATH)
     
     # Function to view and print first 10 samples and first 5 labels of first record in training dataset:
     #split_data.view_training_pickle_file()
@@ -170,7 +251,7 @@ def main():
     #split_data.view_testing_pickle_file()
     
     # Segment ECG signals into heartbeats and extract features:
-    #feature_extraction.segment_and_extract_features(TRAINING_PATH, TESTING_PATH, HEARTBEATS_PATH, debug=False)
+    feature_extraction.segment_and_extract_features(TRAINING_PATH, TESTING_PATH, HEARTBEATS_PATH, debug=False)
     
     # Function to verify segmented heartbeats and the extracted features for a specific record:
     # This function will load the pickle file, iterate through the first few heartbeats (up to the specified num_beats_to_inspect), 
@@ -178,60 +259,13 @@ def main():
     #feature_extraction.verify_heartbeats_and_features(HEARTBEATS_PATH, '101', num_beats_to_inspect=1)
     
     # Function for feature selection process and constructing the training and testing features datasets:
-    #feature_selection.rank_features_and_construct_features_datasets(HEARTBEATS_PATH, TRAINING_PATH, TESTING_PATH)
+    feature_selection.rank_features_and_construct_features_datasets(HEARTBEATS_PATH, TRAINING_PATH, TESTING_PATH)
     
     # Function to orchestrate training phase of the RF model:
-    #training_and_testing.train_rf_model(CLASSIFIER_PATH)
+    training_and_testing.train_rf_model(CLASSIFIER_PATH)
     
     # Evaluating the model on the testing set:
     evaluation_test = training_and_testing.evaluate_model(CLASSIFIER_PATH, TESTING_PATH)
-    
-    
-    
-    
-    # # Splitting the results
-    # trees, features, accuracies, f1_scores = zip(*tuning_results)
-    # # Plotting Accuracy vs Number of Trees
-    # plt.figure(figsize=(10, 6))
-    # plt.plot(trees, accuracies, marker='o')
-    # plt.title('Accuracy vs Number of Trees')
-    # plt.xlabel('Number of Trees')
-    # plt.ylabel('Accuracy')
-    # plt.grid(True)
-    # plt.show()
-    # # Plotting Accuracy vs Number of Features
-    # plt.figure(figsize=(10, 6))
-    # plt.plot(features, accuracies, marker='o', color='red')
-    # plt.title('Accuracy vs Number of Features')
-    # plt.xlabel('Number of Features')
-    # plt.ylabel('Accuracy')
-    # plt.grid(True)
-    # plt.show()
-    
-    
-    
-    # Optionally, find optimal number of features
-    # Uncomment the following lines if feature optimization analysis is needed
-    # best_num_features, best_accuracy, results = find_optimal_features()
-    # print(f"Optimal number of features: {best_num_features} with accuracy: {best_accuracy}")
-    # for num_features, accuracy in results.items():
-    #     print(f"{num_features} features: Accuracy = {accuracy}")
-    
-    
-    
-    
-    
-    # # Load training and testing data
-    # train_features, train_labels = load_dataset("./data/Training/training_dataset_features.pickle")
-    # test_features, test_labels = load_dataset("./data/Testing/testing_dataset_features.pickle")
-
-    # # Find the optimal number of trees
-    # optimal_trees_results = find_optimal_trees(train_features, train_labels, test_features, test_labels)
-
-    # # Find the best tree count based on desired criteria (e.g., highest accuracy or F1 score)
-    # best_tree_count = max(optimal_trees_results, key=lambda x: optimal_trees_results[x]['accuracy'])
-    # best_f1_score = optimal_trees_results[best_tree_count]['f1_score']
-    # print(f"Optimal tree count: {best_tree_count} with accuracy: {optimal_trees_results[best_tree_count]['accuracy']} and F1-score: {best_f1_score}")
 
 
 

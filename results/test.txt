@@ -1,0 +1,30 @@
+Normal beats (N)
+Precision: 95.94%
+Recall: 97.73%
+F1-Score: 96.82%
+Sensitivity: 97.73%
+Specificity: 74.86%
+Positive Predictivity: 95.94%
+False Positive Rate: 4.14%
+Accuracy: 94.50%
+
+Supraventricular beats (S)
+Precision: 45.22%
+Recall: 37.62%
+F1-Score: 41.07%
+Sensitivity: 37.62%
+Specificity: 98.28%
+Positive Predictivity: 45.22%
+False Positive Rate: 45.56%
+Accuracy: 96.08%
+
+
+Ventricular beats (V)
+Precision: 92.6%
+Recall: 86.68%
+F1-Score: 89.62%
+Sensitivity: 86.68%
+Specificity: 99.53%
+Positive Predictivity: 92.76%
+False Positive Rate: 6.77%
+Accuracy: 98.70%

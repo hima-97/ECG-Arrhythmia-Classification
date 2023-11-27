@@ -14,7 +14,7 @@ from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 
 
 # Number of top ranked features to consider:
-NUMBER_OF_FEATURES = 20
+NUMBER_OF_FEATURES = 10
 # Number of trees to use for the Random Forest classifier:
 NUMBER_OF_TREES = 84
 # Initializing a standard scaler object for normalizing the feature data:

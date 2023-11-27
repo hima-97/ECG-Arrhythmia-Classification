@@ -125,8 +125,8 @@ def construct_training_features_dataset(heartbeats_path, training_path):
     # Retrieving the names of the higher ranked features:
     ranked_features_names = train_features_names[mi_rank]
 
-    print("\nMI ranked features: " + str(ranked_features_names))
-    print("\nMI of ranked features: " + str(mi_features[mi_rank]))
+    print("\nMI ranked features:\n" + str(ranked_features_names))
+    print("\nMI of ranked features:\n" + str(mi_features[mi_rank]))
 
     # Saving the ranked features and their mutual information scores to a pickle file:
     print("\nSaving features rank file...")
