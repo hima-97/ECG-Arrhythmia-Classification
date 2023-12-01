@@ -145,23 +145,23 @@ def plot_optimal_trees():
 def main():
 
     # Preprocess original data:
-    preprocessing.preprocess_data(ORIGINAL_PATH, PREPROCESSED_PATH)
+    #preprocessing.preprocess_data(ORIGINAL_PATH, PREPROCESSED_PATH)
     
     # Check if all files have been preprocessed:
-    preprocessing.check_all_files_preprocessed(ORIGINAL_PATH, PREPROCESSED_PATH)
+    #preprocessing.check_all_files_preprocessed(ORIGINAL_PATH, PREPROCESSED_PATH)
     
     # Resample preprocessed data from 360 Hz to 256 Hz:
     #resampling.resample_preprocessed_data(PREPROCESSED_PATH, RESAMPLED_PATH, SAMPLE_RATE)
     
     # Check if all preprocessed files have been resampled:
-    resampling.check_all_files_resampled(PREPROCESSED_PATH, RESAMPLED_PATH)
+    #resampling.check_all_files_resampled(PREPROCESSED_PATH, RESAMPLED_PATH)
     
     # Now each resampled ECG signal has the following properties:
     # Resampled Length: 462222
     # Actual Sampling Rate: 256.0 Hz
     
     # Split and save the dataset into training and testing sets:
-    split_data.split_and_save_dataset(ORIGINAL_PATH, RESAMPLED_PATH, TRAINING_PATH, TESTING_PATH)
+    #split_data.split_and_save_dataset(ORIGINAL_PATH, RESAMPLED_PATH, TRAINING_PATH, TESTING_PATH)
     
     # Function to view and print first 10 samples and first 5 labels of first record in training dataset:
     #split_data.view_training_pickle_file()
@@ -170,7 +170,7 @@ def main():
     #split_data.view_testing_pickle_file()
     
     # Segment ECG signals into heartbeats and extract features:
-    feature_extraction.segment_and_extract_features(TRAINING_PATH, TESTING_PATH, HEARTBEATS_PATH, debug=False)
+    #feature_extraction.segment_and_extract_features(TRAINING_PATH, TESTING_PATH, HEARTBEATS_PATH, debug=False)
     
     # Function to verify segmented heartbeats and the extracted features for a specific record:
     # This function will load the pickle file, iterate through the first few heartbeats (up to the specified num_beats_to_inspect), 
@@ -178,7 +178,7 @@ def main():
     #feature_extraction.verify_heartbeats_and_features(HEARTBEATS_PATH, '101', num_beats_to_inspect=1)
     
     # Function for feature selection process and constructing the training and testing features datasets:
-    feature_selection.rank_features_and_construct_features_datasets(HEARTBEATS_PATH, TRAINING_PATH, TESTING_PATH)
+    #feature_selection.rank_features_and_construct_features_datasets(HEARTBEATS_PATH, TRAINING_PATH, TESTING_PATH)
     
     # Function to orchestrate training phase of the RF model:
     training_and_testing.train_rf_model(CLASSIFIER_PATH)
