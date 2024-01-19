@@ -1,6 +1,6 @@
 import numpy as np
 import pickle
-from .ecgtypes import BeatType
+from .ecg_types import BeatType
 from sklearn.feature_selection import mutual_info_classif
 
 # This file is dedicated to the feature selection/ranking process and constructing the training and testing features datasets.

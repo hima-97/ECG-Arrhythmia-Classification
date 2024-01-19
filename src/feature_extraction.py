@@ -1,18 +1,17 @@
 import os
 import numpy as np
-import pandas as pd # Library to work with dataframes
 from scipy.signal import find_peaks
 import pickle # Library to work with pickle files
 import time
 import matplotlib.pyplot as plt
-from .ecgtypes import BeatType
-from .Feature_Extraction_Utils.pqrs_features import ExtractPQRS
-from .Feature_Extraction_Utils.rr_features import RRFeatures
-from .Feature_Extraction_Utils.advanced_features import compute_wavelet_descriptor as wt_features
-from .Feature_Extraction_Utils.advanced_features import compute_hos_descriptor as hos_features
-from .Feature_Extraction_Utils.advanced_features import compute_HBF as hbf_features
-from .Feature_Extraction_Utils.advanced_features import compute_Uniform_LBP as lbp_features
-from .Feature_Extraction_Utils.advanced_features import compute_morphological_features as m_features
+from .ecg_types import BeatType
+from .feature_extraction_utils.pqrs_features import ExtractPQRS
+from .feature_extraction_utils.rr_features import RRFeatures
+from .feature_extraction_utils.advanced_features import compute_wavelet_descriptor as wt_features
+from .feature_extraction_utils.advanced_features import compute_hos_descriptor as hos_features
+from .feature_extraction_utils.advanced_features import compute_HBF as hbf_features
+from .feature_extraction_utils.advanced_features import compute_Uniform_LBP as lbp_features
+from .feature_extraction_utils.advanced_features import compute_morphological_features as m_features
 
 
 

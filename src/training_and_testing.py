@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import pickle
-from .ecgtypes import BeatType
+from .ecg_types import BeatType
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_predict

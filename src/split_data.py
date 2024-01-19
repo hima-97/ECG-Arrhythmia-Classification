@@ -2,7 +2,7 @@ import os
 import wfdb
 import pickle
 import numpy as np
-from src.ecgtypes import HeartRhythm, BeatType
+from src.ecg_types import HeartRhythm, BeatType
 
 
 # Defining training and testing datasets:

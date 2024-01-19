@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import wfdb # Library to read the WFDB formatted data
 import numpy as np # Library to work with arrays
-from src import ecgtypes
+from src import ecg_types
 
 
 
