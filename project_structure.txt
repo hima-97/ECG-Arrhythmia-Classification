@@ -30,7 +30,7 @@ ECG-Arrhythmia-Classification/
 ├── logs/
 ├── results/
 ├── .gitattributes
-├── code_structure.txt
+├── project_structure.txt
 ├── main.py
 └── README.md
 └── requirements.txt
