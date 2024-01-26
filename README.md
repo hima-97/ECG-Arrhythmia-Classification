@@ -1,6 +1,5 @@
 #  Application Of Machine Learning For Single-lead ECG-based Arrhythmia Classification Via Smart Wearable Devices
-This repo contains the code used for investigating the use of Random Forests for classifiying selected heartbeats features.
-Features were selected using a filter method based on the mutual information ranking criterion on the training set.
+This repo contains the code used for 
 
 # Requirements
 The following Python libraires are required to execute the code: 
