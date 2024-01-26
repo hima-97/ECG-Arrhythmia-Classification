@@ -12,6 +12,45 @@ The following Python libraires are required to execute the code:
 * pandas
 * PyWavelets
 
+# Project Structure
+
+ECG-Arrhythmia-Classification/
+│
+├── data/
+│   ├── mit-bih-arrhythmia-database-1.0.0/
+│   ├── Preprocessed Data 360 Hz/
+│   ├── Training/
+│   ├── Testing/
+│   ├── Heartbeats Data/
+│   └── Heartbeats Classifier
+│
+├── src/
+│   ├── __pycache__/
+│   ├── feature_extraction_utils/
+│   │   ├── __pycache__/
+│   │   ├── __init__.py
+│   │   ├── advanced_features.py
+│   │   ├── pqrs_features.py
+│   │   ├── rr_features.py
+│   │   └── signal_buffer.py
+│   ├── ecg_components.txt
+│   ├── ecg_types.py
+│   ├── feature_extraction.py
+│   ├── feature_selection.py
+│   ├── plotting.py
+│   ├── preprocessing.py
+│   ├── resampling.py
+│   ├── split_data.py
+│   └── training_and_testing.py
+│
+├── logs/
+├── results/
+├── .gitattributes
+├── project_structure.txt
+├── main.py
+└── README.md
+└── requirements.txt
+
 # How to run the code
 Execute the Python 'main.py' file in the _/src_ folder. The following steps will be executed in order:
 
