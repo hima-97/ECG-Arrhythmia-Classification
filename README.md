@@ -1,3 +1,30 @@
+#  Application Of Machine Learning For Single-lead ECG-based Arrhythmia Classification Via Smart Wearable Devices
+This repo contains the code used for investigating the use of Random Forests for classifiying selected heartbeats features.
+Features were selected using a filter method based on the mutual information ranking criterion on the training set.
+
+# Requirements
+The following Python libraires are required to execute the code: 
+
+* numpy
+* matplotlib (optional)
+* wfdb
+* scipy
+* pandas
+* PyWavelets
+* sklearn
+* pandas
+
+# How to run the code
+Execute the Python 'main.py' file in the _/src_ folder. The following steps will be executed in order:
+
+1. Preprocessing of the original data by reading the [MIT-BIH Arrhythmia Database](https://physionet.org/content/mitdb/1.0.0/).
+2. Resampling of the ECG signals from 360 Hz to the new sampling rate of 256 Hz.
+3. Split and save the dataset into training and testing sets according to the literature defined inter-patient paradigm.
+4. Segmentation of the ECG signals into individual heartbeats and extraction of the heatbeat features using the extractors defined in the _/src/feature_extraction_utils_ folder
+5. Ranking and selecting features based on mutual information and constructing feature datasets for training and testing.
+6. Training and testing the Random Forest classifier.
+
+
 Symbols used in plots:
 [An expanded and updated version of the table below can be found at http://www.physionet.org/physiobank/annotations.shtml.]
 
