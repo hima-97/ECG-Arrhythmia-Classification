@@ -5,13 +5,12 @@ This repo contains the code used for
 The following Python libraires are required to execute the code: 
 
 * numpy
+* sklearn
 * matplotlib (optional)
 * wfdb
 * scipy
 * pandas
 * PyWavelets
-* sklearn
-* pandas
 
 # How to run the code
 Execute the Python 'main.py' file in the _/src_ folder. The following steps will be executed in order:
