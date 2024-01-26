@@ -14,6 +14,7 @@ The following Python libraires are required to execute the code:
 
 # Project Structure
 
+```
 ECG-Arrhythmia-Classification/
 │
 ├── data/
@@ -50,6 +51,7 @@ ECG-Arrhythmia-Classification/
 ├── main.py
 └── README.md
 └── requirements.txt
+```
 
 # How to run the code
 Execute the Python 'main.py' file in the _/src_ folder. The following steps will be executed in order:
