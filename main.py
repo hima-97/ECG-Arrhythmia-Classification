@@ -24,25 +24,25 @@ SAMPLE_RATE = 256 # Sample rate in Hz
 def main():
 
     # Preprocess original data:
-    #preprocessing.preprocess_data(ORIGINAL_PATH, PREPROCESSED_PATH)
+    preprocessing.preprocess_data(ORIGINAL_PATH, PREPROCESSED_PATH)
     
     # Check if all files have been preprocessed:
-    #preprocessing.check_all_files_preprocessed(ORIGINAL_PATH, PREPROCESSED_PATH)
+    preprocessing.check_all_files_preprocessed(ORIGINAL_PATH, PREPROCESSED_PATH)
     
     # Resample preprocessed data from 360 Hz to 256 Hz:
-    #resampling.resample_preprocessed_data(PREPROCESSED_PATH, RESAMPLED_PATH, SAMPLE_RATE)
+    resampling.resample_preprocessed_data(PREPROCESSED_PATH, RESAMPLED_PATH, SAMPLE_RATE)
     
     # Check if all preprocessed files have been resampled:
-    #resampling.check_all_files_resampled(PREPROCESSED_PATH, RESAMPLED_PATH)
+    resampling.check_all_files_resampled(PREPROCESSED_PATH, RESAMPLED_PATH)
     
     # Split and save the dataset into training and testing sets:
     split_data.split_and_save_dataset(ORIGINAL_PATH, RESAMPLED_PATH, TRAINING_PATH, TESTING_PATH)
     
     # Function to view and print first 10 samples and first 5 labels of first record in training dataset:
-    #split_data.view_training_pickle_file()
+    split_data.view_training_pickle_file()
     
     # Function to view and print first 10 samples and first 5 labels of first record in testing dataset:
-    #split_data.view_testing_pickle_file()
+    split_data.view_testing_pickle_file()
     
     # Segment ECG signals into heartbeats and extract features:
     feature_extraction.segment_and_extract_features(TRAINING_PATH, TESTING_PATH, HEARTBEATS_PATH, debug=False)
