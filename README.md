@@ -5,14 +5,14 @@ The primary goal is to categorize three heartbeat types: normal (N), supraventri
 
 A comprehensive outline of the project, including methodologies, experiments, and results, is available [here](https://github.com/hima-97/ECG-Arrhythmia-Classification/blob/master/Himanshu%20Kumar%20-%20Application%20of%20Machine%20Learning%20for%20Single-Lead%20ECG-Based%20Arrhythmia%20Classification%20via%20Smart%20Wearable%20Devices.pdf)
 
-# Methodology
+## Methodology
 The approach adopted in this project is methodical and comprehensive, starting from the preprocessing of raw ECG data to the deployment of a Random Forest classifier. 
 
 Key phases include data preprocessing, feature extraction, feature selection, model training, and evaluation. 
 
 The project emphasizes on mutual information for feature selection, ensuring the model focuses on the most relevant aspects of the ECG data.
 
-# Data Preprocessing
+## Data Preprocessing
 The preprocessing phase is fundamental in transforming raw ECG data into a format suitable for machine learning algorithms. 
 This process involves several steps:
 
@@ -21,14 +21,14 @@ This process involves several steps:
 * High-frequency Noise Removal: A low-pass Butterworth filter removes unwanted high-frequency components.
 * Signal Normalization: Standardizes the signal magnitude within a uniform range for consistent analysis.
 
-# Feature Extraction
+## Feature Extraction
 Feature extraction is a crucial step in representing ECG signals in a way that highlights characteristics relevant to heartbeat classification. It includes:
 
 * QRS Complex Analysis: Involves calculating the width, amplitude, and slope of the QRS complex, providing insights into heartbeat morphology.
 * RR Interval Features: Focuses on the time intervals between consecutive R-peaks, which are indicative of heart rate variability.
 * Advanced Descriptors: Incorporates techniques like Hermite Basis Functions (HBF), wavelet descriptors, and Higher Order Statistics (HOS) for a comprehensive signal analysis.
 
-# Feature Selection
+## Feature Selection
 Feature selection is conducted using Mutual Information (MI), a statistical measure that assesses the dependency between variables. It identifies features that are most informative about the heartbeat classes, thereby enhancing model performance and reducing computational complexity.
 
 Implements Mutual Information (MI) ranking for feature selection to reduce computational complexity and enhance model accuracy.
@@ -36,7 +36,7 @@ Features are ranked according to their relevance in predicting heartbeat classes
 
 This stage is critical in enhancing model accuracy and reducing computational complexity. Utilizing Mutual Information (MI), a statistical measure of dependency, this process identifies features that significantly contribute to classifying the heartbeat types. The top 10 MI-ranked features are selected for model training, ensuring a focus on the most relevant ECG signal characteristics.
 
-# Model Training and Testing
+## Model Training and Testing
 The project harnesses a Random Forest classifier, renowned for its accuracy and resilience. The model undergoes rigorous hyperparameter tuning for optimal performance. Extensive evaluation methods, including accuracy assessment and cross-validation, are employed to affirm the classifier's efficacy in heartbeat categorization.
 
 A robust Random Forest classifier with 84 decision trees is implemented. Extensive model evaluation includes a leave-one-out cross-validation strategy, considering the data's uniqueness. The model's performance is meticulously assessed through accuracy, precision, recall, F1 score, and specificity metrics. These evaluations demonstrate the classifier's proficiency in distinguishing between normal, supraventricular, and ventricular heartbeats, validating its potential for integration into smart wearable technologies.
@@ -46,7 +46,7 @@ The model is assessed through three experimental setups, each refining the class
 Hyperparameter tuning is performed to optimize the number of trees and features.
 Performance metrics demonstrate the model's high accuracy and reliability in arrhythmia classification.
 
-# Requirements
+## Requirements
 The following Python libraries are required to execute the code: 
 
 * numpy: For data manipulation and numerical computations
@@ -57,7 +57,7 @@ The following Python libraries are required to execute the code:
 * pandas: For structured data handling and analysis
 * matplotlib (optional): For creating static, interactive, and animated visualizations in Python
 
-# Project Structure
+## Project Structure
 
 ```
 ECG-Arrhythmia-Classification/
@@ -98,7 +98,7 @@ ECG-Arrhythmia-Classification/
 └── requirements.txt
 ```
 
-# How to run the code
+## How to run the code
 Execute the Python 'main.py' file in the _/src_ folder. The following steps will be executed in order:
 
 1. Preprocessing of the original data by reading the [MIT-BIH Arrhythmia Database](https://physionet.org/content/mitdb/1.0.0/).
