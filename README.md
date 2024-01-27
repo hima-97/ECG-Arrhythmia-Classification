@@ -41,7 +41,7 @@ The project harnesses a Random Forest classifier, renowned for its accuracy and 
 
 A robust Random Forest classifier with 84 decision trees is implemented. Extensive model evaluation includes a leave-one-out cross-validation strategy, considering the data's uniqueness. The model's performance is meticulously assessed through accuracy, precision, recall, F1 score, and specificity metrics. These evaluations demonstrate the classifier's proficiency in distinguishing between normal, supraventricular, and ventricular heartbeats, validating its potential for integration into smart wearable technologies.
 
-## Results:
+### Results:
 The model is assessed through three experimental setups, each refining the classifier's performance.
 Hyperparameter tuning is performed to optimize the number of trees and features.
 Performance metrics demonstrate the model's high accuracy and reliability in arrhythmia classification.
