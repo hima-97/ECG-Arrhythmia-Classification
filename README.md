@@ -1,11 +1,9 @@
 #  Application Of Machine Learning For Single-Lead ECG-Based Arrhythmia Classification Via Smart Wearable Devices
-This repository contains a comprehensive machine learning project aimed at classifying heartbeats from single-lead ECG data, pivotal for smart wearable devices. It demonstrates an advanced application of machine learning algorithms in biomedical signal processing, highlighting my proficiency in both fields. 
+This repository presents an intricate machine learning project focused on classifying heartbeats from single-lead ECG data, crucial in the domain of smart wearable devices. It showcases an advanced application of machine learning techniques in biomedical signal processing, underscoring my expertise in both areas.
 
+The primary goal is to categorize three heartbeat types: normal (N), supraventricular (S), and ventricular (V) beats, using single-lead ECG signals. This classification is essential for real-time cardiac monitoring through wearable technology. The project embodies a detailed methodology, encompassing data preprocessing, feature extraction and selection, and the implementation and evaluation of a Random Forest classifier.
 
-The project's core objective is to categorize three types of heartbeats: normal (N), supraventricular (S), and ventricular (V), using single-lead ECG signals. This classification is crucial for real-time cardiac monitoring in wearable technology. The project adopts a meticulous approach, encompassing data preprocessing, feature extraction, selection, and model evaluation, culminating in the implementation of a Random Forest classifier.
-
-
-A detailed of the project, including methodology, experiments, and results, is accessible [here](https://github.com/hima-97/ECG-Arrhythmia-Classification/blob/master/Himanshu%20Kumar%20-%20Application%20of%20Machine%20Learning%20for%20Single-Lead%20ECG-Based%20Arrhythmia%20Classification%20via%20Smart%20Wearable%20Devices.pdf)
+A comprehensive outline of the project, including methodologies, experiments, and results, is available [here](https://github.com/hima-97/ECG-Arrhythmia-Classification/blob/master/Himanshu%20Kumar%20-%20Application%20of%20Machine%20Learning%20for%20Single-Lead%20ECG-Based%20Arrhythmia%20Classification%20via%20Smart%20Wearable%20Devices.pdf)
 
 # Methodology
 The approach adopted in this project is methodical and comprehensive, starting from the preprocessing of raw ECG data to the deployment of a Random Forest classifier. 
@@ -33,19 +31,31 @@ Feature extraction is a crucial step in representing ECG signals in a way that h
 # Feature Selection
 Feature selection is conducted using Mutual Information (MI), a statistical measure that assesses the dependency between variables. It identifies features that are most informative about the heartbeat classes, thereby enhancing model performance and reducing computational complexity.
 
+Implements Mutual Information (MI) ranking for feature selection to reduce computational complexity and enhance model accuracy.
+Features are ranked according to their relevance in predicting heartbeat classes.
+
+This stage is critical in enhancing model accuracy and reducing computational complexity. Utilizing Mutual Information (MI), a statistical measure of dependency, this process identifies features that significantly contribute to classifying the heartbeat types. The top 10 MI-ranked features are selected for model training, ensuring a focus on the most relevant ECG signal characteristics.
+
 # Model Training and Testing
-The project utilizes a Random Forest classifier, an ensemble learning method known for its accuracy and robustness. The classifier is fine-tuned through hyperparameter optimization, ensuring optimal performance. The model undergoes extensive evaluation, including accuracy assessment and cross-validation, to validate its effectiveness in heartbeat classification.
+The project harnesses a Random Forest classifier, renowned for its accuracy and resilience. The model undergoes rigorous hyperparameter tuning for optimal performance. Extensive evaluation methods, including accuracy assessment and cross-validation, are employed to affirm the classifier's efficacy in heartbeat categorization.
+
+A robust Random Forest classifier with 84 decision trees is implemented. Extensive model evaluation includes a leave-one-out cross-validation strategy, considering the data's uniqueness. The model's performance is meticulously assessed through accuracy, precision, recall, F1 score, and specificity metrics. These evaluations demonstrate the classifier's proficiency in distinguishing between normal, supraventricular, and ventricular heartbeats, validating its potential for integration into smart wearable technologies.
+
+## Results:
+The model is assessed through three experimental setups, each refining the classifier's performance.
+Hyperparameter tuning is performed to optimize the number of trees and features.
+Performance metrics demonstrate the model's high accuracy and reliability in arrhythmia classification.
 
 # Requirements
 The following Python libraries are required to execute the code: 
 
 * numpy: For data manipulation and numerical computations
 * scipy: For scientific and technical computations
-* sklearn: Comprehensive toolkit for machine learning and data mining tasks, including model training and evaluation
+* sklearn: For machine learning and data mining tasks, including model training and evaluation
 * wfdb: For reading ECG data from the MIT-BIH Arrhythmia Database
 * PyWavelets: For wavelet analysis in feature extraction
-* pandas: Data manipulation and analysis library, ideal for handling structured data
-* matplotlib (optional): A versatile plotting library for creating static, interactive, and animated visualizations in Python
+* pandas: For structured data handling and analysis
+* matplotlib (optional): For creating static, interactive, and animated visualizations in Python
 
 # Project Structure
 
