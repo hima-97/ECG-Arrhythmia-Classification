@@ -1,16 +1,44 @@
-#  Application Of Machine Learning For Single-lead ECG-based Arrhythmia Classification Via Smart Wearable Devices
-This repo contains the code used for 
+#  Application Of Machine Learning For Single-Lead ECG-Based Arrhythmia Classification Via Smart Wearable Devices
+This repository contains a comprehensive machine learning project aimed at classifying heartbeats from single-lead ECG data, pivotal for smart wearable devices. It demonstrates an advanced application of machine learning algorithms in biomedical signal processing, highlighting my proficiency in both fields. 
+The project's core objective is to categorize three types of heartbeats: normal (N), supraventricular (S), and ventricular (V), using single-lead ECG signals. This classification is crucial for real-time cardiac monitoring in wearable technology. The project adopts a meticulous approach, encompassing data preprocessing, feature extraction, selection, and model evaluation, culminating in the implementation of a Random Forest classifier.
+
+A detailed of the project, including methodology, experiments, and results, is accessible [here](https://github.com/hima-97/ECG-Arrhythmia-Classification/blob/master/Himanshu%20Kumar%20-%20Application%20of%20Machine%20Learning%20for%20Single-Lead%20ECG-Based%20Arrhythmia%20Classification%20via%20Smart%20Wearable%20Devices.pdf)
+
+# Methodology
+The approach adopted in this project is methodical and comprehensive, starting from the preprocessing of raw ECG data to the deployment of a Random Forest classifier. Key phases include data preprocessing, feature extraction, feature selection, model training, and evaluation. The project emphasizes on mutual information for feature selection, ensuring the model focuses on the most relevant aspects of the ECG data.
+
+# Data Preprocessing
+The preprocessing phase is fundamental in transforming raw ECG data into a format suitable for machine learning algorithms. 
+This process involves several steps:
+
+* Baseline Wander Removal: Utilizes a high-pass Butterworth filter to eliminate low-frequency noise, ensuring signal stability.
+* Noise Reduction: Implements a band-reject Butterworth filter to diminish 60 Hz AC interference, enhancing signal clarity.
+* High-frequency Noise Removal: Employs a low-pass Butterworth filter to remove unwanted high-frequency components.
+* Signal Normalization: Standardizes the signal magnitude, bringing it within a uniform range for consistent analysis.
+
+# Feature Extraction
+Feature extraction is a crucial step in representing ECG signals in a way that highlights characteristics relevant to heartbeat classification. It includes:
+
+* QRS Complex Analysis: Involves calculating the width, amplitude, and slope of the QRS complex, providing insights into heartbeat morphology.
+* RR Interval Features: Focuses on the time intervals between consecutive R-peaks, which are indicative of heart rate variability.
+* Advanced Descriptors: Incorporates techniques like Hermite Basis Functions (HBF), wavelet descriptors, and Higher Order Statistics (HOS) for a comprehensive signal analysis.
+
+# Feature Selection
+Feature selection is conducted using Mutual Information (MI), a statistical measure that assesses the dependency between variables. It identifies features that are most informative about the heartbeat classes, thereby enhancing model performance and reducing computational complexity.
+
+# Model Training and Testing
+The project utilizes a Random Forest classifier, an ensemble learning method known for its accuracy and robustness. The classifier is fine-tuned through hyperparameter optimization, ensuring optimal performance. The model undergoes extensive evaluation, including accuracy assessment and cross-validation, to validate its effectiveness in heartbeat classification.
 
 # Requirements
-The following Python libraires are required to execute the code: 
+The following Python librarires are required to execute the code: 
 
-* numpy
-* sklearn
-* matplotlib (optional)
-* wfdb
-* scipy
-* pandas
-* PyWavelets
+* numpy: For data manipulation and numerical computations
+* scipy: For scientific and technical computations
+* sklearn: Comprehensive toolkit for machine learning and data mining tasks, including model training and evaluation
+* wfdb: For reading ECG data from the MIT-BIH Arrhythmia Database
+* PyWavelets: For wavelet analysis in feature extraction
+* pandas: Data manipulation and analysis library, ideal for handling structured data
+* matplotlib (optional): A versatile plotting library for creating static, interactive, and animated visualizations in Python
 
 # Project Structure
 
