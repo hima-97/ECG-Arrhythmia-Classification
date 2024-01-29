@@ -14,7 +14,9 @@ Comprehensive Approach:
 Initial exploration to grasp the intrinsic characteristics of the ECG dataset.
 
 * Signal Preprocessing:  
-Resampling of ECG signals to align with the required sampling rate.
+Noise removal and resampling of ECG signals to align with the required sampling rate.
+
+* Heartbeat Segmentation:  
 Heartbeat segmentation to isolate individual cardiac cycles, critical for accurate feature extraction.
 
 * Feature Extraction:  
@@ -75,19 +77,39 @@ Consequently, the project focuses on classifying three beat types: Normal, Supra
 The preprocessing of ECG signals is a critical phase in this project, ensuring the raw data's accuracy and suitability for machine learning algorithms. The preprocessing pipeline has been meticulously designed to address various artifacts commonly present in raw ECG signals, such as noise induced by muscle contractions, power-line interference, and baseline wander.
 
 * Baseline Wander Removal:  
-Baseline wander, often introduced by patient movements or respiration, manifests as low-frequency noise in ECG signals. A high-pass Butterworth filter, with a default cutoff frequency of 1 Hz, is employed to counter this. The frequency can be adjusted to 0.5 Hz in cases of significant baseline wander around this range. Signal padding is incorporated to minimize edge effects, and the filter order is kept at 1 to avoid over-attenuation.
+Baseline wander, often introduced by patient movements or respiration, manifests as low-frequency noise in ECG signals. A high-pass Butterworth filter, with a default cutoff frequency of 1 Hz, is employed to counter this.  
+The frequency can be adjusted to 0.5 Hz in cases of significant baseline wander around this range. Signal padding is incorporated to minimize edge effects, and the filter order is kept at 1 to avoid over-attenuation.
 
 * Noise Reduction:  
 To mitigate external electrical noise, especially the 60 Hz interference from power lines, a band-reject Butterworth filter with cutoff frequencies of 59 Hz and 61 Hz is utilized. This approach effectively eliminates AC power line interference, ensuring the signal's integrity. Notably, the majority of the 60 Hz noise in the database originates from the playback stage of the recording equipment, which was battery-powered. Signal padding is again used here to reduce edge effects during filtering.
 
 * High-frequency Noise Removal:  
-To suppress high-frequency noise components while preserving clinically relevant information, a low-pass Butterworth filter with a 25 Hz cut-off frequency is applied. This step is critical in maintaining the balance between noise reduction and data integrity. Similar to earlier steps, signal padding is employed to mitigate edge effects.
+To suppress high-frequency noise components while preserving clinically relevant information, a low-pass Butterworth filter with a 25 Hz cut-off frequency is applied. This step is critical in maintaining the balance between noise reduction and data integrity. Signal padding is also employed here to mitigate edge effects.
 
 * Normalization:  
 Normalizing the ECG signals between 0 and 1 is vital for standardizing signal amplitude across different recordings. This step is crucial when dealing with diverse datasets, ensuring a consistent analytical approach. Normalization thus facilitates accurate and interpretable data analysis.
 
 * ECG Signal Resampling:  
-Considering the standard 256 Hz sampling rate of modern smart wearables like the Hexoskin Pro Kit, Apple Watch, and Samsung Watch, the ECG signals from the MIT-BIH Arrhythmia Database, originally recorded at 360 Hz, are resampled to 256 Hz. This resampling process aligns the data sampling rates with those of the target devices, ensuring the model's applicability and accuracy upon deployment. The resampling is achieved through the formula num_samples_resampled = int((256/360) * num_samples_original), maintaining the proportionality between the original and the new sampling rates. The annotation points are also adjusted correspondingly to accurately locate R-peaks in the resampled ECG signals.
+Considering the standard 256 Hz sampling rate of modern smart wearables like the Hexoskin Pro Kit, Apple Watch, and Samsung Watch, the ECG signals from the MIT-BIH Arrhythmia Database, originally at 360 Hz, are resampled to 256 Hz. This resampling process aligns the data sampling rates with those of the target devices, ensuring the model's applicability and accuracy upon deployment. The resampling is achieved through the formula  
+num_samples_resampled = int((256/360) * num_samples_original)  
+maintaining the proportionality between the original and the new sampling rates. The annotation points are also adjusted correspondingly to accurately locate R-peaks in the resampled ECG signals.
+
+### Heartbeat segmentation
+Heartbeat segmentation is a pivotal step in the analysis of ECG signals, particularly for arrhythmia classification. This process entails segmenting ECG signals into individual heartbeats, each representing a single cardiac cycle. Such segmentation is crucial for precise feature extraction and effective classification.
+
+Dataset Division Using Inter-patient Paradigm:  
+To ensure a realistic and clinically applicable approach, the dataset, sourced from the MIT-BIH Arrhythmia Database, is divided into training and testing sets based on an inter-patient paradigm. This division ensures that the model is trained and tested on data from different patients, bolstering its ability to generalize effectively to new, unseen data.
+
+The 44 recordings are evenly split as follows:
+* Training Set: 101, 106, 108, 109, 112, 114, 115, 116, 118, 119, 122, 124, 201, 203, 205, 207, 208, 209, 215, 220, 223, and 230
+* Testing Set: 100, 103, 105, 111, 113, 117, 121, 123, 200, 202, 210, 212, 213, 214, 219, 221, 222, 228, 231, 232, 233, and 234
+
+Segmentation Process:  
+The segmentation process leverages the R spike annotations from the MIT-BIH Arrhythmia Database as markers to identify individual heartbeats. These annotations, typically located at the R-wave peak of the QRS complex, are used to segment the ECG signal on a beat-by-beat basis. The approach recognizes each cardiac cycle as an independent unit, allowing for a detailed analysis of inter-beat variability and morphological differences.
+
+The segmentation process begins with the detection of the R peak using annotations provided in the record's .atr files. Each heartbeat is segmented by selecting a 640 ms window around the annotated R peak, comprising 373 ms before and 267 ms after the R peak. This window size is chosen to encompass the complete QRS complex and adjacent parts of the ECG waveform.
+
+To normalize the signal and remove baseline wander, the mean value of each segment is subtracted from its individual samples. This normalization centers the signal around the R peak, ensuring an accurate and consistent analysis of the ECG waveform.
 
 ### Feature Extraction
 Feature extraction is a crucial step in representing ECG signals in a way that highlights characteristics relevant to heartbeat classification. It includes:
