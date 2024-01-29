@@ -60,7 +60,7 @@ Each record includes:
 * Annotation file (.atr): Houses expert annotations aligned with the R-wave peaks, ensuring accuracy for beat characterization.
 
 Annotation and Classification Focus:  
-Two independent cardiologists annotated the heartbeats, providing high-reliability labels for each beat.
+Two independent cardiologists annotated the heartbeats, providing high-reliability labels for each beat.  
 The heartbeats are classified into five categories based on the AAMI EC57 standard:  
 * N (Normal Beat)
 * S (Supraventricular Ectopic Beat)
@@ -69,16 +69,25 @@ The heartbeats are classified into five categories based on the AAMI EC57 standa
 * Q (Unknown Beat)
 
 For the purpose of this study, Fusion Beats (F) and Unknown Beats (Q) were excluded, aligning with previous studies.  
-Consequently, the project zeroes in on classifying three critical beat types: Normal, Supraventricular, and Ventricular beats.
+Consequently, the project focuses on classifying three beat types: Normal, Supraventricular, and Ventricular beats.
 
 ### Data Preprocessing
-The preprocessing phase is fundamental in transforming raw ECG data into a format suitable for machine learning algorithms. 
-This process involves several steps:
+The preprocessing of ECG signals is a critical phase in this project, ensuring the raw data's accuracy and suitability for machine learning algorithms. The preprocessing pipeline has been meticulously designed to address various artifacts commonly present in raw ECG signals, such as noise induced by muscle contractions, power-line interference, and baseline wander.
 
-* Baseline Wander Removal: A high-pass Butterworth filter eliminates low-frequency noise for signal stability.
-* Noise Reduction: A band-reject Butterworth filter diminishes 60 Hz AC interference, enhancing signal clarity.
-* High-frequency Noise Removal: A low-pass Butterworth filter removes unwanted high-frequency components.
-* Signal Normalization: Standardizes the signal magnitude within a uniform range for consistent analysis.
+* Baseline Wander Removal:  
+Baseline wander, often introduced by patient movements or respiration, manifests as low-frequency noise in ECG signals. A high-pass Butterworth filter, with a default cutoff frequency of 1 Hz, is employed to counter this. The frequency can be adjusted to 0.5 Hz in cases of significant baseline wander around this range. Signal padding is incorporated to minimize edge effects, and the filter order is kept at 1 to avoid over-attenuation.
+
+* Noise Reduction:  
+To mitigate external electrical noise, especially the 60 Hz interference from power lines, a band-reject Butterworth filter with cutoff frequencies of 59 Hz and 61 Hz is utilized. This approach effectively eliminates AC power line interference, ensuring the signal's integrity. Notably, the majority of the 60 Hz noise in the database originates from the playback stage of the recording equipment, which was battery-powered. Signal padding is again used here to reduce edge effects during filtering.
+
+* High-frequency Noise Removal:  
+To suppress high-frequency noise components while preserving clinically relevant information, a low-pass Butterworth filter with a 25 Hz cut-off frequency is applied. This step is critical in maintaining the balance between noise reduction and data integrity. Similar to earlier steps, signal padding is employed to mitigate edge effects.
+
+* Normalization:  
+Normalizing the ECG signals between 0 and 1 is vital for standardizing signal amplitude across different recordings. This step is crucial when dealing with diverse datasets, ensuring a consistent analytical approach. Normalization thus facilitates accurate and interpretable data analysis.
+
+* ECG Signal Resampling:  
+Considering the standard 256 Hz sampling rate of modern smart wearables like the Hexoskin Pro Kit, Apple Watch, and Samsung Watch, the ECG signals from the MIT-BIH Arrhythmia Database, originally recorded at 360 Hz, are resampled to 256 Hz. This resampling process aligns the data sampling rates with those of the target devices, ensuring the model's applicability and accuracy upon deployment. The resampling is achieved through the formula num_samples_resampled = int((256/360) * num_samples_original), maintaining the proportionality between the original and the new sampling rates. The annotation points are also adjusted correspondingly to accurately locate R-peaks in the resampled ECG signals.
 
 ### Feature Extraction
 Feature extraction is a crucial step in representing ECG signals in a way that highlights characteristics relevant to heartbeat classification. It includes:
