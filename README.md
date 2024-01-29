@@ -10,32 +10,32 @@ The methodology employed in this project reflects a rigorous and holistic approa
 
 Comprehensive Approach:
 
-* Data Exploration and Preparation:··
+* Data Exploration and Preparation:  
 Initial exploration to grasp the intrinsic characteristics of the ECG dataset.
 Preparing and standardizing raw ECG data for machine learning processing.
 
-* Signal Processing:··
+* Signal Processing:  
 Resampling of ECG signals to align with the required sampling rate.
 Heartbeat segmentation to isolate individual cardiac cycles, critical for accurate feature extraction.
 
-* Feature Extraction:··
+* Feature Extraction:  
 Deriving key attributes from heartbeats, transforming raw data into a machine-learning-ready format.
 Employing advanced techniques for a thorough representation of ECG signals.
 
 * Feature Selection with Mutual Information (MI):
 Applying MI for prioritizing features based on relevance, ensuring model efficiency and focus.
 
-* Model Training:
+* Model Training:  
 Training the RF model using selected features, fine-tuning its ability to classify arrhythmias.
 
-* Hyperparameter Tuning:
+* Hyperparameter Tuning:  
 Optimizing model parameters to enhance training efficiency and accuracy.
 
-* Model Validation and Evaluation:
+* Model Validation and Evaluation:  
 Implementing a custom leave-one-out cross-validation strategy to validate the model’s generalizability and mitigate overfitting.
 Thorough evaluation in a separate testing phase to assess the model's performance on unseen data.
 
-* Performance Assessment:
+* Performance Assessment:  
 Utilizing Key Performance Indicators (KPIs) such as accuracy, precision, recall, and F1 score for final model evaluation.
 These metrics provide a comprehensive view of the model's diagnostic capabilities in classifying arrhythmias from single-lead ECG data.
 
