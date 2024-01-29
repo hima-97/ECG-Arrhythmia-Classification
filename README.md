@@ -61,7 +61,7 @@ Each record includes:
 
 Annotation and Classification Focus:  
 Two independent cardiologists annotated the heartbeats, providing high-reliability labels for each beat.
-The heartbeats are classified into five categories based on the AAMI EC57 standard.  
+The heartbeats are classified into five categories based on the AAMI EC57 standard:  
 * N (Normal Beat)
 * S (Supraventricular Ectopic Beat)
 * V (Ventricular Ectopic Beat)
