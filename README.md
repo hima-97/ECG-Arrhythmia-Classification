@@ -6,29 +6,58 @@ The primary goal is to categorize three heartbeat types: normal (N), supraventri
 A comprehensive outline of the project, including methodologies, experiments, and results, is available [here](https://github.com/hima-97/ECG-Arrhythmia-Classification/blob/master/Himanshu%20Kumar%20-%20Application%20of%20Machine%20Learning%20for%20Single-Lead%20ECG-Based%20Arrhythmia%20Classification%20via%20Smart%20Wearable%20Devices.pdf)
 
 ## Methodology
-The approach adopted in this project is methodical and comprehensive, starting from the preprocessing of raw ECG data to the deployment of a Random Forest classifier. 
+The methodology employed in this project reflects a rigorous and holistic approach to classifying cardiac rhythms using single-lead ECG data, a pivotal feature in contemporary smart wearable devices like the Apple Watch and Samsung Watch. The project pivots on the Random Forest (RF) classifier, selected for its effectiveness in handling complex datasets.
 
-Key phases include data preprocessing, feature extraction, feature selection, model training, and evaluation. 
+Comprehensive Approach:
 
-The project emphasizes on mutual information for feature selection, ensuring the model focuses on the most relevant aspects of the ECG data.
+* Data Exploration and Preparation:
+Initial exploration to grasp the intrinsic characteristics of the ECG dataset.
+Preparing and standardizing raw ECG data for machine learning processing.
 
-## Data Preprocessing
+* Signal Processing:
+Resampling of ECG signals to align with the required sampling rate.
+Heartbeat segmentation to isolate individual cardiac cycles, critical for accurate feature extraction.
+
+* Feature Extraction:
+Deriving key attributes from heartbeats, transforming raw data into a machine-learning-ready format.
+Employing advanced techniques for a thorough representation of ECG signals.
+
+* Feature Selection with Mutual Information (MI):
+Applying MI for prioritizing features based on relevance, ensuring model efficiency and focus.
+
+* Model Training:
+Training the RF model using selected features, fine-tuning its ability to classify arrhythmias.
+
+* Hyperparameter Tuning:
+Optimizing model parameters to enhance training efficiency and accuracy.
+
+* Model Validation and Evaluation:
+Implementing a custom leave-one-out cross-validation strategy to validate the model’s generalizability and mitigate overfitting.
+Thorough evaluation in a separate testing phase to assess the model's performance on unseen data.
+
+* Performance Assessment:
+Utilizing Key Performance Indicators (KPIs) such as accuracy, precision, recall, and F1 score for final model evaluation.
+These metrics provide a comprehensive view of the model's diagnostic capabilities in classifying arrhythmias from single-lead ECG data.
+
+This methodical and detailed approach ensures a seamless transition from raw ECG data acquisition to developing a proficient model capable of classifying different arrhythmias, thereby demonstrating the project's applicability in smart wearable technology for remote healthcare monitoring.
+
+### Data Preprocessing
 The preprocessing phase is fundamental in transforming raw ECG data into a format suitable for machine learning algorithms. 
 This process involves several steps:
 
-* Baseline Wander Removal: A high-pass Butterworth filter eliminates low-frequency noise, ensuring signal stability.
+* Baseline Wander Removal: A high-pass Butterworth filter eliminates low-frequency noise for signal stability.
 * Noise Reduction: A band-reject Butterworth filter diminishes 60 Hz AC interference, enhancing signal clarity.
 * High-frequency Noise Removal: A low-pass Butterworth filter removes unwanted high-frequency components.
 * Signal Normalization: Standardizes the signal magnitude within a uniform range for consistent analysis.
 
-## Feature Extraction
+### Feature Extraction
 Feature extraction is a crucial step in representing ECG signals in a way that highlights characteristics relevant to heartbeat classification. It includes:
 
 * QRS Complex Analysis: Involves calculating the width, amplitude, and slope of the QRS complex, providing insights into heartbeat morphology.
 * RR Interval Features: Focuses on the time intervals between consecutive R-peaks, which are indicative of heart rate variability.
 * Advanced Descriptors: Incorporates techniques like Hermite Basis Functions (HBF), wavelet descriptors, and Higher Order Statistics (HOS) for a comprehensive signal analysis.
 
-## Feature Selection
+### Feature Selection
 Feature selection is conducted using Mutual Information (MI), a statistical measure that assesses the dependency between variables. It identifies features that are most informative about the heartbeat classes, thereby enhancing model performance and reducing computational complexity.
 
 Implements Mutual Information (MI) ranking for feature selection to reduce computational complexity and enhance model accuracy.
@@ -36,12 +65,12 @@ Features are ranked according to their relevance in predicting heartbeat classes
 
 This stage is critical in enhancing model accuracy and reducing computational complexity. Utilizing Mutual Information (MI), a statistical measure of dependency, this process identifies features that significantly contribute to classifying the heartbeat types. The top 10 MI-ranked features are selected for model training, ensuring a focus on the most relevant ECG signal characteristics.
 
-## Model Training and Testing
+### Model Training and Testing
 The project harnesses a Random Forest classifier, renowned for its accuracy and resilience. The model undergoes rigorous hyperparameter tuning for optimal performance. Extensive evaluation methods, including accuracy assessment and cross-validation, are employed to affirm the classifier's efficacy in heartbeat categorization.
 
 A robust Random Forest classifier with 84 decision trees is implemented. Extensive model evaluation includes a leave-one-out cross-validation strategy, considering the data's uniqueness. The model's performance is meticulously assessed through accuracy, precision, recall, F1 score, and specificity metrics. These evaluations demonstrate the classifier's proficiency in distinguishing between normal, supraventricular, and ventricular heartbeats, validating its potential for integration into smart wearable technologies.
 
-#### Results:
+### Results:
 The model is assessed through three experimental setups, each refining the classifier's performance.
 Hyperparameter tuning is performed to optimize the number of trees and features.
 Performance metrics demonstrate the model's high accuracy and reliability in arrhythmia classification.
