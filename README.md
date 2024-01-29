@@ -95,14 +95,18 @@ num_samples_resampled = int((256/360) * num_samples_original)
 maintaining the proportionality between the original and the new sampling rates. The annotation points are also adjusted correspondingly to accurately locate R-peaks in the resampled ECG signals.
 
 ### Heartbeat segmentation
-Heartbeat segmentation is a pivotal step in the analysis of ECG signals, particularly for arrhythmia classification. This process entails segmenting ECG signals into individual heartbeats, each representing a single cardiac cycle. Such segmentation is crucial for precise feature extraction and effective classification.
+Heartbeat segmentation is a pivotal step in the analysis of ECG signals, particularly for arrhythmia classification.  
+This process entails segmenting ECG signals into individual heartbeats, each representing a single cardiac cycle. Such segmentation is crucial for precise feature extraction and effective classification.
 
 Dataset Division Using Inter-patient Paradigm:  
-To ensure a realistic and clinically applicable approach, the dataset, sourced from the MIT-BIH Arrhythmia Database, is divided into training and testing sets based on an inter-patient paradigm. This division ensures that the model is trained and tested on data from different patients, bolstering its ability to generalize effectively to new, unseen data.
+To ensure a realistic and clinically applicable approach, the dataset, sourced from the MIT-BIH Arrhythmia Database,  
+is divided into training and testing sets based on an inter-patient paradigm. This division ensures that the model is trained and tested on data from different patients, bolstering its ability to generalize effectively to new, unseen data.
 
 The 44 recordings are evenly split as follows:
-* Training Set: 101, 106, 108, 109, 112, 114, 115, 116, 118, 119, 122, 124, 201, 203, 205, 207, 208, 209, 215, 220, 223, and 230
-* Testing Set: 100, 103, 105, 111, 113, 117, 121, 123, 200, 202, 210, 212, 213, 214, 219, 221, 222, 228, 231, 232, 233, and 234
+* Training Set:  
+101, 106, 108, 109, 112, 114, 115, 116, 118, 119, 122, 124, 201, 203, 205, 207, 208, 209, 215, 220, 223, 230
+* Testing Set:  
+100, 103, 105, 111, 113, 117, 121, 123, 200, 202, 210, 212, 213, 214, 219, 221, 222, 228, 231, 232, 233, 234
 
 Segmentation Process:  
 The segmentation process leverages the R spike annotations from the MIT-BIH Arrhythmia Database as markers to identify individual heartbeats. These annotations, typically located at the R-wave peak of the QRS complex, are used to segment the ECG signal on a beat-by-beat basis. The approach recognizes each cardiac cycle as an independent unit, allowing for a detailed analysis of inter-beat variability and morphological differences.
