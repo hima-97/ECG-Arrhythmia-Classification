@@ -10,15 +10,15 @@ The methodology employed in this project reflects a rigorous and holistic approa
 
 Comprehensive Approach:
 
-* Data Exploration and Preparation:
+* Data Exploration and Preparation:··
 Initial exploration to grasp the intrinsic characteristics of the ECG dataset.
 Preparing and standardizing raw ECG data for machine learning processing.
 
-* Signal Processing:
+* Signal Processing:··
 Resampling of ECG signals to align with the required sampling rate.
 Heartbeat segmentation to isolate individual cardiac cycles, critical for accurate feature extraction.
 
-* Feature Extraction:
+* Feature Extraction:··
 Deriving key attributes from heartbeats, transforming raw data into a machine-learning-ready format.
 Employing advanced techniques for a thorough representation of ECG signals.
 
