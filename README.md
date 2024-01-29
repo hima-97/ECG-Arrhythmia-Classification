@@ -10,11 +10,10 @@ The methodology employed in this project reflects a rigorous and holistic approa
 
 Comprehensive Approach:
 
-* Data Exploration and Preparation:  
+* Data Exploration and Analysis:  
 Initial exploration to grasp the intrinsic characteristics of the ECG dataset.
-Preparing and standardizing raw ECG data for machine learning processing.
 
-* Signal Processing:  
+* Signal Preprocessing:  
 Resampling of ECG signals to align with the required sampling rate.
 Heartbeat segmentation to isolate individual cardiac cycles, critical for accurate feature extraction.
 
@@ -22,7 +21,7 @@ Heartbeat segmentation to isolate individual cardiac cycles, critical for accura
 Deriving key attributes from heartbeats, transforming raw data into a machine-learning-ready format.
 Employing advanced techniques for a thorough representation of ECG signals.
 
-* Feature Selection with Mutual Information (MI):
+* Feature Selection with Mutual Information (MI):  
 Applying MI for prioritizing features based on relevance, ensuring model efficiency and focus.
 
 * Model Training:  
@@ -40,6 +39,36 @@ Utilizing Key Performance Indicators (KPIs) such as accuracy, precision, recall,
 These metrics provide a comprehensive view of the model's diagnostic capabilities in classifying arrhythmias from single-lead ECG data.
 
 This methodical and detailed approach ensures a seamless transition from raw ECG data acquisition to developing a proficient model capable of classifying different arrhythmias, thereby demonstrating the project's applicability in smart wearable technology for remote healthcare monitoring.
+
+
+### Data Exploration and Analysis
+For this project, the MIT-BIH Arrhythmia Database, sourced from Physionet.org, was meticulously selected. This dataset is a gold standard in cardiac arrhythmia research, thanks to its extensive collection of accurately annotated ECG recordings.
+
+The database comprises 48 half-hour excerpts from two-channel ambulatory ECG recordings, carefully curated from over 4000 long-term Holter recordings at the Beth Israel Hospital Arrhythmia Laboratory between 1975 and 1979. Each record encapsulates 30 minutes of ECG data, sampled at 360 Hz per lead, amounting to 648,000 data points per lead per recording.
+
+Recording Quality:  
+The ECG equipment was battery-powered, minimizing 60 Hz noise typically introduced during recording. However, noise at 30 Hz, resulting from double-speed digitization during playback, was noted.
+
+Exclusion Criteria:  
+Records 102, 104, 107, and 217, containing paced beats, were excluded in line with the AAMI recommended practice and similar studies.  
+This exclusion led to a refined dataset of 44 records and 100,733 labeled heartbeats.
+
+File Structure:  
+Each record includes:  
+* Header file (.hea): Details the signal's attributes like format, type, and sample count.  
+* Binary file (.dat): Contains the digitized ECG signal.  
+* Annotation file (.atr): Houses expert annotations aligned with the R-wave peaks, ensuring accuracy for beat characterization.
+
+Annotation and Classification Focus:  
+Expert Annotations: Two independent cardiologists annotated the heartbeats, providing high-reliability labels for each beat.
+Beat Classification: The heartbeats are classified into five categories based on the AAMI EC57 standard.  
+* N (Normal Beat)
+* S (Supraventricular Ectopic Beat)
+* V (Ventricular Ectopic Beat)
+* F (Fusion Beat)
+* Q (Unknown Beat)
+
+For the purpose of this study, Fusion Beats (FB) and Unknown Beats (UB) were excluded, aligning with previous research paradigms. Consequently, the project zeroes in on classifying three critical beat types: Normal, Supraventricular, and Ventricular beats.
 
 ### Data Preprocessing
 The preprocessing phase is fundamental in transforming raw ECG data into a format suitable for machine learning algorithms. 
