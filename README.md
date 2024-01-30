@@ -66,15 +66,17 @@ The heartbeats are classified into five categories based on the AAMI EC57 standa
 * F (Fusion Beat)
 * Q (Unknown Beat)
 
-For the purpose of this study, Fusion Beats (F) and Unknown Beats (Q) were excluded, aligning with previous studies.  
+For the purpose of this project, Fusion Beats (F) and Unknown Beats (Q) were excluded, aligning with previous studies.  
 Consequently, the project focuses on classifying three beat types: Normal, Supraventricular, and Ventricular beats.
 
 ### Data Preprocessing
 The preprocessing of ECG signals ensures the raw data's accuracy and suitability for machine learning algorithms.  
-The preprocessing pipeline has been meticulously designed to address various artifacts commonly present in raw ECG signals, such as noise induced by muscle contractions, power-line interference, and baseline wander.
+The preprocessing pipeline has been meticulously designed to address various artifacts commonly present in raw  
+ECG signals, such as noise induced by muscle contractions, power-line interference, and baseline wander.
 
 * Baseline Wander Removal:  
-Baseline wander, often introduced by patient movements or respiration, manifests as low-frequency noise in ECG signals. A high-pass Butterworth filter, with a default cutoff frequency of 1 Hz, is employed to counter this.  
+Baseline wander, often introduced by patient movements or respiration, manifests as low-frequency noise in  
+ECG signals. A high-pass Butterworth filter, with a default cutoff frequency of 1 Hz, is employed to counter this.  
 The frequency can be adjusted to 0.5 Hz in cases of significant baseline wander around this range. Signal padding is incorporated to minimize edge effects, and the filter order is kept at 1 to avoid over-attenuation.
 
 * Noise Reduction:  
@@ -168,9 +170,8 @@ These features include the amplitude differences between various wave peaks (P, 
 
     A figure showing the temporal properties and variations in amplitude derived from the cardiac cycle in a normal ECG, including the identification of key fiducial points used to extract these measurements, is available [here](https://github.com/hima-97/ECG-Arrhythmia-Classification/blob/master/src/Key%20Fiducial%20Points%20of%20Heartbeat.jpg).
 
-
 ### Feature Selection
-The feature selection process in this project is plays a crucial role in balancing computational efficiency with classification accuracy. This project employs Mutual Information (MI) ranking, a robust method ideally suited for ECG classification due to its ability to quantify the shared information between features and class labels, thereby ranking them according to their relevance. It identifies features that are most informative about the heartbeat classes, thereby enhancing model performance and reducing computational complexity.
+The feature selection process in this project plays a crucial role in balancing computational efficiency with classification accuracy. This project employs Mutual Information (MI) ranking, a robust method ideally suited for ECG classification due to its ability to quantify the shared information between features and class labels, thereby ranking them according to their relevance. It identifies features that are most informative about the heartbeat classes, thereby enhancing model performance and reducing computational complexity.
 
 * Methodology:  
 Using the mutual_info_classif function from Scikit-Learn, we effectively detect both linear and nonlinear relationships between features and the class labels. This approach is particularly effective for complex models like Random Forest, which must interpret intricate patterns present in ECG data.
