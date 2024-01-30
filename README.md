@@ -120,13 +120,15 @@ The segmentation process leverages the R spike annotations from the MIT-BIH Arrh
   To normalize the signal and remove baseline wander, the mean value of each segment is subtracted from its individual samples. This normalization centers the signal around the R peak, ensuring an accurate and consistent analysis of the ECG waveform.
 
 ### Feature Extraction
-Feature extraction is a pivotal phase in this study, where distinct and quantifiable attributes are derived from segmented ECG heartbeats. These features are instrumental in distinguishing between different types of heartbeats and are essential for the accurate classification of arrhythmias.
+Feature extraction is a crucial phase in this project, where distinct and quantifiable attributes are derived from segmented ECG heartbeats. These features are instrumental in distinguishing between different types of heartbeats and are essential for the accurate classification of arrhythmias.
 
-Feature extraction is a crucial step in representing ECG signals in a way that highlights characteristics relevant to heartbeat classification. It includes:
+Custom classes and feature extraction methods are used to extract diverse features. This modular approach enhances scalability, allowing easy integration of new techniques without affecting existing code.
 
-* QRS Complex Analysis: Involves calculating the width, amplitude, and slope of the QRS complex, providing insights into heartbeat morphology.
-* RR Interval Features: Focuses on the time intervals between consecutive R-peaks, which are indicative of heart rate variability.
-* Advanced Descriptors: Incorporates techniques like Hermite Basis Functions (HBF), wavelet descriptors, and Higher Order Statistics (HOS) for a comprehensive signal analysis.
+The extracted features for each heartbeat are organized into a dictionary. This dictionary effectively represents a single heartbeat, with keys corresponding to different types of extracted features such as QRS morphology, RR intervals, wavelet features, and so on.
+
+These dictionaries, each representing an individual heartbeat, are then collectively stored in a list. This list encompasses all the heartbeats processed in a particular dataset. For efficient data management and ease of access, this list of heartbeat dictionaries is saved into a pickle file.
+
+In fact, two separate pickle files are created: one for the training dataset and another for the testing dataset. This separation ensures that the model is trained and evaluated on distinct sets of data, which is a fundamental practice in machine learning to assess the model's performance and generalizability.
 
 A total of 141 features are extracted and categorized as follows:
 
