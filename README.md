@@ -96,7 +96,8 @@ maintaining the proportionality between the original and the new sampling rates.
 
 ### Heartbeat segmentation
 Heartbeat segmentation is a pivotal step in the analysis of ECG signals, particularly for arrhythmia classification.  
-This process entails segmenting ECG signals into individual heartbeats, each representing a single cardiac cycle. Such segmentation is crucial for precise feature extraction and effective classification.
+This process entails segmenting ECG signals into individual heartbeats, each representing a single cardiac cycle.  
+Such segmentation is crucial for precise feature extraction and effective classification.
 
 Dataset Division Using Inter-patient Paradigm:  
 To ensure a realistic and clinically applicable approach, the dataset, sourced from the MIT-BIH Arrhythmia Database,  
