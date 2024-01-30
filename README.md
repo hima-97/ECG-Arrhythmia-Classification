@@ -233,7 +233,7 @@ The model is assessed through three experimental setups, each refining the class
         - Iterated over search results, assessing model performance (accuracy and F1 score)
           across different hyperparameter combinations (trees and features).
 
-        - Identified the best hyperparameters (search.best_params_) and the highest score (search.best_score_).
+        - Identified best hyperparameters (search.best_params_) and highest score (search.best_score_).
         
         - Refitted the model on the entire dataset using these optimal settings to maximize performance.
 
