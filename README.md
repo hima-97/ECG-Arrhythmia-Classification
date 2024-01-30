@@ -70,7 +70,8 @@ For the purpose of this study, Fusion Beats (F) and Unknown Beats (Q) were exclu
 Consequently, the project focuses on classifying three beat types: Normal, Supraventricular, and Ventricular beats.
 
 ### Data Preprocessing
-The preprocessing of ECG signals ensures the raw data's accuracy and suitability for machine learning algorithms. The preprocessing pipeline has been meticulously designed to address various artifacts commonly present in raw ECG signals, such as noise induced by muscle contractions, power-line interference, and baseline wander.
+The preprocessing of ECG signals ensures the raw data's accuracy and suitability for machine learning algorithms.  
+The preprocessing pipeline has been meticulously designed to address various artifacts commonly present in raw ECG signals, such as noise induced by muscle contractions, power-line interference, and baseline wander.
 
 * Baseline Wander Removal:  
 Baseline wander, often introduced by patient movements or respiration, manifests as low-frequency noise in ECG signals. A high-pass Butterworth filter, with a default cutoff frequency of 1 Hz, is employed to counter this.  
@@ -83,7 +84,7 @@ To mitigate external electrical noise, especially the 60 Hz interference from po
 To suppress high-frequency noise components while preserving clinically relevant information, a low-pass Butterworth filter with a 25 Hz cut-off frequency is applied. This step is critical in maintaining the balance between noise reduction and data integrity. Signal padding is also employed here to mitigate edge effects.
 
 * Normalization:  
-Normalizing the ECG signals between 0 and 1 is vital for standardizing signal amplitude across different recordings. This step is crucial when dealing with diverse datasets, ensuring a consistent analytical approach. Normalization thus facilitates accurate and interpretable data analysis.
+Normalizing the ECG signals between 0 and 1 is vital for standardizing signal amplitude across different recordings. This step is crucial when dealing with diverse datasets, ensuring a consistent analytical approach.
 
 * ECG Signal Resampling:  
 Considering the standard 256 Hz sampling rate of modern smart wearables like the Hexoskin Pro Kit, Apple Watch, and Samsung Watch, the ECG signals from the MIT-BIH Arrhythmia Database, originally at 360 Hz, are resampled to 256 Hz. This resampling process aligns the data sampling rates with those of the target devices, ensuring the model's applicability and accuracy upon deployment.
