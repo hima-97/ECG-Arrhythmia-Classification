@@ -190,31 +190,31 @@ The emphasis on interpretability in feature selection is vital. By using MI rank
 In developing our Random Forest model for arrhythmia classification, the MI ranking of features ensures that we are utilizing the most relevant ECG signal characteristics. This focus is integral to the model's success in accurately classifying arrhythmias, a key aspect of cardiac monitoring and diagnosis.
 
 ### Model Training and Testing
-* Mode Training:  
-The project harnesses a Random Forest classifier, renowned for its accuracy and resilience. Utilizing an ensemble of decision trees, the RF model capitalizes on the diversity of its composite learners. This approach diminishes individual biases and reduces variance, ultimately enhancing generalizability.
+* Model Training:  
+The project harnesses a Random Forest classifier, renowned for its accuracy and resilience. Utilizing an ensemble of decision trees, the RF model capitalizes on the diversity of its composite learners. This approach diminishes individual biases and reduces variance, ultimately enhancing generalizability.  
 
-Post-training, the model calculates importance scores for each feature. This process, inherent to the RF algorithm, provides valuable insights into the most influential factors in classification.
-
-A custom function is implemented for cross-validation. The function first identifies unique sources in the training data, representing different subsets. For each source, the training set is divided into two: a subset for training and another for testing. The function yields pairs of indices for training and testing splits, facilitating a thorough cross-validation process where each data part is used for both training and validation. This approach ensures every unique data source is utilized once as the test set, providing a comprehensive and unbiased evaluation of the model's training performance. 
+  Post-training, the model calculates importance scores for each feature. This process, inherent to the RF algorithm, provides valuable insights into the most influential factors in classification.
+  
+  A custom function is implemented for cross-validation. The function first identifies unique sources in the training data, representing different subsets. For each source, the training set is divided into two: a subset for training and another for testing. The function yields pairs of indices for training and testing splits, facilitating a thorough cross-validation process where each data part is used for both training and validation. This approach ensures every unique data source is utilized once as the test set, providing a comprehensive and unbiased evaluation of the model's training performance. 
 
 * Model Testing:  
 A separate test dataset, unexposed to the model during training, is used to rigorously assess the model's classification accuracy and generalization capabilities. The test dataset undergoes the same preprocessing and feature extraction procedures as the training set, ensuring uniformity in data representation.
 
-A confusion matrix is constructed to visualize the model's performance across different arrhythmia classes. This matrix is instrumental in pinpointing the model's strengths and potential areas of improvement.
+  A confusion matrix is constructed to visualize the model's performance across different arrhythmia classes. This matrix is instrumental in pinpointing the model's strengths and potential areas of improvement.
 
-The model’s efficacy is gauged using key metrics like precision, recall, sensitivity, specificity, positive predictivity, false positive rate, accuracy, and F1 score. These metrics offer a detailed and nuanced understanding of the model's diagnostic abilities.
+  The model’s efficacy is gauged using key metrics like precision, recall, sensitivity, specificity, positive predictivity, false positive rate, accuracy, and F1 score. These metrics offer a detailed and nuanced understanding of the model's diagnostic abilities.
 
 ### Results:
 The model is assessed through three experimental setups, each refining the classifier's performance.
 
 * Experiment 1:
-    The model utilized the entire set of 141 features, with 101 decision trees.
+  The model utilized the entire set of 141 features, with 101 decision trees.
 
-* Experiment 2:
-    The model was trained with the top 6 features and 40 decision trees, following the same approach of similar successfull studies.
+* Experiment 2:  
+  The model was trained with the top 6 features and 40 decision trees, following the same approach of similar successfull studies.
 
 * Experiment 3:
-    Hyperparameter tuning is implemented to identify the optimal configuration, focusing on the number of trees and top ranked features.
+  Hyperparameter tuning is implemented to identify the optimal configuration, focusing on the number of trees and top ranked features.
 
     The hyperparameter tuning was performed as follows:
 
@@ -222,15 +222,18 @@ The model is assessed through three experimental setups, each refining the class
             'n_estimators': Number of trees in the forest, ranging from 1 to 100.
             'max_features': Number of top-ranked features to consider, ranging from 1 to 20.
         
-        - Initialized GridSearchCV with the Random Forest classifier, parameter grid, and set it to perform 5-fold cross-validation.
+        - Initialized GridSearchCV with the Random Forest classifier, parameter grid,
+          and set it to perform 5-fold cross-validation.
         
-        - Utilized two evaluation metrics: 'accuracy' and 'f1_weighted', focusing on overall accuracy and a balance between precision and recall.
+        - Utilized two evaluation metrics: 'accuracy' and 'f1_weighted',
+          focusing on overall accuracy and a balance between precision and recall.
 
         - Fitted the Random Forest model over the defined hyperparameter grid.
         
-        - Iterated over search results, assessing model performance (accuracy and F1 score) across different hyperparameter combinations (trees and features).
+        - Iterated over search results, assessing model performance (accuracy and F1 score)
+          across different hyperparameter combinations (trees and features).
 
-        - Identified the best hyperparameters (search.best_params_) and the highest achieved score (search.best_score_).
+        - Identified the best hyperparameters (search.best_params_) and the highest score (search.best_score_).
         
         - Refitted the model on the entire dataset using these optimal settings to maximize performance.
 
@@ -238,20 +241,7 @@ The model is assessed through three experimental setups, each refining the class
 
     The 10 top-ranked features and 84 decision trees were identified as the most optimal parameters.
 
-    The model showed an overall accuracy of 95.69% and an overall F1 score of 95.37% (weighted average).
-
-    Heartbeats classification performance metrics for experiment 3:
-
-      |Beat Type| Col 2   | Col 3   | Col 4   | Col 5   | Col 6   | Col 7   | Col 8   |
-      |:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|
-      |         |         |         |         |         |         |         |         |
-      |         |         |         |         |         |         |         |         |
-      |         |         |         |         |         |         |         |         |
-      |         |         |         |         |         |         |         |         |
-
-
-Hyperparameter tuning is performed to optimize the number of trees and features.
-Performance metrics demonstrate the model's high accuracy and reliability in arrhythmia classification.
+    The model performance improved by 4%, showing an overall accuracy of 95.69% and an overall F1 score of 95.37% (weighted average).
 
 ## Requirements
 The following Python libraries are required to execute the code:
