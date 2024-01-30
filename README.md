@@ -103,10 +103,10 @@ To ensure a realistic and clinically applicable approach, the dataset is divided
 
   The 44 recordings are evenly split as follows:
 
-  Training Set:  
-  101, 106, 108, 109, 112, 114, 115, 116, 118, 119, 122, 124, 201, 203, 205, 207, 208, 209, 215, 220, 223, 230  
-  Testing Set:  
-  100, 103, 105, 111, 113, 117, 121, 123, 200, 202, 210, 212, 213, 214, 219, 221, 222, 228, 231, 232, 233, 234
+    Training Set:  
+    101, 106, 108, 109, 112, 114, 115, 116, 118, 119, 122, 124, 201, 203, 205, 207, 208, 209, 215, 220, 223, 230  
+    Testing Set:  
+    100, 103, 105, 111, 113, 117, 121, 123, 200, 202, 210, 212, 213, 214, 219, 221, 222, 228, 231, 232, 233, 234
 
 * Data Processing and Serialization:  
 During the dataset division into training and testing sets, each heartbeat in the ECG data undergoes a processing step to create a structured representation. This representation includes details such as time, type, and rhythm class of each heartbeat. In this context, we represent each heartbeat by a structured dictionary, which encapsulates these specific details.  
