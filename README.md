@@ -124,12 +124,13 @@ Feature extraction is a crucial phase in this project, where distinct and quanti
 
 Custom classes and feature extraction methods are used to extract diverse features. This modular approach enhances scalability, allowing easy integration of new techniques without affecting existing code.
 
-The extracted features for each heartbeat are then organized into a dictionary. This dictionary effectively represents a single heartbeat, with keys corresponding to different types of extracted features such as QRS morphology,  
-RR intervals, wavelet features, and so on.
+The extracted features for each heartbeat are then organized into a dictionary. This dictionary effectively represents a single heartbeat, with keys corresponding to different types of extracted features such as QRS morphology, RR intervals, wavelet features, and so on.
 
-These dictionaries, each representing an individual heartbeat, are then collectively stored in a list. This list encompasses all the heartbeats processed in a particular dataset. For efficient data management and ease of access, this list of heartbeat dictionaries is saved into a pickle file.
+These dictionaries, each representing an individual heartbeat, are then collectively stored in a list.  
+This list encompasses all the heartbeats processed in a particular dataset. For efficient data management and ease of access, this list of heartbeat dictionaries is saved into a pickle file.
 
-In fact, two separate pickle files are created: one for the training dataset and another for the testing dataset. This separation ensures that the model is trained and evaluated on distinct sets of data, which is a fundamental practice in machine learning to assess the model's performance and generalizability.
+In fact, two separate pickle files are created: one for the training dataset and another for the testing dataset.  
+This separation ensures that the model is trained and evaluated on distinct sets of data, which is a fundamental practice in machine learning to assess the model's performance and generalizability.
 
 A total of 141 features are extracted and categorized as follows:
 
