@@ -206,6 +206,50 @@ The model’s efficacy is gauged using key metrics like precision, recall, sensi
 
 ### Results:
 The model is assessed through three experimental setups, each refining the classifier's performance.
+
+* Experiment 1:
+    The model utilized the entire set of 141 features, with 101 decision trees.
+
+* Experiment 2:
+    The model was trained with the top 6 features and 40 decision trees, following the same approach of similar successfull studies.
+
+* Experiment 3:
+    Hyperparameter tuning is implemented to identify the optimal configuration, focusing on the number of trees and top ranked features.
+
+    The hyperparameter tuning was performed as follows:
+
+        - Created a dictionary specifying the range of hyperparameters to test:
+            'n_estimators': Number of trees in the forest, ranging from 1 to 100.
+            'max_features': Number of top-ranked features to consider, ranging from 1 to 20.
+        
+        - Initialized GridSearchCV with the Random Forest classifier, parameter grid, and set it to perform 5-fold cross-validation.
+        
+        - Utilized two evaluation metrics: 'accuracy' and 'f1_weighted', focusing on overall accuracy and a balance between precision and recall.
+
+        - Fitted the Random Forest model over the defined hyperparameter grid.
+        
+        - Iterated over search results, assessing model performance (accuracy and F1 score) across different hyperparameter combinations (trees and features).
+
+        - Identified the best hyperparameters (search.best_params_) and the highest achieved score (search.best_score_).
+        
+        - Refitted the model on the entire dataset using these optimal settings to maximize performance.
+
+        - Retrieved the best model estimator (search.best_estimator_) for detailed analysis.
+
+    The 10 top-ranked features and 84 decision trees were identified as the most optimal parameters.
+
+    The model showed an overall accuracy of 95.69% and an overall F1 score of 95.37% (weighted average).
+
+    Heartbeats classification performance metrics for experiment 3:
+
+      |Beat Type| Col 2   | Col 3   | Col 4   | Col 5   | Col 6   | Col 7   | Col 8   |
+      |:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|:-------:|
+      |         |         |         |         |         |         |         |         |
+      |         |         |         |         |         |         |         |         |
+      |         |         |         |         |         |         |         |         |
+      |         |         |         |         |         |         |         |         |
+
+
 Hyperparameter tuning is performed to optimize the number of trees and features.
 Performance metrics demonstrate the model's high accuracy and reliability in arrhythmia classification.
 
@@ -242,6 +286,7 @@ ECG-Arrhythmia-Classification/
 │   │   ├── rr_features.py
 │   │   └── signal_buffer.py
 │   ├── ecg_components.txt
+│   ├── heartbeat_amplitude_features.txt
 │   ├── ecg_types.py
 │   ├── feature_extraction.py
 │   ├── feature_selection.py
