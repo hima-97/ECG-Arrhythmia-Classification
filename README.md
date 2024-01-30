@@ -22,7 +22,6 @@ Heartbeat segmentation to isolate individual cardiac cycles, critical for accura
 
 * Feature Extraction:  
 Deriving key attributes from heartbeats, transforming raw data into a machine-learning-ready format.  
-Employing advanced techniques for a thorough representation of ECG signals.
 
 * Feature Selection with Mutual Information (MI):  
 Applying MI for prioritizing features based on relevance, ensuring model efficiency and focus.
@@ -34,7 +33,7 @@ Training the RF model using selected features, fine-tuning its ability to classi
 Optimizing model parameters to enhance training efficiency and accuracy.
 
 * Model Validation and Evaluation:  
-Implementing a custom leave-one-out cross-validation strategy to validate the model’s generalizability and mitigate overfitting.
+Custom leave-one-out cross-validation strategy to validate the model’s generalizability and mitigate overfitting.
 Thorough evaluation in a separate testing phase to assess the model's performance on unseen data.
 
 * Performance Assessment:  
@@ -45,17 +44,13 @@ This methodical and detailed approach ensures a seamless transition from raw ECG
 
 
 ### Data Exploration and Analysis
-For this project, the MIT-BIH Arrhythmia Database, sourced from Physionet.org, was meticulously selected.  
+For this project, the [MIT-BIH Arrhythmia Database](https://physionet.org/content/mitdb/1.0.0/), sourced from Physionet.org, was meticulously selected.  
 This dataset is a gold standard in cardiac arrhythmia research, thanks to its extensive collection of accurately annotated ECG recordings.
 
 The database comprises 48 half-hour excerpts from two-channel ambulatory ECG recordings, carefully curated from over 4000 long-term Holter recordings at the Beth Israel Hospital Arrhythmia Laboratory between 1975 and 1979. Each record encapsulates 30 minutes of ECG data, sampled at 360 Hz per lead, amounting to 648,000 data points per lead per recording.
 
-Recording Quality:  
-The ECG equipment was battery-powered, minimizing 60 Hz noise typically introduced during recording.  
-However, noise at 30 Hz, resulting from double-speed digitization during playback, was noted.
-
 Exclusion Criteria:  
-Records 102, 104, 107, and 217, containing paced beats, were excluded in line with the AAMI recommended practice and similar studies. This exclusion led to a refined dataset of 44 records and 100,733 labeled heartbeats.
+Records 102, 104, 107, and 217, containing paced beats, were excluded in line with the Association for the Advancement of Medical Instrumentation (AAMI) recommended practice and similar studies. This exclusion led to a refined dataset of 44 records and 100,733 labeled heartbeats.
  
 Each record includes:
 * Header file (.hea): Details the signal's attributes like format, type, and sample count.  
@@ -75,7 +70,7 @@ For the purpose of this study, Fusion Beats (F) and Unknown Beats (Q) were exclu
 Consequently, the project focuses on classifying three beat types: Normal, Supraventricular, and Ventricular beats.
 
 ### Data Preprocessing
-The preprocessing of ECG signals is a critical phase in this project, ensuring the raw data's accuracy and suitability for machine learning algorithms. The preprocessing pipeline has been meticulously designed to address various artifacts commonly present in raw ECG signals, such as noise induced by muscle contractions, power-line interference, and baseline wander.
+The preprocessing of ECG signals ensures the raw data's accuracy and suitability for machine learning algorithms. The preprocessing pipeline has been meticulously designed to address various artifacts commonly present in raw ECG signals, such as noise induced by muscle contractions, power-line interference, and baseline wander.
 
 * Baseline Wander Removal:  
 Baseline wander, often introduced by patient movements or respiration, manifests as low-frequency noise in ECG signals. A high-pass Butterworth filter, with a default cutoff frequency of 1 Hz, is employed to counter this.  
