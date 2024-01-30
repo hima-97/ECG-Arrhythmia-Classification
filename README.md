@@ -90,8 +90,11 @@ To suppress high-frequency noise components while preserving clinically relevant
 Normalizing the ECG signals between 0 and 1 is vital for standardizing signal amplitude across different recordings. This step is crucial when dealing with diverse datasets, ensuring a consistent analytical approach. Normalization thus facilitates accurate and interpretable data analysis.
 
 * ECG Signal Resampling:  
-Considering the standard 256 Hz sampling rate of modern smart wearables like the Hexoskin Pro Kit, Apple Watch, and Samsung Watch, the ECG signals from the MIT-BIH Arrhythmia Database, originally at 360 Hz, are resampled to 256 Hz. This resampling process aligns the data sampling rates with those of the target devices, ensuring the model's applicability and accuracy upon deployment. The resampling is achieved through the formula  
-num_samples_resampled = int((256/360) * num_samples_original)  
+Considering the standard 256 Hz sampling rate of modern smart wearables like the Hexoskin Pro Kit, Apple Watch, and Samsung Watch, the ECG signals from the MIT-BIH Arrhythmia Database, originally at 360 Hz, are resampled to 256 Hz. This resampling process aligns the data sampling rates with those of the target devices, ensuring the model's applicability and accuracy upon deployment.  
+The resampling is achieved through the formula
+
+num_samples_resampled = int((256/360) * num_samples_original)
+
 maintaining the proportionality between the original and the new sampling rates. The annotation points are also adjusted correspondingly to accurately locate R-peaks in the resampled ECG signals.
 
 ### Heartbeat segmentation
@@ -117,11 +120,43 @@ The segmentation process begins with the detection of the R peak using annotatio
 To normalize the signal and remove baseline wander, the mean value of each segment is subtracted from its individual samples. This normalization centers the signal around the R peak, ensuring an accurate and consistent analysis of the ECG waveform.
 
 ### Feature Extraction
+Feature extraction is a pivotal phase in this study, where distinct and quantifiable attributes are derived from segmented ECG heartbeats. These features are instrumental in distinguishing between different types of heartbeats and are essential for the accurate classification of arrhythmias.
+
 Feature extraction is a crucial step in representing ECG signals in a way that highlights characteristics relevant to heartbeat classification. It includes:
 
 * QRS Complex Analysis: Involves calculating the width, amplitude, and slope of the QRS complex, providing insights into heartbeat morphology.
 * RR Interval Features: Focuses on the time intervals between consecutive R-peaks, which are indicative of heart rate variability.
 * Advanced Descriptors: Incorporates techniques like Hermite Basis Functions (HBF), wavelet descriptors, and Higher Order Statistics (HOS) for a comprehensive signal analysis.
+
+A total of 141 features are extracted and categorized as follows:
+
+* Heart Rate Related Features:  
+These include the current, previous, and next RR intervals, which are the time intervals between successive R peaks. They provide critical insights into the heart rate variability.
+
+* Normalized Heart Rate Related Features:  
+The RR interval features are normalized by dividing them by their average value in the last 32 heartbeats, enhancing their comparability across different heartbeats.
+
+* QRS Temporal Features:  
+These encompass the total duration of the QRS complex, its width at half and a quarter of its peak value, and the distance between the Q wave peak and the S wave peak, shedding light on the morphology of each heartbeat.
+
+* Normalized QRS Temporal Features:  
+Similar to heart rate features, these QRS temporal characteristics are normalized against their average values in the last 32 beats.
+
+* Hermite Basis Function (HBF) Coefficients:  
+Utilizing Hermite polynomials of degrees 3, 4, and 5, we decompose each beat segment into a series of orthogonal polynomials. These coefficients effectively summarize the waveform's characteristics, capturing subtle variations indicative of different arrhythmias. Each beat segment is analyzed using the hermfit function in Python, generating coefficients that represent the ECG waveform's characteristics.
+
+* Discrete Wavelet Transform (DWT) Coefficients:  
+We apply DWT using the db1 wavelet at three levels of decomposition. This multi-resolution analysis dissects the ECG signal into various frequency bands, enabling detailed examination of specific signal characteristics. The ECG signal is decomposed into different frequency bands, facilitating the analysis of time-varying characteristics of the ECG waveform.
+
+* Higher Order Statistics (HOS) Features:  
+Including third and fourth-order cumulants like kurtosis and skewness, HOS features provide a deeper understanding of the signal's shape and distribution, especially in the context of heart rhythm irregularities. Calculating kurtosis and skewness within specific intervals around the R peak, we gain insights into the signal distribution's asymmetry and 'tailedness'.
+
+* Euclidean Distances:  
+We measure the Euclidean distances between the R peak and four strategically chosen points in the ECG waveform. These distances quantify the variations in the waveform relative to the R peak, offering insights into the heart's electrical activity. These are calculated between the R peak and four points in the ECG segment, highlighting amplitude variations relative to the R peak.
+
+* Heartbeat Amplitude Features:  
+These features include the amplitude differences between various wave peaks (P, Q, R, S), providing an understanding of the electrical forces generated by the heart. Fiducial points, including the peaks of the P, Q, R, S waves, are identified through inflection points in the ECG signal. The differences in amplitude between these points are critical in analyzing the signal morphology. In cases where the QRS complex exhibits complex morphology, the maximum signal value within a 100 ms window around the annotated R peak (𝑄𝑅𝑆𝑚𝑎𝑥) serves as a reference for accurately identifying the R peak. This adaptation is crucial for ensuring the reliability of feature extraction, especially in abnormal heartbeats.
+A detailed explanation of the algorithm used to extract the heartbeat amplitude features is available [here](https://github.com/hima-97/ECG-Arrhythmia-Classification/blob/master/src/heartbeat_amplitude_features.txt)
 
 ### Feature Selection
 Feature selection is conducted using Mutual Information (MI), a statistical measure that assesses the dependency between variables. It identifies features that are most informative about the heartbeat classes, thereby enhancing model performance and reducing computational complexity.
