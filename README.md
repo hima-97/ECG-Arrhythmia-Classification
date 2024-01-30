@@ -77,7 +77,8 @@ ECG signals, such as noise induced by muscle contractions, power-line interferen
 * Baseline Wander Removal:  
 Baseline wander, often introduced by patient movements or respiration, manifests as low-frequency noise in  
 ECG signals. A high-pass Butterworth filter, with a default cutoff frequency of 1 Hz, is employed to counter this.  
-The frequency can be adjusted to 0.5 Hz in cases of significant baseline wander around this range. Signal padding is incorporated to minimize edge effects, and the filter order is kept at 1 to avoid over-attenuation.
+The frequency can be adjusted to 0.5 Hz for significant baseline wander around this range.  
+Signal padding is incorporated to minimize edge effects and the filter order is set to 1 to avoid over-attenuation.
 
 * Noise Reduction:  
 To mitigate external electrical noise, especially the 60 Hz interference from power lines, a band-reject Butterworth filter with cutoff frequencies of 59 Hz and 61 Hz is utilized. This approach effectively eliminates AC power line interference, ensuring the signal's integrity. Notably, the majority of the 60 Hz noise in the database originates from the playback stage of the recording equipment, which was battery-powered. Signal padding is again used here to reduce edge effects during filtering.
