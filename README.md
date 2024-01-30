@@ -96,8 +96,7 @@ Considering the standard 256 Hz sampling rate of modern smart wearables like the
   maintaining the proportionality between the original and the new sampling rates. The annotation points are also adjusted correspondingly to accurately locate R-peaks in the resampled ECG signals.
 
 ### Heartbeat segmentation
-Heartbeat segmentation is a pivotal step in the analysis of ECG signals, particularly for arrhythmia classification.  
-This process entails segmenting ECG signals into individual heartbeats, each representing a single cardiac cycle.  
+Heartbeat segmentation entails segmenting ECG signals into individual heartbeats, each representing a single cardiac cycle.  
 Such segmentation is crucial for precise feature extraction and effective classification.
 
 Dataset Division Using Inter-patient Paradigm:  
