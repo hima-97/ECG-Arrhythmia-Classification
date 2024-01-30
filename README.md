@@ -107,9 +107,9 @@ For efficient storage and retrieval of this structured data, especially consider
 When the model is set for training or evaluation, these pickle files can be deserialized back into Python objects. This process ensures that all the structured data is accurately reconstructed and can be directly utilized in our machine learning models without additional preprocessing.
 
 The 44 recordings are evenly split as follows:
-- Training Set:  
+ Training Set:  
 101, 106, 108, 109, 112, 114, 115, 116, 118, 119, 122, 124, 201, 203, 205, 207, 208, 209, 215, 220, 223, 230
-- Testing Set:  
+ Testing Set:  
 100, 103, 105, 111, 113, 117, 121, 123, 200, 202, 210, 212, 213, 214, 219, 221, 222, 228, 231, 232, 233, 234
 
 * Segmentation Process:  
