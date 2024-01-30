@@ -96,12 +96,10 @@ Considering the standard 256 Hz sampling rate of modern smart wearables like the
   maintaining the proportionality between the original and the new sampling rates. The annotation points are also adjusted correspondingly to accurately locate R-peaks in the resampled ECG signals.
 
 ### Heartbeat segmentation
-Heartbeat segmentation entails segmenting ECG signals into individual heartbeats, each representing a single cardiac cycle.  
-Such segmentation is crucial for precise feature extraction and effective classification.
+Heartbeat segmentation entails segmenting ECG signals into individual heartbeats, each representing a single cardiac cycle. Such segmentation is crucial for precise feature extraction and effective classification.
 
 Dataset Division Using Inter-patient Paradigm:  
-To ensure a realistic and clinically applicable approach, the dataset, sourced from the MIT-BIH Arrhythmia Database,  
-is divided into training and testing sets based on an inter-patient paradigm. This division ensures that the model is trained and tested on data from different patients, bolstering its ability to generalize effectively to new, unseen data.
+To ensure a realistic and clinically applicable approach, the dataset is divided into training and testing sets based on an inter-patient paradigm. This division ensures that the model is trained and tested on data from different patients, improving its ability to generalize effectively to new, unseen data.
 
 The 44 recordings are evenly split as follows:
 * Training Set:  
@@ -112,7 +110,7 @@ The 44 recordings are evenly split as follows:
 Segmentation Process:  
 The segmentation process leverages the R spike annotations from the MIT-BIH Arrhythmia Database as markers to identify individual heartbeats. These annotations, typically located at the R-wave peak of the QRS complex, are used to segment the ECG signal on a beat-by-beat basis. The approach recognizes each cardiac cycle as an independent unit, allowing for a detailed analysis of inter-beat variability and morphological differences.
 
-The segmentation process begins with the detection of the R peak using annotations provided in the record's .atr files. Each heartbeat is segmented by selecting a 640 ms window around the annotated R peak, comprising 373 ms before and 267 ms after the R peak. This window size is chosen to encompass the complete QRS complex and adjacent parts of the ECG waveform.
+The segmentation process begins with the detection of the R peak using annotations from the record's .atr files. Each heartbeat is segmented by selecting a 640 ms window around the annotated R peak, comprising 373 ms before and 267 ms after the R peak. This window size is chosen to encompass the complete QRS complex and adjacent parts of the ECG waveform.
 
 To normalize the signal and remove baseline wander, the mean value of each segment is subtracted from its individual samples. This normalization centers the signal around the R peak, ensuring an accurate and consistent analysis of the ECG waveform.
 
