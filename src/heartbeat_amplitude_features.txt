@@ -1,0 +1,28 @@
+Below is a detailed description of the algorithm applied to extract the key fiducial points from each heartbeat:
+
+1) R peak annotations from each record’s .atr file are used to identify each heartbeat. The algorithm selects a 640 ms segment (373 ms preceding and 267 ms following the annotated R peak) of the signal for analyzing each heartbeat.
+
+2) Initially, 𝑄𝑝𝑒𝑎𝑘, 𝑅𝑝𝑒𝑎𝑘, 𝑆𝑝𝑒𝑎𝑘, and 𝑃𝑝𝑒𝑎𝑘 are assumed to be zero, indicating the absence of corresponding waves.
+
+3) If 𝑄𝑅𝑆𝑚𝑎𝑥 (the maximum signal value within 100 ms around the annotation) is positive, 𝑅𝑝𝑒𝑎𝑘 is set to 𝑄𝑅𝑆𝑚𝑎𝑥.
+
+4) Look backward from 𝑄𝑅𝑆𝑚𝑎𝑥 and evaluate the signal and its inflection points in the following way:
+a. Set 𝑄𝑅𝑆𝑚𝑎𝑥/2𝑎 equal to the first location where the signal goes below half of 𝑄𝑅𝑆𝑚𝑎𝑥.
+b. Set 𝑄𝑅𝑆𝑚𝑎𝑥/4𝑎 equal to the first location where the signal goes below a quarter of 𝑄𝑅𝑆𝑚𝑎𝑥.
+c. If the first inflection point is negative and 𝑅𝑝𝑒𝑎𝑘 is not zero, then 𝑄𝑝𝑒𝑎𝑘 is set equal to the value at such point.
+d. If the first inflection point is >= zero and 𝑅𝑝𝑒𝑎𝑘 is not zero, then it is set as 𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡 and 𝑄𝑝𝑒𝑎𝑘 is considered zero.
+e. If the first inflection point is positive and 𝑅𝑝𝑒𝑎𝑘 is zero, then set 𝑅𝑝𝑒𝑎𝑘 equal to the value at such point and set 𝑆𝑝𝑒𝑎𝑘 equal to 𝑄𝑅𝑆𝑚𝑎𝑥.
+f. If the second inflection point is negative, 𝑄𝑝𝑒𝑎𝑘 is zero, and 𝑄𝑅𝑆𝑚𝑎𝑥 is positive, then set 𝑄𝑝𝑒𝑎𝑘 equal to the value at such point.
+g. If 𝑄𝑝𝑒𝑎𝑘 is not zero and the signal crosses zero, then the first non-negative point is set as 𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡.
+h. If the second inflection point is >= zero and 𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡 has not been found yet, then it is set as 𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡.
+
+5) Look forward from 𝑄𝑅𝑆𝑚𝑎𝑥 and evaluate the signal and its inflection points in the following way:
+a. Set 𝑄𝑅𝑆𝑚𝑎𝑥/2𝑏 equal to the first location where the signal goes below half of 𝑄𝑅𝑆𝑚𝑎𝑥.
+b. Set 𝑄𝑅𝑆𝑚𝑎𝑥/4𝑏 equal to the first location where the signal goes below a quarter of 𝑄𝑅𝑆𝑚𝑎𝑥.
+c. If the first inflection point is negative and 𝑅𝑝𝑒𝑎𝑘 is not zero, then set 𝑆𝑝𝑒𝑎𝑘 equal to the value at such point.
+d. If 𝑆𝑝𝑒𝑎𝑘 is not zero and the signal cross zero, then the first non-negative point is marked as 𝑄𝑅𝑆𝑒𝑛𝑑.
+e. If the second inflection point is >= zero and 𝑄𝑅𝑆𝑒𝑛𝑑 has not been found yet, then it is set as 𝑄𝑅𝑆𝑒𝑛𝑑.
+
+6) Find the maximum value of the signal in the segment that goes between 233 ms and 67 ms before 𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡. If such value is greater than three times the standard deviation of the signal during the 67 ms preceding the current segment and it is located at an inflection point in the signal, then set it equal to 𝑃𝑝𝑒𝑎𝑘.
+
+After pinpointing the fiducial points, calculating all the features becomes straightforward by assessing the differences in values or positions of these corresponding fiducial points.
