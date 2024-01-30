@@ -101,16 +101,19 @@ Heartbeat segmentation entails segmenting ECG signals into individual heartbeats
 * Dataset Division Using Inter-patient Paradigm:  
 To ensure a realistic and clinically applicable approach, the dataset is divided into training and testing sets based on an inter-patient paradigm. This division ensures that the model is trained and tested on data from different patients, improving its ability to generalize effectively to new, unseen data.
 
-* Data Processing and Serialization:  
-During the dataset division into training and testing sets, each heartbeat in the ECG data undergoes a processing step to create a structured representation. This representation includes details such as time, type, and rhythm class of each heartbeat. In this context, we represent each heartbeat by a structured dictionary, which encapsulates these specific details.  
-For efficient storage and retrieval of this structured data, especially considering the large datasets typical in machine learning workflows, we employ the Python pickle module. This module is instrumental for serialization, converting the structured data into a byte stream format that can be easily stored or transmitted. pickle is particularly adept at serializing complex Python objects, such as dictionaries and numpy arrays, making it a suitable choice for handling our preprocessed ECG data. This approach not only ensures efficient data handling but also preserves the integrity and structure of the data.  
-When the model is set for training or evaluation, these pickle files can be deserialized back into Python objects. This process ensures that all the structured data is accurately reconstructed and can be directly utilized in our machine learning models without additional preprocessing.
-
-The 44 recordings are evenly split as follows:  
+The 44 recordings are evenly split as follows:
+  
 Training Set:  
 101, 106, 108, 109, 112, 114, 115, 116, 118, 119, 122, 124, 201, 203, 205, 207, 208, 209, 215, 220, 223, 230  
 Testing Set:  
 100, 103, 105, 111, 113, 117, 121, 123, 200, 202, 210, 212, 213, 214, 219, 221, 222, 228, 231, 232, 233, 234
+
+* Data Processing and Serialization:  
+During the dataset division into training and testing sets, each heartbeat in the ECG data undergoes a processing step to create a structured representation. This representation includes details such as time, type, and rhythm class of each heartbeat. In this context, we represent each heartbeat by a structured dictionary, which encapsulates these specific details.  
+
+  For efficient storage and retrieval of this structured data, especially considering the large datasets typical in machine learning workflows, we employ the Python pickle module. This module is instrumental for serialization, converting the structured data into a byte stream format that can be easily stored or transmitted. pickle is particularly adept at serializing complex Python objects, such as dictionaries and numpy arrays, making it a suitable choice for handling our preprocessed ECG data. This approach not only ensures efficient data handling but also preserves the integrity and structure of the data.  
+
+  When the model is set for training or evaluation, these pickle files can be deserialized back into Python objects. This process ensures that all the structured data is accurately reconstructed and can be directly utilized in our machine learning models without additional preprocessing.
 
 * Segmentation Process:  
 The segmentation process leverages the R spike annotations from the MIT-BIH Arrhythmia Database as markers to identify individual heartbeats. These annotations, typically located at the R-wave peak of the QRS complex, are used to segment the ECG signal on a beat-by-beat basis. The approach recognizes each cardiac cycle as an independent unit, allowing for a detailed analysis of inter-beat variability and morphological differences.
