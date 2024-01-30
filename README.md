@@ -1,5 +1,6 @@
 #  Application Of Machine Learning For Single-Lead ECG-Based Arrhythmia Classification Via Smart Wearable Devices
-This repository presents an intricate machine learning project focused on classifying heartbeats from single-lead ECG data, crucial in the domain of contemporary smart wearable devices like the Apple Watch and Samsung Watch.  This project showcases advanced application of machine learning in the field of biomedical signal processing.
+This repository presents an intricate machine learning project focused on classifying heartbeats from single-lead ECG data, crucial in the domain of contemporary smart wearable devices like the Apple Watch and Samsung Watch.  
+This project showcases advanced application of machine learning in the field of biomedical signal processing.
 
 The primary goal is to categorize three heartbeat types: normal (N), supraventricular (S), and ventricular (V) beats, using single-lead ECG signals. This classification is essential for real-time cardiac monitoring through wearable technology. The project embodies a detailed methodology, encompassing data preprocessing, feature extraction and selection, and the implementation and evaluation of a Random Forest classifier.
 
