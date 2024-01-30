@@ -7,7 +7,7 @@ Below is a detailed description of the algorithm applied to extract the key fidu
 3) If 𝑄𝑅𝑆𝑚𝑎𝑥 (the maximum signal value within 100 ms around the annotation) is positive, 𝑅𝑝𝑒𝑎𝑘 is set to 𝑄𝑅𝑆𝑚𝑎𝑥.
 
 4) Look backward from 𝑄𝑅𝑆𝑚𝑎𝑥 and evaluate the signal and its inflection points in the following way:
-a. Set 𝑄𝑅𝑆𝑚𝑎𝑥/2𝑎 equal to the first location where the signal goes below half of 𝑄𝑅𝑆𝑚𝑎𝑥.
+a. Set 𝑄𝑅𝑆𝑚𝑎𝑥/2𝑎 equal to the first location where the signal goes below half of 𝑄𝑅𝑆𝑚𝑎𝑥.    
 b. Set 𝑄𝑅𝑆𝑚𝑎𝑥/4𝑎 equal to the first location where the signal goes below a quarter of 𝑄𝑅𝑆𝑚𝑎𝑥.
 c. If the first inflection point is negative and 𝑅𝑝𝑒𝑎𝑘 is not zero, then 𝑄𝑝𝑒𝑎𝑘 is set equal to the value at such point.
 d. If the first inflection point is >= zero and 𝑅𝑝𝑒𝑎𝑘 is not zero, then it is set as 𝑄𝑅𝑆𝑠𝑡𝑎𝑟𝑡 and 𝑄𝑝𝑒𝑎𝑘 is considered zero.
