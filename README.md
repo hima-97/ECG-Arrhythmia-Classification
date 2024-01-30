@@ -93,9 +93,9 @@ Normalizing the ECG signals between 0 and 1 is vital for standardizing signal am
 Considering the standard 256 Hz sampling rate of modern smart wearables like the Hexoskin Pro Kit, Apple Watch, and Samsung Watch, the ECG signals from the MIT-BIH Arrhythmia Database, originally at 360 Hz, are resampled to 256 Hz. This resampling process aligns the data sampling rates with those of the target devices, ensuring the model's applicability and accuracy upon deployment.  
 The resampling is achieved through the formula
 
-num_samples_resampled = int((256/360) * num_samples_original)
+    num_samples_resampled = int((256/360) * num_samples_original)
 
-maintaining the proportionality between the original and the new sampling rates. The annotation points are also adjusted correspondingly to accurately locate R-peaks in the resampled ECG signals.
+    maintaining the proportionality between the original and the new sampling rates. The annotation points are also adjusted correspondingly to accurately locate R-peaks in the resampled ECG signals.
 
 ### Heartbeat segmentation
 Heartbeat segmentation is a pivotal step in the analysis of ECG signals, particularly for arrhythmia classification.  
