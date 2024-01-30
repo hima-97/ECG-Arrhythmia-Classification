@@ -114,10 +114,10 @@ During the dataset division into training and testing sets, each heartbeat in th
 * Segmentation Process:  
 The segmentation process leverages the R spike annotations from the MIT-BIH Arrhythmia Database as markers to identify individual heartbeats. These annotations, typically located at the R-wave peak of the QRS complex, are used to segment the ECG signal on a beat-by-beat basis. The approach recognizes each cardiac cycle as an independent unit, allowing for a detailed analysis of inter-beat variability and morphological differences.
 
-The segmentation process begins with the detection of the R peak using annotations from the record's .atr files.  
-Each heartbeat is segmented by selecting a 640 ms window around the annotated R peak, comprising 373 ms before and 267 ms after the R peak. This window size is chosen to encompass the complete QRS complex and adjacent parts of the ECG waveform.
+  The segmentation process begins with the detection of the R peak using annotations from the record's .atr files.  
+  Each heartbeat is segmented by selecting a 640 ms window around the annotated R peak, comprising 373 ms before and 267 ms after the R peak. This window size is chosen to encompass the complete QRS complex and adjacent parts of the ECG waveform.
 
-To normalize the signal and remove baseline wander, the mean value of each segment is subtracted from its individual samples. This normalization centers the signal around the R peak, ensuring an accurate and consistent analysis of the ECG waveform.
+  To normalize the signal and remove baseline wander, the mean value of each segment is subtracted from its individual samples. This normalization centers the signal around the R peak, ensuring an accurate and consistent analysis of the ECG waveform.
 
 ### Feature Extraction
 Feature extraction is a pivotal phase in this study, where distinct and quantifiable attributes are derived from segmented ECG heartbeats. These features are instrumental in distinguishing between different types of heartbeats and are essential for the accurate classification of arrhythmias.
