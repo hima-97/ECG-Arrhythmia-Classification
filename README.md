@@ -101,8 +101,8 @@ Heartbeat segmentation entails segmenting ECG signals into individual heartbeats
 * Dataset Division Using Inter-patient Paradigm:  
 To ensure a realistic and clinically applicable approach, the dataset is divided into training and testing sets based on an inter-patient paradigm. This division ensures that the model is trained and tested on data from different patients, improving its ability to generalize effectively to new, unseen data.
 
-  The 44 recordings are evenly split as follows:
-
+  The 44 recordings are evenly split as follows:  
+  
     Training Set:  
     101, 106, 108, 109, 112, 114, 115, 116, 118, 119, 122, 124, 201, 203, 205, 207, 208, 209, 215, 220, 223, 230  
     Testing Set:  
