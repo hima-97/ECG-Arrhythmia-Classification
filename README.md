@@ -3,7 +3,7 @@ This repository presents an intricate machine learning project focused on classi
 
 The primary goal is to categorize three heartbeat types: normal (N), supraventricular (S), and ventricular (V) beats, using single-lead ECG signals. This classification is essential for real-time cardiac monitoring through wearable technology. The project embodies a detailed methodology, encompassing data preprocessing, feature extraction and selection, and the implementation and evaluation of a Random Forest classifier.
 
-A comprehensive outline of the project, including methodologies, experiments, and results, is available [here](https://github.com/hima-97/ECG-Arrhythmia-Classification/blob/master/Himanshu%20Kumar%20-%20Application%20of%20Machine%20Learning%20for%20Single-Lead%20ECG-Based%20Arrhythmia%20Classification%20via%20Smart%20Wearable%20Devices.pdf)
+A comprehensive outline of the project, including methodologies, experiments, and results, is available [here](https://github.com/hima-97/ECG-Arrhythmia-Classification/blob/master/Himanshu%20Kumar%20-%20Application%20of%20Machine%20Learning%20for%20Single-Lead%20ECG-Based%20Arrhythmia%20Classification%20via%20Smart%20Wearable%20Devices.pdf).
 
 ## Methodology
 The methodology employed in this project reflects a rigorous and holistic approach to classifying cardiac rhythms using single-lead ECG data, a pivotal feature in contemporary smart wearable devices like the Apple Watch and Samsung Watch. The project pivots on the Random Forest (RF) classifier, selected for its effectiveness in handling complex datasets.
@@ -161,6 +161,9 @@ These features include the amplitude differences between various wave peaks (P, 
     A detailed explanation of the algorithm used to extract the key fiducial points from each heartbeat heartbeat amplitude features is available [here](https://github.com/hima-97/ECG-Arrhythmia-Classification/blob/master/src/heartbeat_amplitude_features.txt).
 
     After pinpointing the fiducial points, calculating all the features becomes straightforward by assessing the differences in values or positions of these corresponding fiducial points.
+
+    A figure showing the temporal properties and variations in amplitude derived from the cardiac cycle in a normal ECG, including the identification of key fiducial points used to extract these measurements, is available [here](https://github.com/hima-97/ECG-Arrhythmia-Classification/blob/master/src/Key%20Fiducial%20Points%20of%20Heartbeat.jpg).
+
 
 ### Feature Selection
 Feature selection is conducted using Mutual Information (MI), a statistical measure that assesses the dependency between variables. It identifies features that are most informative about the heartbeat classes, thereby enhancing model performance and reducing computational complexity.
