@@ -1,7 +1,9 @@
 #  Application Of Machine Learning For Single-Lead ECG-Based Arrhythmia Classification Via Smart Wearable Devices
-This repository presents an intricate machine learning project focused on classifying heartbeats from single-lead ECG data, crucial in the domain of smart wearable devices. It showcases an advanced application of machine learning techniques in biomedical signal processing, underscoring my expertise in both areas.
+This repository presents an intricate machine learning project focused on classifying heartbeats from single-lead ECG data, crucial in the domain of smart wearable technology. The project showcases advanced application of machine learning in the field of biomedical signal processing.
 
 The primary goal is to categorize three heartbeat types: normal (N), supraventricular (S), and ventricular (V) beats, using single-lead ECG signals. This classification is essential for real-time cardiac monitoring through wearable technology. The project embodies a detailed methodology, encompassing data preprocessing, feature extraction and selection, and the implementation and evaluation of a Random Forest classifier.
+
+Harnessing the MIT-BIH Arrhythmia Database, the project transforms two-lead ECG data to emulate single-lead data acquisition, aligning with the capabilities of current smart wearable devices. The projects culminates in a Random Forest model that demonstrates remarkable accuracy, achieving an overall accuracy of 95.69% and a weighted average F1 score of 95.37%. This performance illustrates the model's proficiency in distinguishing between normal, supraventricular, and ventricular heartbeats, reinforcing its potential for integration into smart wearable technologies for effective cardiac health monitoring.
 
 A comprehensive outline of the project, including methodologies, experiments, and results, is available [here](https://github.com/hima-97/ECG-Arrhythmia-Classification/blob/master/Himanshu%20Kumar%20-%20Application%20of%20Machine%20Learning%20for%20Single-Lead%20ECG-Based%20Arrhythmia%20Classification%20via%20Smart%20Wearable%20Devices.pdf).
 
@@ -302,5 +304,5 @@ Execute the Python 'main.py' file in the _/src_ folder. The following steps will
 2. Resampling of the ECG signals from 360 Hz to the new sampling rate of 256 Hz.
 3. Split and save the dataset into training and testing sets according to the literature defined inter-patient paradigm.
 4. Segmentation of the ECG signals into individual heartbeats and extraction of the heatbeat features using the extractors defined in the _/src/feature_extraction_utils_ folder
-5. Ranking and selecting features based on mutual information and constructing feature datasets for training and testing.
+5. Ranking and selecting features by mutual information and constructing feature datasets for training and testing.
 6. Training and testing the Random Forest classifier.
