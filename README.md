@@ -166,17 +166,43 @@ These features include the amplitude differences between various wave peaks (P, 
 
 
 ### Feature Selection
-Feature selection is conducted using Mutual Information (MI), a statistical measure that assesses the dependency between variables. It identifies features that are most informative about the heartbeat classes, thereby enhancing model performance and reducing computational complexity.
+The feature selection process in this project is plays a crucial role in balancing computational efficiency with classification accuracy. This project employs Mutual Information (MI) ranking, a robust method ideally suited for ECG classification due to its ability to quantify the shared information between features and class labels, thereby ranking them according to their relevance. It identifies features that are most informative about the heartbeat classes, thereby enhancing model performance and reducing computational complexity.
 
-Implements Mutual Information (MI) ranking for feature selection to reduce computational complexity and enhance model accuracy.
-Features are ranked according to their relevance in predicting heartbeat classes.
+* Methodology:  
+Using the mutual_info_classif function from Scikit-Learn, we effectively detect both linear and nonlinear relationships between features and the class labels. This approach is particularly effective for complex models like Random Forest, which must interpret intricate patterns present in ECG data.
 
-This stage is critical in enhancing model accuracy and reducing computational complexity. Utilizing Mutual Information (MI), a statistical measure of dependency, this process identifies features that significantly contribute to classifying the heartbeat types. The top 10 MI-ranked features are selected for model training, ensuring a focus on the most relevant ECG signal characteristics.
+* Process:  
+We construct feature vectors, labels, and source information for each heartbeat. The MI for each feature relative to the class labels is calculated, focusing our model on the most informative aspects for heartbeat classification.
+
+* Application:  
+The MI ranking reduces computational demands by ranking and selecting the top features based on their MI scores. This strategic selection balances computational efficiency with the need for classification accuracy.
+
+* Consistency Across Datasets:  
+The same feature ranking applied to the training dataset is also used for the testing dataset. This consistency ensures the model is equally efficient and effective across different datasets.
+
+* Efficiency:  
+MI ranking effectively identifies the most relevant features for ECG classification, ensuring the model's efficiency. By concentrating on a subset of highly informative features, we manage computational complexity without compromising the model's ability to differentiate various heartbeat types.
+
+* Interpretability:  
+The emphasis on interpretability in feature selection is vital. By using MI ranking, we not only enhance model performance but also ensure that the selected features are truly indicative of the underlying cardiac rhythms. This interpretability is crucial for clinical applications where understanding the model's decision-making process is as important as its accuracy.
+
+* Application in Random Forest Model:  
+In developing our Random Forest model for arrhythmia classification, the MI ranking of features ensures that we are utilizing the most relevant ECG signal characteristics. This focus is integral to the model's success in accurately classifying arrhythmias, a key aspect of cardiac monitoring and diagnosis.
 
 ### Model Training and Testing
-The project harnesses a Random Forest classifier, renowned for its accuracy and resilience. The model undergoes rigorous hyperparameter tuning for optimal performance. Extensive evaluation methods, including accuracy assessment and cross-validation, are employed to affirm the classifier's efficacy in heartbeat categorization.
+* Mode Training:  
+The project harnesses a Random Forest classifier, renowned for its accuracy and resilience. Utilizing an ensemble of decision trees, the RF model capitalizes on the diversity of its composite learners. This approach diminishes individual biases and reduces variance, ultimately enhancing generalizability.
 
-A robust Random Forest classifier with 84 decision trees is implemented. Extensive model evaluation includes a leave-one-out cross-validation strategy, considering the data's uniqueness. The model's performance is meticulously assessed through accuracy, precision, recall, F1 score, and specificity metrics. These evaluations demonstrate the classifier's proficiency in distinguishing between normal, supraventricular, and ventricular heartbeats, validating its potential for integration into smart wearable technologies.
+Post-training, the model calculates importance scores for each feature. This process, inherent to the RF algorithm, provides valuable insights into the most influential factors in classification.
+
+A custom function is implemented for cross-validation. The function first identifies unique sources in the training data, representing different subsets. For each source, the training set is divided into two: a subset for training and another for testing. The function yields pairs of indices for training and testing splits, facilitating a thorough cross-validation process where each data part is used for both training and validation. This approach ensures every unique data source is utilized once as the test set, providing a comprehensive and unbiased evaluation of the model's training performance. 
+
+* Model Testing:  
+A separate test dataset, unexposed to the model during training, is used to rigorously assess the model's classification accuracy and generalization capabilities. The test dataset undergoes the same preprocessing and feature extraction procedures as the training set, ensuring uniformity in data representation.
+
+A confusion matrix is constructed to visualize the model's performance across different arrhythmia classes. This matrix is instrumental in pinpointing the model's strengths and potential areas of improvement.
+
+The model’s efficacy is gauged using key metrics like precision, recall, sensitivity, specificity, positive predictivity, false positive rate, accuracy, and F1 score. These metrics offer a detailed and nuanced understanding of the model's diagnostic abilities.
 
 ### Results:
 The model is assessed through three experimental setups, each refining the classifier's performance.
@@ -184,7 +210,7 @@ Hyperparameter tuning is performed to optimize the number of trees and features.
 Performance metrics demonstrate the model's high accuracy and reliability in arrhythmia classification.
 
 ## Requirements
-The following Python libraries are required to execute the code: 
+The following Python libraries are required to execute the code:
 
 * numpy: For data manipulation and numerical computations
 * scipy: For scientific and technical computations
@@ -195,7 +221,6 @@ The following Python libraries are required to execute the code:
 * matplotlib (optional): For creating static, interactive, and animated visualizations in Python
 
 ## Project Structure
-
 ```
 ECG-Arrhythmia-Classification/
 │
