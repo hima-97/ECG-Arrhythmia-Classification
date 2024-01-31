@@ -134,11 +134,7 @@ Custom classes and methods are used to extract diverse features, offering a modu
 The extracted features for each heartbeat are then organized into a dictionary. This dictionary effectively represents a single heartbeat, with keys corresponding to different types of extracted features such as QRS morphology,  
 RR intervals, wavelet features, and so on.
 
-These dictionaries, each representing an individual heartbeat, are then collectively stored in a list.  
-This list encompasses all the heartbeats processed in a particular dataset. For efficient data management and ease of access, this list of heartbeat dictionaries is saved into a pickle file.
-
-In fact, two separate pickle files are created: one for the training dataset and another for the testing dataset.  
-This separation ensures that the model is trained and evaluated on distinct sets of data, which is a fundamental practice in machine learning to assess the model's performance and generalizability.
+These heartbeat dictionaries are then compiled into a list, encompassing all heartbeats in a dataset. For effective data management, this list is serialized into pickle files, with separate files for training and testing datasets. This separation is key in machine learning, allowing for distinct training and evaluation datasets to ensure accurate model assessment and generalizability.
 
 A total of 141 features are extracted and categorized as follows:
 
