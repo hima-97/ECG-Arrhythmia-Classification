@@ -187,10 +187,11 @@ MI ranking aids in reducing computational load by prioritizing features based on
 
 ### Model Training and Testing
 * Model Training:  
-This project employs a Random Forest (RF) classifier, known for its high accuracy and robustness. The model takes advantage of the varied strengths of its individual decision trees to mitigate individual biases and lowers variance, thereby improving the model's generalizability.  
+This project employs a Random Forest (RF) classifier, known for its high accuracy and robustness, configured with a specific number of top ranked features and of decision trees. The model takes advantage of the varied strengths of its individual decision trees to mitigate individual biases and lowers variance, thereby improving the model's generalizability.  
   
   During training, a custom function is implemented for cross-validation. The function first identifies unique sources in the training data, representing different subsets. For each source, the training set is divided into two:  
-  a subset for training and another for testing. The function yields pairs of indices for training and testing splits, facilitating a thorough cross-validation process where each data part is used for both training and validation. This approach ensures every unique data source is utilized once as the test set, providing a comprehensive and unbiased evaluation of the model's training performance.
+  a subset for training and another for testing. The function yields pairs of indices for training and testing splits, facilitating a thorough cross-validation process where each data part is used for both training and validation.  
+  This approach ensures every unique data source is utilized once as the test set, providing a comprehensive and unbiased evaluation of the model's training performance.
 
   After training, the RF model provides a feature importance score for each attribute. These scores indicate the relative importance or contribution of each feature towards making accurate predictions. This insight is crucial not only for model optimization but also for understanding the underlying patterns in ECG signals.
 
