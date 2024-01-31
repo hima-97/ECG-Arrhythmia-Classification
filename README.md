@@ -119,17 +119,17 @@ The segmentation process leverages the R spike annotations from the MIT-BIH Arrh
   The segmentation process begins with the detection of the R peak using annotations from the record's .atr files.  
   Each heartbeat is segmented by selecting a 640 ms window around the annotated R peak, comprising 373 ms before and 267 ms after the R peak. This window size is chosen to encompass the complete QRS complex and adjacent parts of the ECG waveform.
 
-  In this project, arrays are utilized to represent segments of the ECG signal as they efficiently store and manipulate numerical data.  
-  This underscores the importance of arrays as a fundamental data structure in numerical computing and signal processing.
+  In this project, arrays are utilized to represent segments of the ECG signal as they efficiently store and manipulate numerical data. This underscores the importance of arrays as a fundamental data structure in numerical computing and signal processing.
 
-  A custom ```SignalBuffer``` class is used to manage and process segments of ECG signals. In signal processing, a buffer is a temporary storage that holds a segment of data for a short period. This is crucial in real-time signal processing, where processing the entire continuous signal at once is impractical due to its ongoing nature or size constraints. By using a buffer, we can simulate real-time processing effectively: new data is added to the buffer as it comes in, and old data is removed to make room.
+  A custom ```SignalBuffer``` class is used to manage and process segments of ECG signals. In signal processing,  
+  a buffer is a temporary storage that holds a segment of data for a short period. This is crucial in real-time signal processing, where processing the entire continuous signal at once is impractical due to its ongoing nature or size constraints. By using a buffer, we can simulate real-time processing effectively: new data is added to the buffer as it comes in, and old data is removed to make room.
   
   In this project, ```SignalBuffer``` is used to hold a window of the ECG signal surrounding the R peak in a heartbeat. To normalize the signal and remove baseline wander, the mean value of each segment is subtracted from its individual samples. This normalization centers the signal around the R peak, ensuring accurate and consistent analysis of the ECG waveform. The buffer collects samples around the beat time, ensuring that you are always working with a relevant and up-to-date portion of the signal for feature extraction.
 
 ### Feature Extraction
-Feature extraction is a crucial phase in this project, where distinct and quantifiable attributes are derived from segmented ECG heartbeats. These features are instrumental in distinguishing between different types of heartbeats and are essential for the accurate classification of arrhythmias.
+Feature extraction is a crucial phase in this project, where unique attributes are derived from segmented ECG heartbeats, crucial for differentiating heartbeats and accurately classifying arrhythmias.
 
-Custom classes and feature extraction methods are used to extract diverse features. This modular approach enhances scalability, allowing easy integration of new techniques without affecting existing code.
+Custom classes and methods are used to extract diverse features, offering a modular design that simplifies the integration of new techniques and ensures scalability.
 
 The extracted features for each heartbeat are then organized into a dictionary. This dictionary effectively represents a single heartbeat, with keys corresponding to different types of extracted features such as QRS morphology,  
 RR intervals, wavelet features, and so on.
