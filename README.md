@@ -180,31 +180,14 @@ P, Q, R, S waves, are identified through inflection points in the ECG signal. Th
 ### Feature Selection
 The feature selection process in this project plays a crucial role in balancing computational efficiency with classification accuracy. This project employs Mutual Information (MI) ranking, a robust method suited for ECG classification due to its ability to quantify the shared information between features and class labels, thereby ranking them according to their relevance.
 
-The following steps are involved for the feature selection process:
+The ```mutual_info_classif``` function from ```Scikit-Learn``` is utilized to detect both linear and nonlinear relationships between features and the class labels.  
+Feature vectors along with labels and source information are constructed for each heartbeat.  
+The MI for each feature is calculated relative to the class labels, focusing the model on features most informative for heartbeat classification.
 
-  - The ```mutual_info_classif``` function from ```Scikit-Learn``` is utilized to detect both linear and nonlinear relationships between features and the class labels.
+MI ranking aids in reducing computational load by prioritizing features based on their MI scores, effectively balancing computational efficiency and classification accuracy.  
+The use of MI ranking enhances model transparency, ensuring that selected features are genuinely reflective of cardiac rhythms, crucial for clinical applicability and understanding the model's reasoning.
 
-  - Feature vectors along with labels and source information are constructed for each heartbeat.
-
-  - The MI for each feature is calculated relative to the class labels, focusing the model on features most informative for heartbeat classification.
-
-* Process:  
-We construct feature vectors, labels, and source information for each heartbeat. The MI for each feature relative to the class labels is calculated, focusing our model on the most informative aspects for heartbeat classification.
-
-* Application:  
-The MI ranking reduces computational demands by ranking and selecting the top features based on their MI scores. This strategic selection balances computational efficiency with the need for classification accuracy.
-
-* Consistency Across Datasets:  
-The same feature ranking applied to the training dataset is also used for the testing dataset. This consistency ensures the model is equally efficient and effective across different datasets.
-
-* Efficiency:  
-MI ranking effectively identifies the most relevant features for ECG classification, ensuring the model's efficiency. By concentrating on a subset of highly informative features, we manage computational complexity without compromising the model's ability to differentiate various heartbeat types.
-
-* Interpretability:  
-The emphasis on interpretability in feature selection is vital. By using MI ranking, we not only enhance model performance but also ensure that the selected features are truly indicative of the underlying cardiac rhythms. This interpretability is crucial for clinical applications where understanding the model's decision-making process is as important as its accuracy.
-
-* Application in Random Forest Model:  
-In developing our Random Forest model for arrhythmia classification, the MI ranking of features ensures that we are utilizing the most relevant ECG signal characteristics. This focus is integral to the model's success in accurately classifying arrhythmias, a key aspect of cardiac monitoring and diagnosis.
+The same feature ranking applied to the training dataset is replicated for the testing dataset, ensuring consistent model performance and efficiency.
 
 ### Model Training and Testing
 * Model Training:  
