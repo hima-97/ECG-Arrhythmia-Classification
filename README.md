@@ -189,13 +189,11 @@ MI ranking aids in reducing computational load by prioritizing features based on
 * Model Training:  
 This project employs a Random Forest (RF) classifier, known for its high accuracy and robustness, configured with a specific number of top ranked features and of decision trees. The model takes advantage of the varied strengths of its individual decision trees to mitigate individual biases and lowers variance, thereby improving the model's generalizability.  
   
-  During training, a custom leave-one-out cross-validation function tailored for ECG data is implemented. The function first identifies unique sources in the training data, representing different subsets. For each source, the training set is divided into two:  
-  a subset for training and another for testing. The function yields pairs of indices for training and testing splits, facilitating a thorough cross-validation process where each data part is used for both training and validation.  
-  This approach ensures every unique data source is utilized once as the test set, providing a comprehensive and unbiased evaluation of the model's training performance.
+  During training, the project employs a custom leave-one-out cross-validation tailored for ECG data. Unique data sources are identified, and the training set is split accordingly into two subsets: one for training and the other for testing. This yields index pairs for each split, ensuring a comprehensive cross-validation where each data segment is used in both training and validation roles. This method guarantees a thorough and unbiased assessment of the model's training performance by using each data source uniquely as a test set.
 
-  After training, the RF model provides a feature importance score for each attribute. These scores indicate the relative importance or contribution of each feature towards making accurate predictions. This insight is crucial not only for model optimization but also for understanding the underlying patterns in ECG signals.
+  After training, the Random Forest (RF) model calculates a feature importance score for each attribute. These scores highlight the significance of each feature in making accurate predictions, offering valuable insights for both model optimization and understanding ECG signal patterns.
 
-  To ensure consistency and reproducibility, a random state is set for the Random Forest classifier. The model, along with its evaluation metrics, is saved for future reference, ensuring that our results can be replicated and verified.
+  To maintain consistency and ensure reproducibility, the RF classifier is set with a fixed random state. Both the model and its performance metrics are saved, allowing results to be replicated and verified in future analyses.
 
 * Model Testing:  
 A separate test dataset, unexposed to the model during training, is used to rigorously assess the model's classification accuracy and generalization capabilities. The test dataset undergoes the same preprocessing and feature extraction procedures as the training set, ensuring uniformity in data representation.
