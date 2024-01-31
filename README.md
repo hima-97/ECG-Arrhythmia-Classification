@@ -206,13 +206,13 @@ A separate test dataset, unexposed to the model during training, is used to rigo
 The model is assessed through three experimental setups, each refining the classifier's performance.
 
 * Experiment 1:
-  The model utilized the entire set of 141 features, with 101 decision trees.
+  The model was trained with the entire set of 141 features and 101 decision trees.
 
 * Experiment 2:  
   The model was trained with the top 6 features and 40 decision trees, following the same approach of similar successfull studies.
 
 * Experiment 3:
-  Hyperparameter tuning is implemented to identify the optimal configuration, focusing on the number of trees and top ranked features.
+  Hyperparameter tuning was implemented to identify the optimal configuration, focusing on the number of trees and top ranked features.
 
     The hyperparameter tuning was performed as follows:
 
@@ -237,7 +237,7 @@ The model is assessed through three experimental setups, each refining the class
 
         - Retrieved the best model estimator (search.best_estimator_) for detailed analysis.
 
-    The 10 top-ranked features and 84 decision trees were identified as the most optimal parameters.
+    The 10 top-ranked features and a total of 84 decision trees were identified as the most optimal parameters.
 
     The model performance improved by 4%, showing an overall accuracy of 95.69% and an overall F1 score of 95.37% (weighted average).
 
