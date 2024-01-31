@@ -77,8 +77,7 @@ ECG signals, such as noise induced by muscle contractions, power-line interferen
 * Baseline Wander Removal:  
 Baseline wander, often introduced by patient movements or respiration, manifests as low-frequency noise in  
 ECG signals. A high-pass Butterworth filter, with a default cutoff frequency of 1 Hz, is employed to counter this.  
-The frequency can be adjusted to 0.5 Hz for significant baseline wander around this range.  
-Signal padding is incorporated to minimize edge effects and the filter order is set to 1 to avoid over-attenuation.
+The frequency can be adjusted to 0.5 Hz for significant baseline wander around this range. Signal padding is incorporated to minimize edge effects and the filter order is set to 1 to avoid over-attenuation.
 
 * Noise Reduction:  
 To mitigate external electrical noise, especially the 60 Hz interference from power lines, a band-reject Butterworth filter with cutoff frequencies of 59 Hz and 61 Hz is utilized. This approach effectively eliminates AC power line interference, ensuring the signal's integrity. Notably, the majority of the 60 Hz noise in the database originates from the playback stage of the recording equipment, which was battery-powered. Signal padding is again used here to reduce edge effects during filtering.
@@ -90,7 +89,7 @@ To suppress high-frequency noise components while preserving clinically relevant
 Normalizing the ECG signals between 0 and 1 is vital for standardizing signal amplitude across different recordings. This step is crucial when dealing with diverse datasets, ensuring a consistent analytical approach.
 
 * ECG Signal Resampling:  
-Considering the standard 256 Hz sampling rate of modern smart wearables like the Hexoskin Pro Kit, Apple Watch, and Samsung Watch, the ECG signals from the MIT-BIH Arrhythmia Database, originally at 360 Hz, are resampled to 256 Hz. This resampling process aligns the data sampling rates with those of the target devices, ensuring the model's applicability and accuracy upon deployment.
+Considering the standard 256 Hz sampling rate of modern smart wearables like the Hexoskin Pro Kit, Apple Watch, and Samsung Watch, the ECG signals from the MIT-BIH Arrhythmia Database, originally at 360 Hz, are resampled to 256 Hz. This resampling process aligns the data sampling rates with those of the target devices, ensuring the model's applicability and accuracy.
 
     The resampling is achieved through the formula
 
@@ -99,7 +98,7 @@ Considering the standard 256 Hz sampling rate of modern smart wearables like the
   maintaining the proportionality between the original and the new sampling rates. The annotation points are also adjusted correspondingly to accurately locate R-peaks in the resampled ECG signals.
 
 ### Heartbeat segmentation
-Heartbeat segmentation entails segmenting ECG signals into individual heartbeats, each representing a single cardiac cycle. Such segmentation is crucial for precise feature extraction and effective classification.
+Heartbeat segmentation consists of segmenting ECG signals into individual heartbeats, each representing a single cardiac cycle. Such segmentation is crucial for precise feature extraction and effective classification.
 
 * Dataset Division Using Inter-patient Paradigm:  
 To ensure a realistic and clinically applicable approach, the dataset is divided into training and testing sets based on an inter-patient paradigm. This division ensures that the model is trained and tested on data from different patients, improving its ability to generalize effectively to new, unseen data.
@@ -112,7 +111,7 @@ To ensure a realistic and clinically applicable approach, the dataset is divided
 * Data Processing and Serialization:  
 During the dataset division into training and testing sets, each heartbeat in the ECG data undergoes a processing step to create a structured representation. More specifically, each heartbeat is represented by a structured dictionary with details such as time, type, and rhythm class.  
 
-  To ensure efficient data handling and preserve the integrity and structure of the data, the Python ```pickle``` module is utilized. This module is instrumental for serialization, converting the structured data into a byte stream format that can be easily stored or transmitted. When the model is set for training or evaluation, these pickle files can be deserialized back into Python objects. This process ensures that all the structured data is accurately reconstructed and can be directly utilized in our machine learning models without additional preprocessing.
+  To ensure efficient data handling and preserve the integrity and structure of the data, the Python ```pickle``` module is utilized. This module is crucial for serialization, converting the structured data into a byte stream format that can be easily stored or transmitted. When the model is set for training or evaluation, these pickle files can be deserialized back into Python objects. This process ensures that all the structured data is accurately reconstructed and can be directly utilized in the machine learning model without additional preprocessing.
 
 * Segmentation Process:  
 The segmentation process leverages the R spike annotations from the MIT-BIH Arrhythmia Database as markers to identify individual heartbeats. These annotations, typically located at the R-wave peak of the QRS complex, are used to segment the ECG signal on a beat-by-beat basis. The approach recognizes each cardiac cycle as an independent unit, allowing for a detailed analysis of inter-beat variability and morphological differences.
@@ -120,7 +119,12 @@ The segmentation process leverages the R spike annotations from the MIT-BIH Arrh
   The segmentation process begins with the detection of the R peak using annotations from the record's .atr files.  
   Each heartbeat is segmented by selecting a 640 ms window around the annotated R peak, comprising 373 ms before and 267 ms after the R peak. This window size is chosen to encompass the complete QRS complex and adjacent parts of the ECG waveform.
 
-  To normalize the signal and remove baseline wander, the mean value of each segment is subtracted from its individual samples. This normalization centers the signal around the R peak, ensuring an accurate and consistent analysis of the ECG waveform.
+  In this project, arrays are utilized to represent segments of the ECG signal as they efficiently store and manipulate numerical data.  
+  This underscores the importance of arrays as a fundamental data structure in numerical computing and signal processing.
+
+  A custom ```SignalBuffer``` class is used to manage and process segments of ECG signals. In signal processing, a buffer is a temporary storage that holds a segment of data for a short period. This is crucial in real-time signal processing, where processing the entire continuous signal at once is impractical due to its ongoing nature or size constraints. By using a buffer, we can simulate real-time processing effectively: new data is added to the buffer as it comes in, and old data is removed to make room.
+  
+  In this project, ```SignalBuffer``` is used to hold a window of the ECG signal surrounding the R peak in a heartbeat. To normalize the signal and remove baseline wander, the mean value of each segment is subtracted from its individual samples. This normalization centers the signal around the R peak, ensuring accurate and consistent analysis of the ECG waveform. The buffer collects samples around the beat time, ensuring that you are always working with a relevant and up-to-date portion of the signal for feature extraction.
 
 ### Feature Extraction
 Feature extraction is a crucial phase in this project, where distinct and quantifiable attributes are derived from segmented ECG heartbeats. These features are instrumental in distinguishing between different types of heartbeats and are essential for the accurate classification of arrhythmias.
