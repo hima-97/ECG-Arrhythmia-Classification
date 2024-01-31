@@ -180,14 +180,10 @@ P, Q, R, S waves, are identified through inflection points in the ECG signal. Th
 ### Feature Selection
 The feature selection process in this project plays a crucial role in balancing computational efficiency with classification accuracy. This project employs Mutual Information (MI) ranking, a robust method suited for ECG classification due to its ability to quantify the shared information between features and class labels, thereby ranking them according to their relevance.
 
-The ```mutual_info_classif``` function from ```Scikit-Learn``` is utilized to detect both linear and nonlinear relationships between features and the class labels.  
-Feature vectors along with labels and source information are constructed for each heartbeat.  
-The MI for each feature is calculated relative to the class labels, focusing the model on features most informative for heartbeat classification.
+The ```mutual_info_classif``` function from ```Scikit-Learn``` is utilized to detect both linear and nonlinear relationships between features and the class labels. Feature vectors along with labels and source information are constructed for each heartbeat. The MI for each feature is calculated relative to the class labels, focusing the model on features most informative for heartbeat classification.
 
 MI ranking aids in reducing computational load by prioritizing features based on their MI scores, effectively balancing computational efficiency and classification accuracy.  
 The use of MI ranking enhances model transparency, ensuring that selected features are genuinely reflective of cardiac rhythms, crucial for clinical applicability and understanding the model's reasoning.
-
-The same feature ranking applied to the training dataset is replicated for the testing dataset, ensuring consistent model performance and efficiency.
 
 ### Model Training and Testing
 * Model Training:  
