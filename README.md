@@ -182,12 +182,11 @@ The feature selection process in this project plays a crucial role in balancing 
 
 The ```mutual_info_classif``` function from ```Scikit-Learn``` is utilized to detect both linear and nonlinear relationships between features and the class labels. Feature vectors along with labels and source information are constructed for each heartbeat. The MI for each feature is calculated relative to the class labels, focusing the model on features most informative for heartbeat classification.
 
-MI ranking aids in reducing computational load by prioritizing features based on their MI scores, effectively balancing computational efficiency and classification accuracy.  
-The use of MI ranking enhances model transparency, ensuring that selected features are genuinely reflective of cardiac rhythms, crucial for clinical applicability and understanding the model's reasoning.
+MI ranking aids in reducing computational load by prioritizing features based on their MI scores, effectively balancing computational efficiency and classification accuracy. The use of MI ranking enhances model transparency, ensuring that selected features are genuinely reflective of cardiac rhythms, crucial for clinical applicability and understanding the model's reasoning.
 
 ### Model Training and Testing
 * Model Training:  
-The project harnesses a Random Forest classifier, renowned for its accuracy and resilience. Utilizing an ensemble of decision trees, the RF model capitalizes on the diversity of its composite learners. This approach diminishes individual biases and reduces variance, ultimately enhancing generalizability.  
+This project employs a Random Forest (RF) classifier, known for its high accuracy and robustness. The model takes advantage of the varied strengths of its individual decision trees to mitigate individual biases and lowers variance, thereby improving the model's generalizability.  
 
   Post-training, the model calculates importance scores for each feature. This process, inherent to the RF algorithm, provides valuable insights into the most influential factors in classification.
   
