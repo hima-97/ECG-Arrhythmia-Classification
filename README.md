@@ -299,4 +299,4 @@ Execute the Python 'main.py' file in the _/src_ folder. The following steps will
 3. Split and save the dataset into training and testing sets based on inter-patient paradigm.
 4. Segmentation of the ECG signals into individual heartbeats and extraction of the heatbeat features using the extractors defined in the ```_/src/feature_extraction_utils_``` directory.
 5. Ranking and selecting features by mutual information and constructing feature datasets for training and testing.
-6. Training and testing the Random Forest classifier.
+6. Training, validating, and testing the Random Forest classifier.
