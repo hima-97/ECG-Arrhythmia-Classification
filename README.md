@@ -89,7 +89,7 @@ Normalizing the ECG signals between 0 and 1 is vital for standardizing signal am
 Considering the standard 256 Hz sampling rate of modern smart wearables like the Hexoskin Pro Kit,  
 Apple Watch, and Samsung Watch, the ECG signals from the MIT-BIH Arrhythmia Database, originally at 360 Hz, are resampled to 256 Hz. This resampling process aligns the data sampling rates with those of the target devices, ensuring the model's applicability and accuracy.
 
-    The resampling is achieved through the formula
+    The resampling is achieved through the following formula:
 
         num_samples_resampled = int((256/360) * num_samples_original)  
   
@@ -112,7 +112,8 @@ During the dataset division into training and testing sets, each heartbeat in th
   To ensure efficient data handling and preserve the integrity and structure of the data, the Python ```pickle``` module is utilized. This module is crucial for serialization, converting the structured data into a byte stream format that can be easily stored or transmitted. When the model is set for training or evaluation, these pickle files can be deserialized back into Python objects. This process ensures that all the structured data is accurately reconstructed and can be directly utilized in the machine learning model without additional preprocessing.
 
 * Segmentation Process:  
-The segmentation process leverages the R spike annotations from the MIT-BIH Arrhythmia Database as markers to identify individual heartbeats. These annotations, typically located at the R-wave peak of the QRS complex, are used to segment the ECG signal on a beat-by-beat basis. The approach recognizes each cardiac cycle as an independent unit, allowing for a detailed analysis of inter-beat variability and morphological differences.
+The segmentation process leverages the R spike annotations from the MIT-BIH Arrhythmia Database as markers to identify individual heartbeats. These annotations, typically located at the R-wave peak of the QRS complex,  
+are used to segment the ECG signal on a beat-by-beat basis. The approach recognizes each cardiac cycle as an independent unit, allowing for a detailed analysis of inter-beat variability and morphological differences.
 
   The segmentation process begins with the detection of the R peak using annotations from the record's .atr files.  
   Each heartbeat is segmented by selecting a 640 ms window around the annotated R peak, comprising 373 ms before and 267 ms after the R peak. This window size is chosen to encompass the complete QRS complex and adjacent parts of the ECG waveform.
@@ -153,8 +154,7 @@ The QRS temporal features are normalized against their average values in the las
 Utilizing Hermite polynomials of degrees 3, 4, and 5, each beat segment is decomposed into a series of orthogonal polynomials. These coefficients effectively summarize the waveform's characteristics, capturing subtle variations indicative of different arrhythmias. Each beat segment is analyzed using the hermfit function in Python, generating coefficients that represent the ECG waveform's characteristics.
 
 * Discrete Wavelet Transform (DWT) Coefficients:  
-DWT is applied here, using the ```db1``` wavelet at three levels of decomposition. This multi-resolution analysis dissects the ECG signal into various frequency bands, enabling detailed examination of specific signal characteristics.  
-The ECG signal is decomposed into different frequency bands, facilitating the analysis of time-varying characteristics of the ECG waveform.
+DWT is applied here, using the ```db1``` wavelet at three levels of decomposition. This multi-resolution analysis dissects the ECG signal into various frequency bands, enabling detailed examination of specific signal characteristics. The ECG signal is decomposed into different frequency bands, facilitating the analysis of time-varying characteristics of the ECG waveform.
 
 * Higher Order Statistics (HOS) Features:  
 Including third and fourth-order cumulants like kurtosis and skewness, HOS features provide a deeper understanding of the signal's shape and distribution, especially in the context of heart rhythm irregularities. Calculating kurtosis and skewness within specific intervals around the R peak, insights into the signal distribution's asymmetry and 'tailedness' are gained.
@@ -209,8 +209,8 @@ The model is assessed through three experimental setups, each refining the class
 * Experiment 2:  
   The model was trained with the top 6 features and 40 decision trees, following the same approach of similar successfull studies.
 
-* Experiment 3:
-  Hyperparameter tuning was implemented to identify the optimal configuration, focusing on the number of trees and top ranked features.
+* Experiment 3:  
+  Hyperparameter tuning was implemented to identify the optimal number of trees and top ranked features to train the model with.
 
     The hyperparameter tuning was performed as follows:
 
