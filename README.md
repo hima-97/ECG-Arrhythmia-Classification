@@ -45,7 +45,7 @@ This dataset is a gold standard in cardiac arrhythmia research, thanks to its ex
 The database comprises 48 half-hour excerpts from two-channel ambulatory ECG recordings, carefully curated from over 4000 long-term Holter recordings at the Beth Israel Hospital Arrhythmia Laboratory between 1975 and 1979. Each record encapsulates 30 minutes of ECG data, sampled at 360 Hz per lead, amounting to 648,000 data points per lead per recording.
 
 Exclusion Criteria:  
-Records 102, 104, 107, and 217, containing paced beats, were excluded in line with the Association for the Advancement of Medical Instrumentation (AAMI) recommended practice and similar studies.
+Records 102, 104, 107, and 217, containing paced beats, were excluded in line with the Association for the Advancement of Medical Instrumentation (AAMI) recommended practice and similar studies.  
 This exclusion led to a refined dataset of 44 records and 100,733 labeled heartbeats.
  
 Each record includes:
