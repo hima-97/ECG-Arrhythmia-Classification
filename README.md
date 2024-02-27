@@ -191,18 +191,18 @@ This project employs a Random Forest (RF) classifier, known for its high accurac
 
   After training, the Random Forest (RF) model calculates a feature importance score for each attribute. These scores highlight the significance of each feature in making accurate predictions, offering valuable insights for both model optimization and understanding ECG signal patterns. Feature importance scores in models like Random Forest are calculated based on how much each feature contributes to the improvement of the model's prediction accuracy. The process for calculating these scores is as follows:
 
-  * Node Impurity Reduction: Each tree in a Random Forest is constructed from a bootstrap sample (random subset) of the data. At each node of a tree, a feature is selected to split the data into subsets in a way that reduces the impurity of the node (e.g., Gini impurity for classification tasks). The impurity reduction achieved by a feature at a particular node is a measure of how well it separates the classes.
+  * Node Impurity Reduction:  
+  Each tree in a Random Forest is constructed from a bootstrap sample (random subset) of the data. At each node of a tree, a feature is selected to split the data into subsets in a way that reduces the impurity of the node (e.g., Gini impurity for classification tasks). The impurity reduction achieved by a feature at a particular node is a measure of how well it separates the classes.
   
-  * Aggregation Across All Trees:
+  * Aggregation Across All Trees:  
   The feature importance score for each feature is essentially the sum of the impurity reduction it provides across all nodes in all trees where it's used for splitting. This sum is then normalized by the total number of trees in the forest to prevent the score from being affected by the size of the forest.
   
-  * Averaging Over the Forest:
-
-Random Forest builds many decision trees. Each tree gives its own set of feature importance scores.
-The final feature importance score for each feature is the average of its scores across all the trees in the forest.
-Normalization:
-
-The scores are often normalized so that the sum of all feature importance scores equals one. This makes the interpretation easier, as each score represents the proportion of the model's predictive power attributable to that feature.
+  * Averaging Over the Forest:  
+  Random Forest builds many decision trees. Each tree gives its own set of feature importance scores.
+  The final feature importance score for each feature is the average of its scores across all the trees in the forest.
+  
+  * Normalization:
+  The scores are often normalized so that the sum of all feature importance scores equals one. This makes the interpretation easier, as each score represents the proportion of the model's predictive power attributable to that feature.
 
   To maintain consistency and ensure reproducibility, the RF classifier is set with a fixed random state. Both the model and its performance metrics are saved, allowing results to be replicated and verified in future analyses.
 
