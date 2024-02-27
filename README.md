@@ -4,7 +4,7 @@ This project showcases advanced application of machine learning in the field of 
 
 The primary goal is to categorize three heartbeat types: normal (N), supraventricular (S), and ventricular (V) beats, using single-lead ECG signals. This classification is essential for real-time cardiac monitoring through wearable technology. The project embodies a detailed methodology, encompassing data preprocessing, feature extraction and selection, and the implementation and evaluation of a Random Forest classifier.
 
-Harnessing the [MIT-BIH Arrhythmia Database](https://physionet.org/content/mitdb/1.0.0/), this project transforms two-lead ECG data to emulate single-lead data acquisition, aligning with the capabilities of current smart wearable devices. The projects culminates in a Random Forest model that demonstrates remarkable accuracy, achieving an overall accuracy of 95.69% and a weighted average F1 score of 95.37%. This performance illustrates the model's proficiency in distinguishing between normal, supraventricular, and ventricular heartbeats, reinforcing its potential for integration into smart wearable technologies for effective cardiac health monitoring.
+Harnessing the [MIT-BIH Arrhythmia Database](https://physionet.org/content/mitdb/1.0.0/), this project transforms two-lead ECG data to emulate single-lead data acquisition, aligning with the capabilities of current smart wearable devices. The project culminates in a Random Forest model that demonstrates remarkable accuracy, achieving an overall accuracy of 95.69% and a weighted average F1 score of 95.37%. This performance illustrates the model's proficiency in distinguishing between normal, supraventricular, and ventricular heartbeats, reinforcing its potential for integration into smart wearable technologies for effective cardiac health monitoring.
 
 A comprehensive outline of the project, including methodologies, experiments, and results, is available [here](https://github.com/hima-97/ECG-Arrhythmia-Classification/blob/master/Himanshu%20Kumar%20-%20Application%20of%20Machine%20Learning%20for%20Single-Lead%20ECG-Based%20Arrhythmia%20Classification%20via%20Smart%20Wearable%20Devices.pdf).
 
@@ -29,19 +29,14 @@ Applying MI for prioritizing features based on relevance, ensuring model efficie
 * Model Training:  
 Training the RF model using selected features, fine-tuning its ability to classify arrhythmias.
 
-* Hyperparameter Tuning:  
-Optimizing model parameters to enhance training efficiency and accuracy.
-
-* Model Validation and Evaluation:  
+* Model Validation:  
 Custom leave-one-out cross-validation strategy to validate the model’s generalizability and mitigate overfitting.
-Thorough evaluation in a separate testing phase to assess the model's performance on unseen data.
 
-* Performance Assessment:  
-Utilizing Key Performance Indicators (KPIs) such as accuracy, precision, recall, and F1 score for final model evaluation.
-These metrics provide a comprehensive view of the model's diagnostic capabilities in classifying arrhythmias from single-lead ECG data.
+* Model Evaluation:  
+Thorough evaluation in a separate testing phase to assess the model's performance on unseen data.
+The model's performance is evaluated using various key performance indicators (KPIs), including accuracy, precision, recall, and F1 score.
 
 This methodical and detailed approach ensures a seamless transition from raw ECG data acquisition to developing a proficient model capable of classifying different arrhythmias, thereby demonstrating the project's applicability in smart wearable technology for remote healthcare monitoring.
-
 
 ### Data Exploration and Analysis
 For this project, the [MIT-BIH Arrhythmia Database](https://physionet.org/content/mitdb/1.0.0/), sourced from Physionet.org, was meticulously selected.  
